@@ -66,7 +66,7 @@
 ## SYSTEM FUNCTIONALITY STATUS
 
 ### ✅ CORE COMPONENTS - 100% WORKING
-- **Guest Management System**: 6 guest slots, StreamYard features
+- **Guest Management System**: 8 guest slots, StreamYard features
 - **Scene Management**: Professional templates (Interview, Gaming, Presentation)
 - **Avatar Management**: Professional image processing
 - **Broadcast Engine**: Multi-platform streaming capability

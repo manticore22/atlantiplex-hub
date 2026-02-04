@@ -381,7 +381,7 @@ if not exist "web\.env.example" (
         echo # Streaming Configuration
         echo MAX_STREAM_QUALITY=1080p
         echo DEFAULT_STREAM_QUALITY=720p
-        echo MAX_GUESTS=6
+        echo MAX_GUESTS=8
         echo RECORDING_PATH=core/recordings/
         echo.
         echo # OBS Studio Configuration

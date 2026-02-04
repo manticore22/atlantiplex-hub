@@ -2,7 +2,7 @@
 """
 🌊 MATRIX BROADCAST STUDIO - GUEST MANAGEMENT SYSTEM
 Professional multi-guest streaming with StreamYard-like functionality
-Features: 6 guest slots, moderator controls, camera/mic configuration
+Features: 8 guest slots, moderator controls, camera/mic configuration
 """
 
 import os
@@ -126,7 +126,7 @@ class StreamGuest:
 class GuestManager:
     """Professional guest management system"""
     
-    def __init__(self, max_guests: int = 6):
+    def __init__(self, max_guests: int = 8):
         self.max_guests = max_guests
         self.guests: Dict[str, StreamGuest] = {}
         self.guest_slots: Dict[int, str] = {}  # slot_number -> guest_id
@@ -417,7 +417,7 @@ class GuestManager:
         }
 
 # Global guest manager instance
-guest_manager = GuestManager(max_guests=6)
+guest_manager = GuestManager(max_guests=8)
 
 # Flask API endpoints for guest management
 def setup_guest_api(app):

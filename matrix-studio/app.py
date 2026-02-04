@@ -46,7 +46,7 @@ from broadcast_engine import BroadcastEngine
 
 # Initialize all components
 scene_manager = SceneManager()
-guest_manager = GuestManager(max_guests=6)
+guest_manager = GuestManager(max_guests=8)
 avatar_manager = AvatarManager()
 profile_manager = ProfileManager()
 broadcast_engine = BroadcastEngine()
@@ -533,7 +533,7 @@ def studio_interface():
         <div class="features">
             <div class="feature">
                 <h3>👥 Guest Management</h3>
-                <p>6 concurrent guests with StreamYard features</p>
+                <p>8 concurrent guests with StreamYard features</p>
             </div>
             <div class="feature">
                 <h3>🎬 Scene Management</h3>

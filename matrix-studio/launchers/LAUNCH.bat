@@ -195,7 +195,7 @@ if not exist "web\.env" (
         echo HOST=0.0.0.0
         echo PORT=8080
         echo DEBUG=false
-        echo MAX_GUESTS=6
+        echo MAX_GUESTS=8
         echo DEFAULT_QUALITY=720p
         echo LOG_LEVEL=INFO
         echo OBS_ENABLED=true

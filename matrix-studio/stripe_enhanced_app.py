@@ -178,7 +178,7 @@ class StripeEnhancedMatrixStudio:
                 'billing_interval': 'month',
                 'stripe_price_id': 'price_pro_monthly',
                 'features': json.dumps([
-                    'Up to 6 guests',
+                    'Up to 8 guests',
                     'Full branding (overlays, backgrounds, stingers)',
                     'High or unlimited recording',
                     'Multistreaming to 5–8 destinations',
@@ -187,7 +187,7 @@ class StripeEnhancedMatrixStudio:
                     'Custom RTMP'
                 ]),
                 'limits': json.dumps({
-                    'max_guests': 6,
+                    'max_guests': 8,
                     'streaming_hours_per_month': float('inf'),
                     'max_quality': '1080p',
                     'max_destinations': 8,
@@ -198,7 +198,7 @@ class StripeEnhancedMatrixStudio:
                     'custom_rtmp': True,
                     'bandwidth_gb': 500
                 }),
-                'max_concurrent_guests': 6,
+                'max_concurrent_guests': 8,
                 'max_quality': '1080p'
             },
             {

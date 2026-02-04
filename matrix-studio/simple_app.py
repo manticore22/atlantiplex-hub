@@ -79,7 +79,7 @@ def home():
         <div class="features">
             <div class="feature">
                 <strong>👥 Guest Management</strong><br>
-                6 concurrent guest slots available
+                8 concurrent guest slots available
             </div>
             <div class="feature">
                 <strong>🎬 Scene Management</strong><br>

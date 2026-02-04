@@ -58,7 +58,7 @@ atlantiplex-hub/matrix-studio/
 **Status**: 🟢 PRODUCTION READY - 100% Functional
 
 ### Core Features
-- ✅ Guest Management (6 concurrent guests)
+- ✅ Guest Management (8 concurrent guests)
 - ✅ Professional Scene Templates
 - ✅ Avatar & Profile Management
 - ✅ Multi-Platform Streaming

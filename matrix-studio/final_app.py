@@ -92,7 +92,7 @@ def home():
         <div class="features">
             <div class="feature">
                 <h3>Guest Management</h3>
-                <p>6 concurrent guest slots with professional controls</p>
+                <p>8 concurrent guest slots with professional controls</p>
             </div>
             <div class="feature">
                 <h3>Scene Management</h3>

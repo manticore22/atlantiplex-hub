@@ -54,7 +54,7 @@ def test_guest_management():
         from guest_management import GuestManager, GuestRole, GuestStatus
         
         # Test initialization
-        guest_manager = GuestManager(max_guests=6)
+        guest_manager = GuestManager(max_guests=8)
         print("  + Guest Manager initialized")
         
         # Test invitation

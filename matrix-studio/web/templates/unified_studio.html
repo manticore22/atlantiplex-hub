@@ -449,8 +449,8 @@
             const guestsGrid = document.getElementById('guests-grid');
             guestsGrid.innerHTML = '';
             
-            // Create 6 guest slots
-            for (let i = 0; i < 6; i++) {
+            // Create 8 guest slots
+            for (let i = 0; i < 8; i++) {
                 const guest = guests[i] || { slot: i + 1, empty: true };
                 const guestCard = createGuestCard(guest);
                 guestsGrid.appendChild(guestCard);

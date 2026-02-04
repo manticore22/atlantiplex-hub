@@ -46,7 +46,7 @@
 **Full-featured tier for serious streamers and podcasters**
 
 **✅ Includes:**
-- Up to 6 concurrent guests
+- Up to 8 concurrent guests
 - Full branding (overlays, backgrounds, stingers)
 - High or unlimited recording
 - Multistreaming to 5–8 destinations

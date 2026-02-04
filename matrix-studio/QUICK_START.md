@@ -21,7 +21,7 @@ Double-click: LAUNCH.bat
 ### **Main Studio Interface (http://localhost:8080):**
 - 🎨 **Beautiful gradient design** with professional layout
 - 🟢 **"System Status: Operational" indicator**
-- 👥 **Guest Management** - 6 guest slots with StreamYard features
+- 👥 **Guest Management** - 8 guest slots with StreamYard features
 - 🎬 **Scene Management** - Professional templates (Interview, Gaming, Presentation)
 - 📡 **Broadcast Engine** - Multi-platform streaming ready
 - 🔐 **Demo credentials** - Username: `demo`, Password: `demo123`
@@ -53,7 +53,7 @@ http://localhost:8080
 
 All components are **PRODUCTION READY**:
 
-- ✅ **Guest Management** - 6 concurrent guests
+- ✅ **Guest Management** - 8 concurrent guests
 - ✅ **Scene Management** - Professional templates
 - ✅ **Avatar System** - Image processing
 - ✅ **Broadcast Engine** - Multi-platform streaming

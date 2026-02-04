@@ -231,7 +231,7 @@ def home():
                 </div>
                 <div class="card-content">
                     <ul>
-                        <li>6 concurrent guest slots</li>
+                        <li>8 concurrent guest slots</li>
                         <li>StreamYard-style controls</li>
                         <li>Real-time video/audio</li>
                         <li>Professional moderation tools</li>

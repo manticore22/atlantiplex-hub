@@ -168,7 +168,7 @@ JWT_SECRET_KEY=your-jwt-secret
 # Streaming Configuration
 MAX_STREAM_QUALITY=1080p
 DEFAULT_STREAM_QUALITY=720p
-MAX_GUESTS=6
+MAX_GUESTS=8
 
 # OBS Configuration
 OBS_HOST=localhost

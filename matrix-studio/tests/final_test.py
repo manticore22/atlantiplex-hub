@@ -21,7 +21,7 @@ def test_guest_management():
     print("Testing Guest Management...")
     try:
         from guest_management import GuestManager, GuestRole
-        guest_manager = GuestManager(max_guests=6)
+        guest_manager = GuestManager(max_guests=8)
         invite = guest_manager.create_guest_invite("Test Guest", "guest@example.com", GuestRole.GUEST)
         join_result = guest_manager.join_via_invite(invite['invite_code'])
         print("  + Guest Management: WORKING")
