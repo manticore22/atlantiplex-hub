@@ -723,6 +723,446 @@ def render_verily_stage(stage_id):
     </html>
     ''', stage_id=stage_id)
 
+# ==================== CHAT DOCK ENDPOINTS ====================
+
+from chat_dock import chat_dock, ChatPlatform
+
+@manticore_bp.route('/chat-dock')
+@manticore_required
+def chat_dock_interface():
+    """Chat Dock Interface for YouTube/Twitch moderation"""
+    return render_template_string('''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>💬 MANTICORE CHAT DOCK</title>
+        <style>
+            body {
+                background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+                color: #fff;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                margin: 0;
+                padding: 20px;
+                height: 100vh;
+                overflow: hidden;
+            }
+            .header {
+                background: linear-gradient(90deg, #ff0000, #ff6b00);
+                padding: 15px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+                text-align: center;
+            }
+            .header h1 {
+                margin: 0;
+                font-size: 1.8em;
+                text-shadow: 0 0 10px rgba(255,0,0,0.5);
+            }
+            .connection-panel {
+                background: rgba(0,20,0,0.8);
+                border: 1px solid #00ff41;
+                border-radius: 10px;
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+            .platform-status {
+                display: flex;
+                gap: 20px;
+                margin-bottom: 15px;
+            }
+            .status-box {
+                flex: 1;
+                background: rgba(0,0,0,0.5);
+                padding: 10px;
+                border-radius: 5px;
+                border-left: 4px solid #ff0000;
+            }
+            .status-box.connected {
+                border-left-color: #00ff41;
+            }
+            .chat-container {
+                display: grid;
+                grid-template-columns: 1fr 300px;
+                gap: 20px;
+                height: calc(100vh - 250px);
+            }
+            .chat-feed {
+                background: rgba(0,0,0,0.7);
+                border: 1px solid #333;
+                border-radius: 10px;
+                overflow-y: auto;
+                padding: 15px;
+            }
+            .message {
+                background: rgba(255,255,255,0.05);
+                border-left: 3px solid #444;
+                padding: 10px;
+                margin-bottom: 10px;
+                border-radius: 5px;
+                transition: all 0.3s;
+            }
+            .message:hover {
+                background: rgba(255,255,255,0.1);
+            }
+            .message.youtube {
+                border-left-color: #ff0000;
+            }
+            .message.twitch {
+                border-left-color: #9146ff;
+            }
+            .message-header {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 5px;
+            }
+            .username {
+                font-weight: bold;
+                color: #00ff41;
+            }
+            .platform-badge {
+                font-size: 0.7em;
+                padding: 2px 8px;
+                border-radius: 3px;
+                background: #444;
+            }
+            .platform-badge.youtube {
+                background: #ff0000;
+            }
+            .platform-badge.twitch {
+                background: #9146ff;
+            }
+            .mod-tools {
+                background: rgba(255,0,0,0.1);
+                border: 1px solid #ff0000;
+                border-radius: 10px;
+                padding: 15px;
+            }
+            .mod-tools h3 {
+                color: #ff6b00;
+                margin-top: 0;
+            }
+            .mod-button {
+                display: block;
+                width: 100%;
+                padding: 10px;
+                margin: 5px 0;
+                background: linear-gradient(135deg, #ff0000, #ff6b00);
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+            .mod-button:hover {
+                box-shadow: 0 0 15px #ff6b00;
+            }
+            .mod-button.delete {
+                background: linear-gradient(135deg, #666, #999);
+            }
+            .mod-button.timeout {
+                background: linear-gradient(135deg, #ff9800, #ffc107);
+            }
+            .selected {
+                background: rgba(255,0,0,0.3) !important;
+                border: 2px solid #ff0000 !important;
+            }
+            .stats-bar {
+                display: flex;
+                gap: 20px;
+                background: rgba(0,0,0,0.5);
+                padding: 10px;
+                border-radius: 5px;
+                margin-top: 10px;
+            }
+            .stat {
+                text-align: center;
+            }
+            .stat-value {
+                font-size: 1.5em;
+                font-weight: bold;
+                color: #00ff41;
+            }
+            .stat-label {
+                font-size: 0.8em;
+                color: #888;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>💬 MANTICORE CHAT DOCK</h1>
+            <p>YouTube & Twitch Chat Moderation Interface</p>
+        </div>
+        
+        <div class="connection-panel">
+            <div class="platform-status">
+                <div class="status-box" id="youtube-status">
+                    <strong>YouTube:</strong> <span id="yt-status-text">Disconnected</span>
+                    <br><small>API Key: <input type="text" id="yt-api-key" placeholder="Enter API Key" style="width: 200px;"></small>
+                    <br><small>Video ID: <input type="text" id="yt-video-id" placeholder="Enter Video ID" style="width: 200px;"></small>
+                    <br><button onclick="connectYouTube()">Connect YouTube</button>
+                </div>
+                <div class="status-box" id="twitch-status">
+                    <strong>Twitch:</strong> <span id="tw-status-text">Disconnected</span>
+                    <br><small>OAuth: <input type="text" id="tw-oauth" placeholder="oauth:token" style="width: 200px;"></small>
+                    <br><small>Username: <input type="text" id="tw-username" placeholder="Your Username" style="width: 200px;"></small>
+                    <br><small>Channel: <input type="text" id="tw-channel" placeholder="#channel" style="width: 200px;"></small>
+                    <br><button onclick="connectTwitch()">Connect Twitch</button>
+                </div>
+            </div>
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-value" id="total-messages">0</div>
+                    <div class="stat-label">Messages</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="unique-users">0</div>
+                    <div class="stat-label">Users</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="banned-count">0</div>
+                    <div class="stat-label">Banned</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-container">
+            <div class="chat-feed" id="chat-feed">
+                <div style="text-align: center; color: #666; padding: 50px;">
+                    Connect to YouTube or Twitch to start monitoring chat...
+                </div>
+            </div>
+            
+            <div class="mod-tools">
+                <h3>🛡️ Moderation Tools</h3>
+                <p style="font-size: 0.9em; color: #888;">Select a message to moderate</p>
+                <button class="mod-button delete" onclick="deleteMessage()">🗑️ Delete Message</button>
+                <button class="mod-button timeout" onclick="timeoutUser()">⏱️ Timeout User (5m)</button>
+                <button class="mod-button" onclick="banUser()">🚫 Ban User</button>
+                <button class="mod-button" onclick="unbanUser()">✅ Unban User</button>
+                <hr style="border-color: #444; margin: 15px 0;">
+                <button class="mod-button" onclick="clearChat()">🧹 Clear Chat</button>
+                <button class="mod-button" onclick="exportChat()">📥 Export Chat</button>
+            </div>
+        </div>
+        
+        <script>
+            let selectedMessage = null;
+            let messages = [];
+            
+            function connectYouTube() {
+                const apiKey = document.getElementById('yt-api-key').value;
+                const videoId = document.getElementById('yt-video-id').value;
+                
+                fetch('/manticore/api/chat/youtube/connect', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({api_key: apiKey, video_id: videoId})
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if(data.success) {
+                        document.getElementById('youtube-status').classList.add('connected');
+                        document.getElementById('yt-status-text').textContent = 'Connected';
+                        startPolling();
+                    }
+                });
+            }
+            
+            function connectTwitch() {
+                const oauth = document.getElementById('tw-oauth').value;
+                const username = document.getElementById('tw-username').value;
+                const channel = document.getElementById('tw-channel').value;
+                
+                fetch('/manticore/api/chat/twitch/connect', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({oauth_token: oauth, username: username, channel: channel})
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if(data.success) {
+                        document.getElementById('twitch-status').classList.add('connected');
+                        document.getElementById('tw-status-text').textContent = 'Connected';
+                        startPolling();
+                    }
+                });
+            }
+            
+            function startPolling() {
+                setInterval(() => {
+                    fetch('/manticore/api/chat/messages')
+                        .then(r => r.json())
+                        .then(data => {
+                            if(data.messages && data.messages.length > 0) {
+                                updateChat(data.messages);
+                                document.getElementById('total-messages').textContent = data.stats.total_messages;
+                                document.getElementById('unique-users').textContent = data.stats.unique_users;
+                                document.getElementById('banned-count').textContent = data.stats.banned_users;
+                            }
+                        });
+                }, 2000);
+            }
+            
+            function updateChat(newMessages) {
+                const feed = document.getElementById('chat-feed');
+                
+                newMessages.forEach(msg => {
+                    const div = document.createElement('div');
+                    div.className = `message ${msg.platform}`;
+                    div.dataset.messageId = msg.id;
+                    div.dataset.userId = msg.user_id;
+                    div.dataset.username = msg.username;
+                    div.onclick = () => selectMessage(div);
+                    
+                    div.innerHTML = `
+                        <div class="message-header">
+                            <span class="username">${msg.username}</span>
+                            <span class="platform-badge ${msg.platform}">${msg.platform.toUpperCase()}</span>
+                        </div>
+                        <div class="message-content">${msg.message}</div>
+                    `;
+                    
+                    feed.appendChild(div);
+                    feed.scrollTop = feed.scrollHeight;
+                });
+            }
+            
+            function selectMessage(element) {
+                document.querySelectorAll('.message').forEach(m => m.classList.remove('selected'));
+                element.classList.add('selected');
+                selectedMessage = element;
+            }
+            
+            function deleteMessage() {
+                if(!selectedMessage) return alert('Select a message first');
+                const messageId = selectedMessage.dataset.messageId;
+                fetch('/manticore/api/chat/moderate/delete', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message_id: messageId})
+                });
+                selectedMessage.remove();
+            }
+            
+            function timeoutUser() {
+                if(!selectedMessage) return alert('Select a message first');
+                const userId = selectedMessage.dataset.userId;
+                const username = selectedMessage.dataset.username;
+                fetch('/manticore/api/chat/moderate/timeout', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({user_id: userId, username: username, duration: 300})
+                });
+            }
+            
+            function banUser() {
+                if(!selectedMessage) return alert('Select a message first');
+                const userId = selectedMessage.dataset.userId;
+                const username = selectedMessage.dataset.username;
+                fetch('/manticore/api/chat/moderate/ban', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({user_id: userId, username: username})
+                });
+            }
+        </script>
+    </body>
+    </html>
+    ''')
+
+@manticore_bp.route('/api/chat/youtube/connect', methods=['POST'])
+@manticore_required
+def connect_youtube_chat():
+    """Connect to YouTube chat"""
+    data = request.get_json()
+    success = chat_dock.connect_youtube(
+        data.get('api_key'),
+        data.get('video_id')
+    )
+    return jsonify({'success': success, 'platform': 'youtube'})
+
+@manticore_bp.route('/api/chat/twitch/connect', methods=['POST'])
+@manticore_required
+def connect_twitch_chat():
+    """Connect to Twitch chat"""
+    data = request.get_json()
+    success = chat_dock.connect_twitch(
+        data.get('oauth_token'),
+        data.get('username'),
+        data.get('channel')
+    )
+    return jsonify({'success': success, 'platform': 'twitch'})
+
+@manticore_bp.route('/api/chat/messages')
+@manticore_required
+def get_chat_messages():
+    """Get recent chat messages"""
+    messages = chat_dock.get_recent_messages(50)
+    stats = chat_dock.get_stats()
+    
+    return jsonify({
+        'messages': [{
+            'id': m.id,
+            'platform': m.platform.value,
+            'username': m.username,
+            'message': m.message,
+            'timestamp': m.timestamp.isoformat(),
+            'user_id': m.user_id,
+            'is_moderator': m.is_moderator,
+            'is_owner': m.is_owner
+        } for m in messages],
+        'stats': stats
+    })
+
+@manticore_bp.route('/api/chat/moderate/delete', methods=['POST'])
+@manticore_required
+def moderate_delete():
+    """Delete a chat message"""
+    data = request.get_json()
+    success = chat_dock.delete_message(
+        data.get('message_id'),
+        ChatPlatform(data.get('platform', 'youtube'))
+    )
+    return jsonify({'success': success, 'action': 'delete'})
+
+@manticore_bp.route('/api/chat/moderate/timeout', methods=['POST'])
+@manticore_required
+def moderate_timeout():
+    """Timeout a user"""
+    data = request.get_json()
+    success = chat_dock.timeout_user(
+        data.get('user_id'),
+        data.get('username'),
+        ChatPlatform(data.get('platform', 'youtube')),
+        data.get('duration', 300)
+    )
+    return jsonify({'success': success, 'action': 'timeout'})
+
+@manticore_bp.route('/api/chat/moderate/ban', methods=['POST'])
+@manticore_required
+def moderate_ban():
+    """Ban a user"""
+    data = request.get_json()
+    success = chat_dock.ban_user(
+        data.get('user_id'),
+        data.get('username'),
+        ChatPlatform(data.get('platform', 'youtube'))
+    )
+    return jsonify({'success': success, 'action': 'ban'})
+
+@manticore_bp.route('/api/chat/moderate/unban', methods=['POST'])
+@manticore_required
+def moderate_unban():
+    """Unban a user"""
+    data = request.get_json()
+    success = chat_dock.unban_user(
+        data.get('username'),
+        ChatPlatform(data.get('platform', 'youtube'))
+    )
+    return jsonify({'success': success, 'action': 'unban'})
+
 def register_manticore_routes(app):
     """Register Manticore Control Interface routes"""
     app.register_blueprint(manticore_bp)
