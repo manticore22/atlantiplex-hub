@@ -1,0 +1,16 @@
+{
+  "brandName": "Atlantiplex Studio",
+  "studioTabLabel": "Atlantiplex Studio Gaming Tab AR Interface",
+  "stageLabel": "Metacommunication Entanglement Interface (MEI)",
+  "palette": {
+    "primary": "#0ad",
+    "accent": "#0ff",
+    "bg": "#051a2b",
+    "surface": "#0b2a55",
+    "text": "#eaf6ff",
+    "glow": "0 0 12px rgba(0, 214, 255, 0.9)",
+    "fontFamily": "Orbitron, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+  },
+  "logoPath": "/static/atlantiplex-studio-logo.svg",
+  "faviconPath": "/static/favicon.ico"
+}

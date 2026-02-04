@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BROADCAST STUDIO - ATLANTIPLEX</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 50%, #0f0f1f 100%);
+            color: #00ff41;
+            font-family: 'Orbitron', 'Courier New', monospace;
+            height: 100vh;
+            overflow: hidden;
+            text-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
+        }
+        
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 65, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 1;
+            animation: grid-move 10s linear infinite;
+        }
+        
+        .main-container {
+            display: grid;
+            grid-template-columns: 250px 1fr 300px;
+            height: 100vh;
+            background: rgba(0, 10, 20, 0.9);
+        }
+        
+        .scenes-panel {
+            background: rgba(0, 20, 40, 0.95);
+            border: 2px solid #00ff41;
+            padding: 15px;
+            overflow-y: auto;
+            border-right: 1px solid #00ff41;
+        }
+        
+        .preview-area {
+            background: #000;
+            border: 2px solid #00ff41;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .sources-panel {
+            background: rgba(0, 20, 40, 0.95);
+            border: 2px solid #00ff41;
+            padding: 15px;
+            overflow-y: auto;
+            border-left: 1px solid #00ff41;
+        }
+        
+        .panel-header {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #00ff41;
+            padding-bottom: 10px;
+        }
+        
+        .scene-item {
+            background: rgba(0, 40, 80, 0.3);
+            border: 1px solid #00ff41;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .scene-item.active {
+            background: rgba(0, 255, 65, 0.2);
+            border-color: #00ff41;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+        
+        .scene-item:hover {
+            background: rgba(0, 255, 65, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .source-item {
+            background: rgba(0, 40, 80, 0.3);
+            border: 1px solid #00ff41;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .source-item:hover {
+            background: rgba(0, 255, 65, 0.1);
+            border-color: #00ff41;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #00ff41, #00cc33);
+            border: 2px solid #00ff41;
+            color: #000;
+            padding: 8px 15px;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            margin: 5px;
+            font-size: 0.8em;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(135deg, #00ff41, #00aa22);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .source-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .preview-canvas {
+            width: 100%;
+            height: 100%;
+            background: #000;
+            position: relative;
+        }
+        
+        .preview-status {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            padding: 5px 10px;
+            font-size: 0.8em;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: rgba(0, 20, 40, 0.95);
+            border: 2px solid #00ff41;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+        }
+        
+        .modal-header {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            background: rgba(0, 40, 80, 0.8);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 10px;
+            font-family: 'Orbitron', monospace;
+            outline: none;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            border-color: #00ff41;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+        
+        .controls-bottom {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 20, 40, 0.95);
+            border-top: 2px solid #00ff41;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        @keyframes grid-move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-grid"></div>
+    
+    <div class="main-container">
+        <!-- SCENES PANEL -->
+        <div class="scenes-panel">
+            <div class="panel-header">🎬 SCENES</div>
+            <div class="btn-group">
+                <button class="btn" onclick="showSceneModal()">+ Scene</button>
+                <button class="btn" onclick="showSourceModal()">+ Source</button>
+            </div>
+            <div id="scenesList"></div>
+        </div>
+        
+        <!-- PREVIEW AREA -->
+        <div class="preview-area">
+            <div class="preview-status">
+                <div id="previewStatus">PREVIEW MODE</div>
+                <div id="activeSceneName">No Scene Active</div>
+            </div>
+            <div class="preview-canvas" id="previewCanvas">
+                <div style="text-align: center; padding: 50px;">
+                    <h2>🌊 ATLANTIPLEX STUDIO</h2>
+                    <p>Add scenes and sources to begin</p>
+                    <p style="font-size: 0.9em; opacity: 0.7;">
+                        Current Scene: <span id="currentSceneDisplay">None</span><br>
+                        Sources: <span id="sourceCount">0</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SOURCES PANEL -->
+        <div class="sources-panel">
+            <div class="panel-header">🎥 SOURCES</div>
+            <div class="source-list" id="sourcesList"></div>
+        </div>
+    </div>
+    
+    <!-- CONTROLS BOTTOM -->
+    <div class="controls-bottom">
+        <button class="btn" onclick="startBroadcast()">🚀 START BROADCAST</button>
+        <button class="btn" onclick="stopBroadcast()">⏹️ STOP BROADCAST</button>
+        <button class="btn" onclick="recordStream()">⏺️ RECORD</button>
+        <button class="btn" onclick="showSettings()">⚙️ SETTINGS</button>
+    </div>
+    
+    <!-- SCENE MODAL -->
+    <div class="modal" id="sceneModal">
+        <div class="modal-content">
+            <div class="modal-header">Create New Scene</div>
+            <div class="form-group">
+                <label>Scene Name</label>
+                <input type="text" id="sceneName" placeholder="My Scene">
+            </div>
+            <div class="form-group">
+                <label>Scene Type</label>
+                <select id="sceneType">
+                    <option value="custom">Custom</option>
+                    <option value="interview">Interview</option>
+                    <option value="gaming">Gaming</option>
+                    <option value="presentation">Presentation</option>
+                    <option value="green_screen">Green Screen</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button class="btn" onclick="createScene()">Create Scene</button>
+                <button class="btn" onclick="closeSceneModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SOURCE MODAL -->
+    <div class="modal" id="sourceModal">
+        <div class="modal-content">
+            <div class="modal-header">Add Source</div>
+            <div class="form-group">
+                <label>Source Type</label>
+                <select id="sourceType" onchange="updateSourceForm()">
+                    <option value="camera">📹 Camera</option>
+                    <option value="microphone">🎤 Microphone</option>
+                    <option value="display">🖥️ Display Capture</option>
+                    <option value="window">🪟 Window Capture</option>
+                    <option value="image">🖼️ Image</option>
+                    <option value="video">🎬 Video File</option>
+                    <option value="text">📝 Text</option>
+                    <option value="browser">🌐 Browser Source</option>
+                    <option value="color">🎨 Color Source</option>
+                </select>
+            </div>
+            <div id="sourceFormFields"></div>
+            <div class="btn-group">
+                <button class="btn" onclick="addSource()">Add Source</button>
+                <button class="btn" onclick="closeSourceModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Scene and Source Management
+        let scenes = [];
+        let sources = [];
+        let currentScene = null;
+        let sessionId = null;
+        
+        // Initialize session
+        async function initStudio() {
+            try {
+                // Create session
+                const response = await fetch('/api/session/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                sessionId = data.sessionId;
+                
+                // Load existing scenes and sources
+                await loadScenes();
+                await loadSources();
+                
+                console.log('Studio initialized with session:', sessionId);
+            } catch (error) {
+                console.error('Failed to initialize studio:', error);
+                document.getElementById('previewStatus').textContent = 'INITIALIZATION ERROR';
+            }
+        }
+        
+        // Load existing scenes
+        async function loadScenes() {
+            try {
+                const response = await fetch(`/api/scenes/${sessionId}`);
+                const sceneData = await response.json();
+                scenes = sceneData || [];
+                renderScenes();
+            } catch (error) {
+                console.error('Failed to load scenes:', error);
+            }
+        }
+        
+        // Render scenes
+        function renderScenes() {
+            const scenesList = document.getElementById('scenesList');
+            scenesList.innerHTML = '';
+            
+            scenes.forEach((scene, index) => {
+                const sceneDiv = document.createElement('div');
+                sceneDiv.className = `scene-item ${scene.active ? 'active' : ''}`;
+                sceneDiv.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 5px;">${scene.name}</div>
+                    <div style="font-size: 0.8em; opacity: 0.7;">
+                        ${scene.layers?.length || 0} sources • ${scene.active ? 'ACTIVE' : ''}
+                    </div>
+                `;
+                sceneDiv.onclick = () => activateScene(scene.id);
+                scenesList.appendChild(sceneDiv);
+            });
+        }
+        
+        // Render sources
+        function renderSources() {
+            const sourcesList = document.getElementById('sourcesList');
+            sourcesList.innerHTML = '';
+            
+            sources.forEach(source => {
+                const sourceDiv = document.createElement('div');
+                sourceDiv.className = 'source-item';
+                sourceDiv.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 5px;">${getSourceIcon(source.type)} ${source.name}</div>
+                    <div style="font-size: 0.8em; opacity: 0.7;">${source.type}</div>
+                `;
+                sourceDiv.onclick = () => toggleSource(source.id);
+                sourcesList.appendChild(sourceDiv);
+            });
+            
+            document.getElementById('sourceCount').textContent = sources.length;
+        }
+        
+        // Get source icon
+        function getSourceIcon(type) {
+            const icons = {
+                camera: '📹',
+                microphone: '🎤',
+                display: '🖥️',
+                window: '🪟',
+                image: '🖼️',
+                video: '🎬',
+                text: '📝',
+                browser: '🌐',
+                color: '🎨'
+            };
+            return icons[type] || '📹';
+        }
+        
+        // Show scene modal
+        function showSceneModal() {
+            document.getElementById('sceneModal').style.display = 'flex';
+        }
+        
+        // Show source modal
+        function showSourceModal() {
+            document.getElementById('sourceModal').style.display = 'flex';
+            updateSourceForm();
+        }
+        
+        // Update source form based on type
+        function updateSourceForm() {
+            const type = document.getElementById('sourceType').value;
+            const formFields = document.getElementById('sourceFormFields');
+            
+            let fieldsHTML = '';
+            
+            switch(type) {
+                case 'camera':
+                    fieldsHTML = `
+                        <div class="form-group">
+                            <label>Camera Device</label>
+                            <select id="cameraDevice">
+                                <option>Default Camera</option>
+                                <option>Webcam 1</option>
+                                <option>Webcam 2</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Resolution</label>
+                            <select id="cameraResolution">
+                                <option value="1920x1080">1920x1080 (1080p)</option>
+                                <option value="1280x720">1280x720 (720p)</option>
+                                <option value="640x480">640x480 (480p)</option>
+                            </select>
+                        </div>
+                    `;
+                    break;
+                case 'microphone':
+                    fieldsHTML = `
+                        <div class="form-group">
+                            <label>Audio Device</label>
+                            <select id="audioDevice">
+                                <option>Default Microphone</option>
+                                <option>Microphone 1</option>
+                                <option>Microphone 2</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Audio Quality</label>
+                            <select id="audioQuality">
+                                <option value="high">High Quality</option>
+                                <option value="medium">Medium Quality</option>
+                                <option value="low">Low Quality</option>
+                            </select>
+                        </div>
+                    `;
+                    break;
+                case 'image':
+                    fieldsHTML = `
+                        <div class="form-group">
+                            <label>Image File</label>
+                            <input type="file" id="imageFile" accept="image/*">
+                        </div>
+                        <div class="form-group">
+                            <label>Opacity</label>
+                            <input type="range" id="imageOpacity" min="0" max="100" value="100">
+                        </div>
+                    `;
+                    break;
+                case 'video':
+                    fieldsHTML = `
+                        <div class="form-group">
+                            <label>Video File</label>
+                            <input type="file" id="videoFile" accept="video/*">
+                        </div>
+                        <div class="form-group">
+                            <label>Loop Video</label>
+                            <select id="videoLoop">
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                    `;
+                    break;
+                case 'text':
+                    fieldsHTML = `
+                        <div class="form-group">
+                            <label>Text Content</label>
+                            <input type="text" id="textContent" placeholder="Enter your text here...">
+                        </div>
+                        <div class="form-group">
+                            <label>Font Size</label>
+                            <input type="number" id="textSize" value="48" min="12" max="200">
+                        </div>
+                        <div class="form-group">
+                            <label>Text Color</label>
+                            <input type="color" id="textColor" value="#00ff41">
+                        </div>
+                    `;
+                    break;
+                case 'color':
+                    fieldsHTML = `
+                        <div class="form-group">
+                            <label>Background Color</label>
+                            <input type="color" id="bgColor" value="#1a1a1a">
+                        </div>
+                    `;
+                    break;
+                default:
+                    fieldsHTML = `
+                        <div class="form-group">
+                            <label>Source Name</label>
+                            <input type="text" id="sourceName" placeholder="My Source">
+                        </div>
+                        <div class="form-group">
+                            <label>Configuration</label>
+                            <select id="sourceConfig">
+                                <option value="default">Default Settings</option>
+                                <option value="high">High Quality</option>
+                                <option value="performance">Performance Mode</option>
+                            </select>
+                        </div>
+                    `;
+            }
+            
+            formFields.innerHTML = fieldsHTML;
+        }
+        
+        // Create scene
+        async function createScene() {
+            const name = document.getElementById('sceneName').value;
+            const type = document.getElementById('sceneType').value;
+            
+            if (!name) {
+                alert('Please enter a scene name');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/scenes/${sessionId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, type, layers: [] })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    scenes.push(data.scene);
+                    renderScenes();
+                    closeSceneModal();
+                    document.getElementById('sceneName').value = '';
+                } else {
+                    alert('Failed to create scene');
+                }
+            } catch (error) {
+                console.error('Failed to create scene:', error);
+                alert('Failed to create scene');
+            }
+        }
+        
+        // Add source
+        async function addSource() {
+            const type = document.getElementById('sourceType').value;
+            const name = document.getElementById('sourceName')?.value || `${type}_${Date.now()}`;
+            
+            // Get source properties based on type
+            let properties = {};
+            switch(type) {
+                case 'camera':
+                    properties = {
+                        device: document.getElementById('cameraDevice')?.value,
+                        resolution: document.getElementById('cameraResolution')?.value
+                    };
+                    break;
+                case 'microphone':
+                    properties = {
+                        device: document.getElementById('audioDevice')?.value,
+                        quality: document.getElementById('audioQuality')?.value
+                    };
+                    break;
+                case 'image':
+                    properties = {
+                        file: document.getElementById('imageFile')?.files[0]?.name,
+                        opacity: document.getElementById('imageOpacity')?.value
+                    };
+                    break;
+                case 'video':
+                    properties = {
+                        file: document.getElementById('videoFile')?.files[0]?.name,
+                        loop: document.getElementById('videoLoop')?.value
+                    };
+                    break;
+                case 'text':
+                    properties = {
+                        content: document.getElementById('textContent')?.value,
+                        fontSize: document.getElementById('textSize')?.value,
+                        color: document.getElementById('textColor')?.value
+                    };
+                    break;
+                case 'color':
+                    properties = {
+                        color: document.getElementById('bgColor')?.value
+                    };
+                    break;
+                default:
+                    properties = {
+                        config: document.getElementById('sourceConfig')?.value
+                    };
+            }
+            
+            try {
+                const response = await fetch(`/api/sources/${sessionId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, name, properties })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    sources.push(data.source);
+                    renderSources();
+                    closeSourceModal();
+                } else {
+                    alert('Failed to add source');
+                }
+            } catch (error) {
+                console.error('Failed to add source:', error);
+                alert('Failed to add source');
+            }
+        }
+        
+        // Activate scene
+        async function activateScene(sceneId) {
+            try {
+                const response = await fetch(`/api/scenes/${sessionId}/${sceneId}/activate`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    // Update active scene
+                    scenes.forEach(scene => scene.active = scene.id === sceneId);
+                    currentScene = data.scene;
+                    
+                    renderScenes();
+                    updatePreview();
+                }
+            } catch (error) {
+                console.error('Failed to activate scene:', error);
+            }
+        }
+        
+        // Toggle source
+        function toggleSource(sourceId) {
+            const source = sources.find(s => s.id === sourceId);
+            if (source) {
+                source.visible = !source.visible;
+                // In a real implementation, this would control the source visibility
+                console.log('Toggling source:', source.name, source.visible);
+            }
+        }
+        
+        // Update preview
+        function updatePreview() {
+            if (currentScene) {
+                document.getElementById('activeSceneName').textContent = currentScene.name;
+                document.getElementById('currentSceneDisplay').textContent = currentScene.name;
+                document.getElementById('previewStatus').textContent = 'SCENE ACTIVE';
+            } else {
+                document.getElementById('activeSceneName').textContent = 'No Scene Active';
+                document.getElementById('currentSceneDisplay').textContent = 'None';
+                document.getElementById('previewStatus').textContent = 'PREVIEW MODE';
+            }
+        }
+        
+        // Close modals
+        function closeSceneModal() {
+            document.getElementById('sceneModal').style.display = 'none';
+        }
+        
+        function closeSourceModal() {
+            document.getElementById('sourceModal').style.display = 'none';
+        }
+        
+        // Broadcast controls
+        function startBroadcast() {
+            if (!currentScene) {
+                alert('Please create and activate a scene first');
+                return;
+            }
+            
+            alert('Broadcast started! (Feature in development)');
+            document.getElementById('previewStatus').textContent = 'BROADCASTING LIVE';
+        }
+        
+        function stopBroadcast() {
+            alert('Broadcast stopped!');
+            document.getElementById('previewStatus').textContent = 'SCENE ACTIVE';
+        }
+        
+        function recordStream() {
+            alert('Recording started! (Feature in development)');
+            document.getElementById('previewStatus').textContent = 'RECORDING';
+        }
+        
+        function showSettings() {
+            alert('Settings panel coming soon!');
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initStudio);
+    </script>
+</body>
+</html>

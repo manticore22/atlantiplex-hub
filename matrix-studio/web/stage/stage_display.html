@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Atlantiplex Stage Display</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">Atlantiplex Stage</div>
+    <div class="subtle">Deep Sea Facility – Live Stage</div>
+  </header>
+
+  <main class="stage-panel">
+    <section class="card stage-viewport" id="stage-viewport">
+      <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:#9bd7ff;">
+        Stage display area. Connect to your AI co-host and panellists here.
+      </div>
+    </section>
+    <section class="card" style="display:none;" id="panel-controls">
+      <!-- placeholder for future stage controls -->
+    </section>
+    <section class="card" id="log-section">
+      <div id="log" style="height:120px; overflow:auto; background: rgba(0,0,0,0.25); padding:6px; border-radius:6px;"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Verily integrated • Atlantiplex Deep Sea Facility • Stage port 9001
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/socket.io@4/dist/socket.io.min.js"></script>
+  <script>
+    (function(){
+      const urlParams = new URLSearchParams(window.location.search);
+      const room = urlParams.get('room') || 'default';
+      const token = urlParams.get('token') || '';
+      const logEl = document.getElementById('log');
+      const log = (msg) => { const d = document.createElement('div'); d.textContent = msg; logEl.appendChild(d); logEl.scrollTop = logEl.scrollHeight; };
+      if (typeof io === 'undefined') {
+        log('Socket.IO client not loaded. Stage signaling unavailable.');
+        return;
+      }
+      const socket = io(`${window.location.origin}/stage`, { auth: { token } });
+      socket.emit('join-stage', { room });
+      socket.on('peers', data => log('Peers: ' + (data.peers || []).join(', ')));
+      socket.on('user-joined', d => log('User joined: ' + d.id + ' (' + d.count + ')'));
+      socket.on('user-left', d => log('User left: ' + d.id + ' (' + d.count + ')'));
+      socket.on('offer', d => log('Offer from ' + d.from));
+      socket.on('answer', d => log('Answer from ' + d.from));
+      socket.on('ice-candidate', d => log('ICE from ' + d.from));
+    })();
+  </script>
+</body>
+</html>

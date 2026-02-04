@@ -1,0 +1,116 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bottleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3c72;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#2a5298;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7e8ba3;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="lightningGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffeb3b;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ffc107;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff9800;stop-opacity:1" />
+    </linearGradient>
+    
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="bottleGlow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Bottle Shadow -->
+  <ellipse cx="100" cy="170" rx="45" ry="8" fill="#000" opacity="0.3"/>
+  
+  <!-- Bottle Body -->
+  <path d="M 70 80 L 70 140 Q 70 160 85 165 L 115 165 Q 130 160 130 140 L 130 80 Z" 
+        fill="url(#bottleGradient)" 
+        stroke="#4a5f7a" 
+        stroke-width="2"
+        filter="url(#bottleGlow)"
+        opacity="0.9"/>
+  
+  <!-- Bottle Neck -->
+  <rect x="85" y="60" width="30" height="25" 
+        fill="url(#bottleGradient)" 
+        stroke="#4a5f7a" 
+        stroke-width="2"/>
+  
+  <!-- Bottle Cap -->
+  <rect x="82" y="55" width="36" height="8" 
+        fill="#34495e" 
+        stroke="#2c3e50" 
+        stroke-width="1"
+        rx="1"/>
+  
+  <!-- Cork -->
+  <rect x="87" y="50" width="26" height="8" 
+        fill="#d4a574" 
+        stroke="#b8935f" 
+        stroke-width="1"
+        rx="2"/>
+  
+  <!-- Glass Reflection -->
+  <path d="M 75 85 Q 75 100 78 120 L 82 120 Q 80 100 80 85 Z" 
+        fill="#ffffff" 
+        opacity="0.3"/>
+  
+  <!-- Lightning Bolt Inside Bottle -->
+  <g filter="url(#glow)">
+    <path d="M 100 90 L 95 110 L 105 110 L 100 130 L 110 105 L 100 105 L 105 85 Z" 
+          fill="url(#lightningGradient)" 
+          stroke="#ff9800" 
+          stroke-width="1"
+          opacity="0.95">
+      <animateTransform
+        attributeName="transform"
+        type="scale"
+        values="0.95;1.05;0.95"
+        dur="2s"
+        repeatCount="indefinite"
+        additive="sum"
+        attributeType="XML"
+        from="1 1"
+        to="1 1"/>
+      <animate
+        attributeName="opacity"
+        values="0.8;1;0.8"
+        dur="1.5s"
+        repeatCount="indefinite"/>
+    </path>
+  </g>
+  
+  <!-- Energy Particles -->
+  <g opacity="0.7">
+    <circle cx="90" cy="100" r="2" fill="#ffeb3b">
+      <animate attributeName="cy" values="100;120;100" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;0" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="110" cy="130" r="1.5" fill="#ffc107">
+      <animate attributeName="cy" values="130;100;130" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;0" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="95" cy="145" r="1" fill="#ff9800">
+      <animate attributeName="cy" values="145;120;145" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- Label Text -->
+  <text x="100" y="145" font-family="Arial, sans-serif" font-size="8" fill="#ffffff" text-anchor="middle" opacity="0.8">
+    ATLANTIPLEX
+  </text>
+  <text x="100" y="155" font-family="Arial, sans-serif" font-size="6" fill="#ffffff" text-anchor="middle" opacity="0.6">
+    Lightning Studio
+  </text>
+</svg>

@@ -1,0 +1,10 @@
+:root {
+  /* Brand color tokens for LIVE Atlantiplex */
+  --brand-name: "LIVE Atlantiplex";
+  --brand-primary: #0f7bd3;
+  --brand-secondary: #15b8a6;
+  --brand-accent: #ff6f61;
+  --brand-background: #0b1220;
+  --brand-surface: #11162a;
+  --brand-text: #e8f0ff;
+}

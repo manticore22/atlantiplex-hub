@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ATLANTIPLEX LIGHTNING STUDIO - Professional Broadcasting Platform</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-primary: #1e3c72;
+            --brand-accent: #ffeb3b;
+            --brand-secondary: #2a5298;
+            --brand-bg: #0a0f1b;
+            --brand-surface: #1a2942;
+            --brand-surface-elevated: #243351;
+            --brand-text: #eaf6ff;
+            --brand-text-secondary: #b8c5d6;
+            --brand-glow: 0 0 20px rgba(255, 235, 59, 0.4);
+            --brand-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --brand-border-radius: 12px;
+            --brand-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --brand-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--brand-bg) 0%, var(--brand-surface) 50%, var(--brand-bg) 100%);
+            color: var(--brand-text);
+            font-family: var(--brand-font-family);
+            font-weight: 400;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255, 235, 59, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(30, 60, 114, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+        
+        @keyframes backgroundShift {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-10px, -10px) scale(1.02); }
+        }
+        
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 65, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 1;
+            animation: grid-move 10s linear infinite;
+        }
+        
+        .main-container {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            min-height: 100vh;
+            background: rgba(0, 10, 20, 0.95);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: linear-gradient(135deg, var(--brand-surface) 0%, var(--brand-surface-elevated) 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--brand-shadow);
+        }
+        
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .header-logo {
+            width: 40px;
+            height: 40px;
+            filter: drop-shadow(0 0 8px rgba(255, 235, 59, 0.4));
+        }
+        
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--brand-text);
+            text-shadow: var(--brand-glow);
+            letter-spacing: -0.02em;
+        }
+        
+        .header-subtitle {
+            font-size: 0.875rem;
+            color: var(--brand-text-secondary);
+            opacity: 0.8;
+        }
+        
+        .header-controls {
+            margin-left: auto;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .content-area {
+            margin-top: 60px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .panel {
+            background: rgba(0, 20, 40, 0.95);
+            border: 2px solid #00ff41;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 255, 65, 0.2);
+        }
+        
+        .panel-header {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid #00ff41;
+            padding-bottom: 10px;
+            color: #00ff41;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+        
+        .sidebar {
+            background: rgba(0, 20, 40, 0.95);
+            border: 2px solid #00ff41;
+            padding: 20px;
+            margin-top: 60px;
+            overflow-y: auto;
+            height: calc(100vh - 60px);
+        }
+        
+        .sidebar-left {
+            border-right: 1px solid #00ff41;
+        }
+        
+        .sidebar-right {
+            border-left: 1px solid #00ff41;
+        }
+        
+        .stream-item, .schedule-item, .platform-item {
+            background: rgba(0, 40, 80, 0.3);
+            border: 1px solid #00ff41;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stream-item:hover, .schedule-item:hover, .platform-item:hover {
+            background: rgba(0, 255, 65, 0.1);
+            border-color: #00ff41;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 65, 0.3);
+        }
+        
+        .stream-item.live {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: #ff0040;
+            animation: pulse-red 2s infinite;
+        }
+        
+        .stream-item.scheduled {
+            background: rgba(255, 165, 0, 0.1);
+            border-color: #ffa500;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #00ff41, #00cc33);
+            border: 2px solid #00ff41;
+            color: #000;
+            padding: 10px 20px;
+            font-family: 'Orbitron', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            border-radius: 6px;
+            font-size: 0.9em;
+            margin: 5px;
+            box-shadow: 0 4px 15px rgba(0, 255, 65, 0.3);
+        }
+        
+        .btn:hover {
+            background: linear-gradient(135deg, #00ff41, #00aa22);
+            box-shadow: 0 6px 25px rgba(0, 255, 65, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ff0040, #cc0033);
+            border-color: #ff0040;
+            color: #fff;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffa500, #cc8400);
+            border-color: #ffa500;
+            color: #000;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #00ff41;
+            font-size: 0.9em;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            background: rgba(0, 40, 80, 0.8);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 12px;
+            font-family: 'Orbitron', monospace;
+            border-radius: 6px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: #00ff41;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
+            background: rgba(0, 50, 100, 0.9);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: rgba(0, 20, 40, 0.98);
+            border: 2px solid #00ff41;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 40px rgba(0, 255, 65, 0.6);
+            position: relative;
+        }
+        
+        .modal-header {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #00ff41;
+            text-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #ff0040;
+            font-size: 2em;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .close-modal:hover {
+            color: #00ff41;
+            transform: rotate(90deg);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-indicator.online {
+            background: #00ff41;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.6);
+        }
+        
+        .status-indicator.offline {
+            background: #ff0040;
+            box-shadow: 0 0 10px rgba(255, 0, 64, 0.6);
+        }
+        
+        .status-indicator.warning {
+            background: #ffa500;
+            box-shadow: 0 0 10px rgba(255, 165, 0, 0.6);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(0, 40, 80, 0.4);
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            background: rgba(0, 255, 65, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 255, 65, 0.3);
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #00ff41;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+        
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .platform-card {
+            background: rgba(0, 40, 80, 0.4);
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .platform-card:hover {
+            background: rgba(0, 255, 65, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 255, 65, 0.3);
+        }
+        
+        .platform-card.selected {
+            background: rgba(0, 255, 65, 0.2);
+            border-color: #00ff41;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+        }
+        
+        .analytics-chart {
+            background: rgba(0, 40, 80, 0.3);
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00ff41;
+            font-size: 1.2em;
+            text-align: center;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 20, 40, 0.95);
+            border: 2px solid #00ff41;
+            border-radius: 8px;
+            padding: 15px 20px;
+            max-width: 300px;
+            z-index: 1500;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 4px 20px rgba(0, 255, 65, 0.4);
+        }
+        
+        .notification.success {
+            border-color: #00ff41;
+            background: rgba(0, 255, 65, 0.1);
+        }
+        
+        .notification.error {
+            border-color: #ff0040;
+            background: rgba(255, 0, 64, 0.1);
+            color: #ff0040;
+        }
+        
+        .notification.warning {
+            border-color: #ffa500;
+            background: rgba(255, 165, 0, 0.1);
+            color: #ffa500;
+        }
+        
+        @keyframes grid-move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(255, 0, 64, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 0, 64, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 0, 64, 0); }
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .loading-spinner {
+            border: 4px solid rgba(0, 255, 65, 0.1);
+            border-left: 4px solid #00ff41;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 250px 1fr 300px;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                height: auto;
+                border: none !important;
+                border-bottom: 2px solid #00ff41 !important;
+            }
+            
+            .content-area {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-grid"></div>
+    
+    <div class="header">
+        <div class="header-brand">
+            <img src="atlantiplex-lightning-logo-small.svg" alt="Atlantiplex Lightning Studio" class="header-logo">
+            <div>
+                <div class="header-title">Atlantiplex Lightning Studio</div>
+                <div class="header-subtitle">Professional Broadcasting Platform</div>
+            </div>
+        </div>
+        <div class="header-controls">
+            <span id="connectionStatus">
+                <span class="status-indicator offline"></span>
+                DISCONNECTED
+            </span>
+            <button class="btn btn-primary" onclick="refreshData()">🔄 Refresh</button>
+            <button class="btn btn-accent" onclick="showSettings()">⚙️ Settings</button>
+        </div>
+    </div>
+    
+    <div class="main-container">
+        <!-- Left Sidebar - Streams & Schedules -->
+        <div class="sidebar sidebar-left">
+            <div class="panel">
+                <div class="panel-header">📡 QUICK ACTIONS</div>
+                <div class="btn-group">
+                    <button class="btn" onclick="showCreateStreamModal()">+ New Stream</button>
+                    <button class="btn" onclick="showScheduleModal()">📅 Schedule</button>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">🎬 ACTIVE STREAMS</div>
+                <div id="activeStreamsList"></div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">📅 UPCOMING SCHEDULES</div>
+                <div id="upcomingSchedulesList"></div>
+            </div>
+        </div>
+        
+        <!-- Main Content Area -->
+        <div class="content-area">
+            <!-- Analytics Dashboard -->
+            <div class="panel">
+                <div class="panel-header">📊 ANALYTICS DASHBOARD</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalViewers">0</div>
+                        <div class="stat-label">Total Viewers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="activeStreams">0</div>
+                        <div class="stat-label">Active Streams</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalLikes">0</div>
+                        <div class="stat-label">Total Likes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="peakConcurrent">0</div>
+                        <div class="stat-label">Peak Concurrent</div>
+                    </div>
+                </div>
+                
+                <div class="analytics-chart" id="viewerChart">
+                    📈 Real-time Viewer Analytics
+                </div>
+            </div>
+            
+            <!-- Stream Management -->
+            <div class="panel">
+                <div class="panel-header">🎥 STREAM MANAGEMENT</div>
+                <div id="streamsList"></div>
+            </div>
+        </div>
+        
+        <!-- Right Sidebar - Platforms & OBS -->
+        <div class="sidebar sidebar-right">
+            <div class="panel">
+                <div class="panel-header">🌐 PLATFORMS</div>
+                <div class="platform-grid" id="platformGrid"></div>
+                <button class="btn" onclick="showPlatformModal()">+ Add Platform</button>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">🎬 OBS SCENES</div>
+                <div id="scenesList"></div>
+                <button class="btn" onclick="showSceneModal()">+ Create Scene</button>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">🎤 SOURCES</div>
+                <div id="sourcesList"></div>
+                <button class="btn" onclick="showSourceModal()">+ Add Source</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <!-- Create Stream Modal -->
+    <div class="modal" id="createStreamModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('createStreamModal')">×</button>
+            <div class="modal-header">Create New Stream</div>
+            
+            <div class="form-group">
+                <label>Stream Title *</label>
+                <input type="text" id="streamTitle" placeholder="Enter stream title..." maxlength="200">
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="streamDescription" rows="4" placeholder="Describe your stream..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Thumbnail</label>
+                <input type="file" id="streamThumbnail" accept="image/*">
+            </div>
+            
+            <div class="form-group">
+                <label>Platforms *</label>
+                <div class="platform-grid" id="platformSelection"></div>
+            </div>
+            
+            <div class="form-group">
+                <label>Schedule</label>
+                <input type="datetime-local" id="scheduledTime">
+            </div>
+            
+            <div class="form-group">
+                <label>Duration (minutes)</label>
+                <input type="number" id="streamDuration" value="60" min="1" max="480">
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn" onclick="createStream()">🚀 Create Stream</button>
+                <button class="btn" onclick="goLiveImmediately()">⚡ Go Live Now</button>
+                <button class="btn" onclick="closeModal('createStreamModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('settingsModal')">×</button>
+            <div class="modal-header">Studio Settings</div>
+            
+            <div class="form-group">
+                <label>OBS WebSocket URL</label>
+                <input type="text" id="obsUrl" placeholder="ws://localhost:4455">
+            </div>
+            
+            <div class="form-group">
+                <label>OBS Password</label>
+                <input type="password" id="obsPassword" placeholder="Enter OBS password...">
+            </div>
+            
+            <div class="form-group">
+                <label>API Server URL</label>
+                <input type="text" id="apiUrl" placeholder="http://localhost:5000">
+            </div>
+            
+            <div class="btn-group">
+                <button class="btn" onclick="saveSettings()">💾 Save Settings</button>
+                <button class="btn" onclick="testConnections()">🔧 Test Connections</button>
+                <button class="btn" onclick="closeModal('settingsModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Global Variables
+        let authToken = null;
+        let currentUserId = null;
+        let ws = null;
+        let refreshInterval = null;
+        
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+            initializeWebSocket();
+            loadPlatforms();
+            loadStreams();
+            loadSchedules();
+            loadScenes();
+            loadSources();
+            updateAnalytics();
+            
+            // Start real-time updates
+            startRealTimeUpdates();
+        });
+        
+        // Settings Management
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('matrixStudioSettings') || '{}');
+            document.getElementById('obsUrl').value = settings.obsUrl || 'ws://localhost:4455';
+            document.getElementById('apiUrl').value = settings.apiUrl || 'http://localhost:5000';
+            authToken = settings.authToken;
+            currentUserId = settings.currentUserId;
+        }
+        
+        function saveSettings() {
+            const settings = {
+                obsUrl: document.getElementById('obsUrl').value,
+                apiUrl: document.getElementById('apiUrl').value,
+                authToken: authToken,
+                currentUserId: currentUserId
+            };
+            localStorage.setItem('matrixStudioSettings', JSON.stringify(settings));
+            showNotification('Settings saved successfully', 'success');
+            closeModal('settingsModal');
+        }
+        
+        // WebSocket Connection
+        function initializeWebSocket() {
+            const apiUrl = document.getElementById('apiUrl').value || 'http://localhost:5000';
+            const wsUrl = apiUrl.replace('http', 'ws') + '/socket.io/';
+            
+            try {
+                // Simple WebSocket connection (would use Socket.IO client in production)
+                ws = new WebSocket(wsUrl);
+                
+                ws.onopen = function() {
+                    updateConnectionStatus(true);
+                    showNotification('Connected to Matrix Studio', 'success');
+                };
+                
+                ws.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    handleWebSocketMessage(data);
+                };
+                
+                ws.onclose = function() {
+                    updateConnectionStatus(false);
+                    showNotification('Disconnected from Matrix Studio', 'warning');
+                };
+                
+                ws.onerror = function(error) {
+                    console.error('WebSocket error:', error);
+                    updateConnectionStatus(false);
+                };
+                
+            } catch (error) {
+                console.error('Failed to initialize WebSocket:', error);
+                updateConnectionStatus(false);
+            }
+        }
+        
+        function handleWebSocketMessage(data) {
+            switch(data.type) {
+                case 'stream_status_changed':
+                    updateStreamStatus(data.payload);
+                    break;
+                case 'analytics_update':
+                    updateRealtimeAnalytics(data.payload);
+                    break;
+                default:
+                    console.log('Received message:', data);
+            }
+        }
+        
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connectionStatus');
+            if (connected) {
+                statusElement.innerHTML = '<span class="status-indicator online"></span>CONNECTED';
+            } else {
+                statusElement.innerHTML = '<span class="status-indicator offline"></span>DISCONNECTED';
+            }
+        }
+        
+        // API Communication
+        async function apiCall(endpoint, method = 'GET', data = null) {
+            const apiUrl = document.getElementById('apiUrl').value || 'http://localhost:5000';
+            const url = `${apiUrl}${endpoint}`;
+            
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+            
+            if (authToken) {
+                options.headers['Authorization'] = `Bearer ${authToken}`;
+            }
+            
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+            
+            try {
+                const response = await fetch(url, options);
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'API call failed');
+                }
+                
+                return result;
+                
+            } catch (error) {
+                console.error('API call error:', error);
+                showNotification(error.message, 'error');
+                throw error;
+            }
+        }
+        
+        // Platform Management
+        async function loadPlatforms() {
+            try {
+                const result = await apiCall('/api/platforms');
+                const platforms = result.platforms;
+                
+                const platformGrid = document.getElementById('platformGrid');
+                const platformSelection = document.getElementById('platformSelection');
+                
+                platformGrid.innerHTML = '';
+                platformSelection.innerHTML = '';
+                
+                platforms.forEach(platform => {
+                    // Main platform grid
+                    const platformCard = document.createElement('div');
+                    platformCard.className = 'platform-card';
+                    platformCard.innerHTML = `
+                        <div style="font-weight: bold; margin-bottom: 5px;">${platform.display_name}</div>
+                        <div style="font-size: 0.8em;">
+                            <span class="status-indicator ${platform.is_active ? 'online' : 'offline'}"></span>
+                            ${platform.is_active ? 'Connected' : 'Disconnected'}
+                        </div>
+                    `;
+                    platformGrid.appendChild(platformCard);
+                    
+                    // Platform selection for streams
+                    const selectionCard = document.createElement('div');
+                    selectionCard.className = 'platform-card';
+                    selectionCard.innerHTML = `
+                        <div style="font-weight: bold; margin-bottom: 5px;">${platform.display_name}</div>
+                        <input type="checkbox" value="${platform.id}" style="width: 20px; height: 20px;">
+                    `;
+                    platformSelection.appendChild(selectionCard);
+                });
+                
+            } catch (error) {
+                console.error('Failed to load platforms:', error);
+            }
+        }
+        
+        // Stream Management
+        async function loadStreams() {
+            try {
+                const result = await apiCall('/api/streams');
+                const streams = result.streams;
+                
+                const streamsList = document.getElementById('streamsList');
+                const activeStreamsList = document.getElementById('activeStreamsList');
+                
+                streamsList.innerHTML = '';
+                activeStreamsList.innerHTML = '';
+                
+                streams.forEach(stream => {
+                    // Main streams list
+                    const streamItem = document.createElement('div');
+                    streamItem.className = `stream-item ${stream.status}`;
+                    
+                    const platformIcons = stream.platforms.map(p => {
+                        const iconMap = {
+                            'youtube': '📺',
+                            'twitch': '🎮',
+                            'facebook': '📘',
+                            'linkedin': '💼'
+                        };
+                        return iconMap[p.name] || '🌐';
+                    }).join(' ');
+                    
+                    streamItem.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: bold; margin-bottom: 5px;">${stream.title}</div>
+                                <div style="font-size: 0.8em; opacity: 0.8;">
+                                    ${platformIcons} • ${stream.status.toUpperCase()}
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 0.9em; font-weight: bold;">
+                                    ${stream.viewer_count || 0} viewers
+                                </div>
+                                <div style="font-size: 0.7em; opacity: 0.7;">
+                                    ${new Date(stream.created_at).toLocaleDateString()}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="btn-group" style="margin-top: 10px;">
+                            ${stream.status === 'scheduled' ? `<button class="btn" onclick="goLive('${stream.id}')">Go Live</button>` : ''}
+                            ${stream.status === 'live' ? `<button class="btn btn-danger" onclick="stopStream('${stream.id}')">Stop</button>` : ''}
+                            <button class="btn" onclick="editStream('${stream.id}')">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteStream('${stream.id}')">Delete</button>
+                        </div>
+                    `;
+                    streamsList.appendChild(streamItem);
+                    
+                    // Active streams sidebar
+                    if (stream.status === 'live') {
+                        const activeItem = document.createElement('div');
+                        activeItem.className = 'stream-item live';
+                        activeItem.innerHTML = `
+                            <div style="font-weight: bold; margin-bottom: 5px;">${stream.title}</div>
+                            <div style="font-size: 0.8em;">
+                                ${stream.viewer_count || 0} viewers
+                            </div>
+                        `;
+                        activeStreamsList.appendChild(activeItem);
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Failed to load streams:', error);
+            }
+        }
+        
+        // Stream Creation
+        async function createStream() {
+            try {
+                const title = document.getElementById('streamTitle').value;
+                const description = document.getElementById('streamDescription').value;
+                const scheduledTime = document.getElementById('scheduledTime').value;
+                const duration = document.getElementById('streamDuration').value;
+                
+                // Get selected platforms
+                const selectedPlatforms = [];
+                document.querySelectorAll('#platformSelection input[type="checkbox"]:checked').forEach(checkbox => {
+                    selectedPlatforms.push(checkbox.value);
+                });
+                
+                if (!title) {
+                    showNotification('Title is required', 'error');
+                    return;
+                }
+                
+                if (selectedPlatforms.length === 0) {
+                    showNotification('At least one platform must be selected', 'error');
+                    return;
+                }
+                
+                const streamData = {
+                    title: title,
+                    description: description,
+                    platforms: selectedPlatforms,
+                    scheduled_start: scheduledTime || null,
+                    duration_minutes: parseInt(duration)
+                };
+                
+                // Handle thumbnail upload if present
+                const thumbnailFile = document.getElementById('streamThumbnail').files[0];
+                if (thumbnailFile) {
+                    // In a real implementation, upload thumbnail first
+                    // streamData.thumbnail_path = uploadResult.path;
+                }
+                
+                const result = await apiCall('/api/streams', 'POST', streamData);
+                
+                showNotification('Stream created successfully!', 'success');
+                closeModal('createStreamModal');
+                loadStreams();
+                
+                // Clear form
+                document.getElementById('streamTitle').value = '';
+                document.getElementById('streamDescription').value = '';
+                document.getElementById('streamThumbnail').value = '';
+                document.getElementById('scheduledTime').value = '';
+                document.getElementById('streamDuration').value = '60';
+                
+            } catch (error) {
+                console.error('Failed to create stream:', error);
+            }
+        }
+        
+        async function goLive(streamId) {
+            try {
+                const result = await apiCall(`/api/streams/${streamId}/go-live`, 'POST');
+                showNotification('Stream went live!', 'success');
+                loadStreams();
+            } catch (error) {
+                console.error('Failed to go live:', error);
+            }
+        }
+        
+        async function stopStream(streamId) {
+            try {
+                const result = await apiCall(`/api/streams/${streamId}`, 'DELETE');
+                showNotification('Stream stopped', 'success');
+                loadStreams();
+            } catch (error) {
+                console.error('Failed to stop stream:', error);
+            }
+        }
+        
+        // Analytics
+        async function updateAnalytics() {
+            try {
+                const result = await apiCall('/api/analytics/dashboard');
+                const analytics = result;
+                
+                document.getElementById('totalViewers').textContent = analytics.total_viewers || 0;
+                document.getElementById('activeStreams').textContent = analytics.active_streams || 0;
+                document.getElementById('totalLikes').textContent = analytics.total_likes || 0;
+                document.getElementById('peakConcurrent').textContent = analytics.peak_viewers || 0;
+                
+            } catch (error) {
+                console.error('Failed to update analytics:', error);
+            }
+        }
+        
+        // Real-time Updates
+        function startRealTimeUpdates() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+            
+            refreshInterval = setInterval(() => {
+                updateAnalytics();
+                loadStreams();
+            }, 30000); // Update every 30 seconds
+        }
+        
+        // UI Functions
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 5000);
+        }
+        
+        function showCreateStreamModal() {
+            document.getElementById('createStreamModal').style.display = 'flex';
+        }
+        
+        function showSettings() {
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        function refreshData() {
+            loadStreams();
+            loadPlatforms();
+            updateAnalytics();
+            showNotification('Data refreshed', 'success');
+        }
+        
+        // Placeholder functions for other features
+        async function loadSchedules() {
+            // Implement schedule loading
+            document.getElementById('upcomingSchedulesList').innerHTML = '<div class="schedule-item">No upcoming schedules</div>';
+        }
+        
+        async function loadScenes() {
+            // Implement scene loading
+            document.getElementById('scenesList').innerHTML = '<div class="scene-item">No scenes available</div>';
+        }
+        
+        async function loadSources() {
+            // Implement source loading
+            document.getElementById('sourcesList').innerHTML = '<div class="source-item">No sources available</div>';
+        }
+        
+        function goLiveImmediately() {
+            // Go live immediately with current settings
+            showNotification('Going live immediately...', 'warning');
+        }
+        
+        function editStream(streamId) {
+            // Edit stream functionality
+            showNotification('Edit functionality coming soon', 'warning');
+        }
+        
+        async function deleteStream(streamId) {
+            if (confirm('Are you sure you want to delete this stream?')) {
+                try {
+                    await apiCall(`/api/streams/${streamId}`, 'DELETE');
+                    showNotification('Stream deleted successfully', 'success');
+                    loadStreams();
+                } catch (error) {
+                    console.error('Failed to delete stream:', error);
+                }
+            }
+        }
+        
+        function testConnections() {
+            showNotification('Testing connections...', 'warning');
+            // Implement connection testing
+        }
+        
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

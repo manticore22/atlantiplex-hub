@@ -1,0 +1,25 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bottleGradientTiny" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3c72;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2a5298;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="lightningGradientTiny" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffeb3b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffc107;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Bottle Body -->
+  <path d="M 11 13 L 11 22 Q 11 25 14 26 L 18 26 Q 21 25 21 22 L 21 13 Z" 
+        fill="url(#bottleGradientTiny)" 
+        stroke="#4a5f7a" 
+        stroke-width="0.5"/>
+  
+  <!-- Lightning Bolt -->
+  <path d="M 16 14 L 15 18 L 17 18 L 16 21 L 18 17 L 16 17 L 17 13.5 Z" 
+        fill="url(#lightningGradientTiny)" 
+        stroke="#ff9800" 
+        stroke-width="0.3"/>
+</svg>

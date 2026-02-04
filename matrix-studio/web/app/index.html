@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Matrix Studio - Stage Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/app/app.css" />
+</head>
+  <body>
+  <header class="app-header" style="justify-content: center;">
+    <div class="brand">Matrix Studio</div>
+    <div class="subtle">Stage Portal</div>
+  </header>
+  <main id="app" style="padding:20px; max-width:1000px; margin:0 auto;">
+    <section id="login-section">
+      <h2>Login</h2>
+      <div style="display:flex; gap:8px;">
+        <input id="username" placeholder="Username" />
+        <input id="password" placeholder="Password" type="password" />
+        <button id="login-btn">Login</button>
+      </div>
+      <div id="login-status" style="color:#f88; margin-top:6px; height:1.2em;"></div>
+    </section>
+    <section id="stage-section" style="display:none; margin-top:20px;">
+      <h2>Stage</h2>
+      <div id="stage-embed" style="border:1px solid #224; height:520px;">
+        <!-- Stage is embedded below as an iframe for isolation -->
+        <iframe id="stage-frame" src="/stage/?token=" width="100%" height="100%" frameborder="0" allow="camera;microphone;autoplay"></iframe>
+      </div>
+    </section>
+  </main>
+  <script src="/app/app.js"></script>
+</body>
+</html>

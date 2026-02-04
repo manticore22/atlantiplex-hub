@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Studio - Guest View</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .pulse-dot {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .video-container {
+            position: relative;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .control-btn {
+            transition: all 0.2s ease;
+        }
+        .control-btn:hover {
+            transform: scale(1.05);
+        }
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+        .status-online { background: #10b981; }
+        .status-connecting { background: #f59e0b; }
+        .status-offline { background: #ef4444; }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    <!-- Connection Status Bar -->
+    <header class="glass-effect sticky top-0 z-50 px-6 py-3">
+        <div class="container mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <i class="fas fa-broadcast-tower text-2xl"></i>
+                <div>
+                    <h1 class="text-lg font-bold">Matrix Guest Studio</h1>
+                    <p class="text-xs opacity-80">Connected as: <span id="guest-name">Guest</span></p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <div id="connection-status" class="w-3 h-3 bg-yellow-500 rounded-full pulse-dot"></div>
+                    <span id="connection-text" class="text-sm">Connecting...</span>
+                </div>
+                <button id="settings-btn" class="glass-effect px-3 py-1 rounded-lg hover:bg-white hover:bg-opacity-20">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        <!-- Video Preview Area -->
+        <section class="mb-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Main Video -->
+                <div class="lg:col-span-2">
+                    <div class="video-container aspect-video">
+                        <video id="local-video" class="w-full h-full" autoplay muted></video>
+                        <div class="absolute top-4 left-4 glass-effect px-3 py-1 rounded-full text-sm">
+                            <i class="fas fa-video mr-2"></i>You
+                        </div>
+                        <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center">
+                            <div class="glass-effect px-3 py-1 rounded-full text-sm">
+                                <span id="quality-indicator">720p</span>
+                            </div>
+                            <div class="glass-effect px-3 py-1 rounded-full text-sm">
+                                <i class="fas fa-circle status-connecting mr-2"></i>
+                                <span id="stream-status">Connecting...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video Controls -->
+                    <div class="mt-4 flex justify-center space-x-4">
+                        <button id="camera-toggle" class="control-btn bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-lg">
+                            <i class="fas fa-video mr-2"></i>Camera ON
+                        </button>
+                        <button id="mic-toggle" class="control-btn bg-green-500 hover:bg-green-600 px-6 py-3 rounded-lg">
+                            <i class="fas fa-microphone mr-2"></i>Mic ON
+                        </button>
+                        <button id="screen-share" class="control-btn bg-purple-500 hover:bg-purple-600 px-6 py-3 rounded-lg">
+                            <i class="fas fa-desktop mr-2"></i>Share Screen
+                        </button>
+                        <button id="hand-raise" class="control-btn bg-yellow-500 hover:bg-yellow-600 px-6 py-3 rounded-lg">
+                            <i class="fas fa-hand-paper mr-2"></i>Raise Hand
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Side Panel -->
+                <div class="space-y-6">
+                    <!-- Studio Preview -->
+                    <div class="glass-effect rounded-xl p-4">
+                        <h3 class="text-lg font-bold mb-3 flex items-center">
+                            <i class="fas fa-tv mr-2"></i>
+                            Studio Preview
+                        </h3>
+                        <div class="video-container aspect-video">
+                            <video id="studio-preview" class="w-full h-full" autoplay></video>
+                            <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                <div class="text-center">
+                                    <i class="fas fa-spinner fa-spin text-3xl mb-2"></i>
+                                    <p>Waiting for studio stream...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Connection Stats -->
+                    <div class="glass-effect rounded-xl p-4">
+                        <h3 class="text-lg font-bold mb-3 flex items-center">
+                            <i class="fas fa-chart-line mr-2"></i>
+                            Connection Stats
+                        </h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="opacity-80">Bitrate:</span>
+                                <span id="bitrate">0 kbps</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="opacity-80">FPS:</span>
+                                <span id="fps">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="opacity-80">Packets Lost:</span>
+                                <span id="packets-lost">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="opacity-80">Latency:</span>
+                                <span id="latency">0 ms</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat/Communication -->
+                    <div class="glass-effect rounded-xl p-4">
+                        <h3 class="text-lg font-bold mb-3 flex items-center">
+                            <i class="fas fa-comments mr-2"></i>
+                            Studio Chat
+                        </h3>
+                        <div id="chat-messages" class="h-32 overflow-y-auto mb-3 space-y-2 text-sm">
+                            <div class="opacity-60">No messages yet...</div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <input type="text" id="chat-input" class="flex-1 px-3 py-2 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Type message...">
+                            <button id="send-message" class="bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded-lg">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Notifications -->
+        <section class="fixed bottom-8 right-8 max-w-sm">
+            <div id="notification-container" class="space-y-2">
+                <!-- Notifications will appear here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="glass-effect rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4">Guest Settings</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Display Name</label>
+                    <input type="text" id="display-name" class="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Enter your name">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Camera</label>
+                    <select id="camera-select" class="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <option>Default Camera</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Microphone</label>
+                    <select id="mic-select" class="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <option>Default Microphone</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Video Quality</label>
+                    <select id="video-quality" class="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <option value="720p">720p (Recommended)</option>
+                        <option value="1080p">1080p (High Quality)</option>
+                        <option value="480p">480p (Lower Bandwidth)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Virtual Background</label>
+                    <select id="virtual-bg" class="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <option value="none">None</option>
+                        <option value="blur">Blur</option>
+                        <option value="office">Office</option>
+                        <option value="studio">Studio</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeSettingsModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-700">Cancel</button>
+                <button onclick="saveSettings()" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get guest ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const guestId = urlParams.get('guest_id') || 'guest_' + Math.random().toString(36).substr(2, 9);
+        
+        // Initialize Socket.IO connection
+        const socket = io();
+        let localStream = null;
+        let studioStream = null;
+        let isCameraOn = true;
+        let isMicOn = true;
+        let isScreenSharing = false;
+        let isHandRaised = false;
+        let connectionStats = {
+            bitrate: 0,
+            fps: 0,
+            packetsLost: 0,
+            latency: 0
+        };
+
+        // Socket event handlers
+        socket.on('connect', () => {
+            console.log('Connected to Matrix Server');
+            updateConnectionStatus('online', 'Connected');
+            
+            // Join guest room
+            socket.emit('join_guest_room', { guest_id: guestId });
+            
+            // Send guest info
+            socket.emit('guest_info', {
+                guest_id: guestId,
+                name: localStorage.getItem('guest_display_name') || 'Guest',
+                device_info: navigator.userAgent,
+                capabilities: getDeviceCapabilities()
+            });
+        });
+
+        socket.on('disconnect', () => {
+            updateConnectionStatus('offline', 'Disconnected');
+        });
+
+        socket.on('kicked', (data) => {
+            showNotification('You have been removed from the studio', 'error');
+            setTimeout(() => window.close(), 3000);
+        });
+
+        socket.on('media_toggled', (data) => {
+            handleHostMediaToggle(data);
+        });
+
+        socket.on('studio_message', (data) => {
+            addChatMessage(data.sender, data.message);
+        });
+
+        socket.on('studio_preview', (data) => {
+            updateStudioPreview(data.stream_url);
+        });
+
+        // WebRTC setup
+        async function initializeMedia() {
+            try {
+                // Get user media
+                const constraints = {
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user'
+                    },
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                };
+
+                localStream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                // Display local video
+                const localVideo = document.getElementById('local-video');
+                localVideo.srcObject = localStream;
+                
+                // Get available devices
+                await enumerateDevices();
+                
+                // Start stats monitoring
+                startStatsMonitoring();
+                
+                updateConnectionStatus('online', 'Ready');
+                showNotification('Camera and microphone connected', 'success');
+                
+            } catch (error) {
+                console.error('Error accessing media devices:', error);
+                updateConnectionStatus('offline', 'Media Access Denied');
+                showNotification('Failed to access camera/microphone', 'error');
+            }
+        }
+
+        async function enumerateDevices() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                
+                const videoSelect = document.getElementById('camera-select');
+                const audioSelect = document.getElementById('mic-select');
+                
+                videoSelect.innerHTML = '';
+                audioSelect.innerHTML = '';
+                
+                devices.forEach(device => {
+                    if (device.kind === 'videoinput') {
+                        const option = document.createElement('option');
+                        option.value = device.deviceId;
+                        option.text = device.label || `Camera ${videoSelect.options.length + 1}`;
+                        videoSelect.appendChild(option);
+                    } else if (device.kind === 'audioinput') {
+                        const option = document.createElement('option');
+                        option.value = device.deviceId;
+                        option.text = device.label || `Microphone ${audioSelect.options.length + 1}`;
+                        audioSelect.appendChild(option);
+                    }
+                });
+            } catch (error) {
+                console.error('Error enumerating devices:', error);
+            }
+        }
+
+        function startStatsMonitoring() {
+            if (!localStream) return;
+            
+            setInterval(() => {
+                // Update connection stats (simplified)
+                updateConnectionStats();
+            }, 2000);
+        }
+
+        function updateConnectionStats() {
+            // Simulate stats - in production, get from WebRTC stats
+            connectionStats.bitrate = Math.floor(Math.random() * 2000) + 1000;
+            connectionStats.fps = Math.floor(Math.random() * 5) + 28;
+            connectionStats.packetsLost = Math.floor(Math.random() * 10);
+            connectionStats.latency = Math.floor(Math.random() * 50) + 20;
+            
+            // Update UI
+            document.getElementById('bitrate').textContent = connectionStats.bitrate + ' kbps';
+            document.getElementById('fps').textContent = connectionStats.fps;
+            document.getElementById('packets-lost').textContent = connectionStats.packetsLost;
+            document.getElementById('latency').textContent = connectionStats.latency + ' ms';
+        }
+
+        // UI Functions
+        function updateConnectionStatus(status, text) {
+            const statusDot = document.getElementById('connection-status');
+            const statusText = document.getElementById('connection-text');
+            
+            statusDot.className = `w-3 h-3 rounded-full pulse-dot status-${status}`;
+            statusText.textContent = text;
+        }
+
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notification-container');
+            const notification = document.createElement('div');
+            
+            const bgColor = type === 'error' ? 'bg-red-500' : 
+                           type === 'success' ? 'bg-green-500' : 
+                           type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500';
+            
+            notification.className = `glass-effect rounded-lg p-4 ${bgColor} bg-opacity-90`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'info-circle'} mr-3"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        function addChatMessage(sender, message) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'opacity-80';
+            messageDiv.innerHTML = `<span class="font-semibold">${sender}:</span> ${message}`;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function handleHostMediaToggle(data) {
+            if (data.action === 'camera' && data.state === 'off') {
+                isCameraOn = false;
+                updateCameraButton();
+                showNotification('Host turned off your camera', 'warning');
+            } else if (data.action === 'microphone' && data.state === 'off') {
+                isMicOn = false;
+                updateMicButton();
+                showNotification('Host muted your microphone', 'warning');
+            }
+        }
+
+        function updateCameraButton() {
+            const btn = document.getElementById('camera-toggle');
+            if (isCameraOn) {
+                btn.className = 'control-btn bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-lg';
+                btn.innerHTML = '<i class="fas fa-video mr-2"></i>Camera ON';
+            } else {
+                btn.className = 'control-btn bg-gray-500 hover:bg-gray-600 px-6 py-3 rounded-lg';
+                btn.innerHTML = '<i class="fas fa-video-slash mr-2"></i>Camera OFF';
+            }
+        }
+
+        function updateMicButton() {
+            const btn = document.getElementById('mic-toggle');
+            if (isMicOn) {
+                btn.className = 'control-btn bg-green-500 hover:bg-green-600 px-6 py-3 rounded-lg';
+                btn.innerHTML = '<i class="fas fa-microphone mr-2"></i>Mic ON';
+            } else {
+                btn.className = 'control-btn bg-gray-500 hover:bg-gray-600 px-6 py-3 rounded-lg';
+                btn.innerHTML = '<i class="fas fa-microphone-slash mr-2"></i>Mic OFF';
+            }
+        }
+
+        function getDeviceCapabilities() {
+            return {
+                getUserMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+                getDisplayMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia),
+                webrtc: !!(window.RTCPeerConnection || window.webkitRTCPeerConnection),
+                videoCodecs: ['H264', 'VP8', 'VP9'],
+                audioCodecs: ['Opus', 'AAC']
+            };
+        }
+
+        // Event Handlers
+        document.getElementById('camera-toggle').addEventListener('click', () => {
+            isCameraOn = !isCameraOn;
+            if (localStream) {
+                const videoTrack = localStream.getVideoTracks()[0];
+                if (videoTrack) {
+                    videoTrack.enabled = isCameraOn;
+                }
+            }
+            updateCameraButton();
+            
+            // Notify host
+            socket.emit('guest_media_change', {
+                guest_id: guestId,
+                action: 'camera',
+                state: isCameraOn ? 'on' : 'off'
+            });
+        });
+
+        document.getElementById('mic-toggle').addEventListener('click', () => {
+            isMicOn = !isMicOn;
+            if (localStream) {
+                const audioTrack = localStream.getAudioTracks()[0];
+                if (audioTrack) {
+                    audioTrack.enabled = isMicOn;
+                }
+            }
+            updateMicButton();
+            
+            // Notify host
+            socket.emit('guest_media_change', {
+                guest_id: guestId,
+                action: 'microphone',
+                state: isMicOn ? 'on' : 'off'
+            });
+        });
+
+        document.getElementById('screen-share').addEventListener('click', async () => {
+            try {
+                if (isScreenSharing) {
+                    // Stop screen sharing
+                    if (localStream) {
+                        const videoTrack = localStream.getVideoTracks()[0];
+                        if (videoTrack && videoTrack.getSettings().displaySurface) {
+                            videoTrack.stop();
+                        }
+                    }
+                    isScreenSharing = false;
+                    document.getElementById('screen-share').innerHTML = '<i class="fas fa-desktop mr-2"></i>Share Screen';
+                } else {
+                    // Start screen sharing
+                    const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                        video: true,
+                        audio: false
+                    });
+                    
+                    if (localStream) {
+                        // Replace video track
+                        const videoTrack = screenStream.getVideoTracks()[0];
+                        const sender = localStream.getVideoTracks()[0];
+                        // In WebRTC implementation, would replace track here
+                        
+                        // Handle screen share end
+                        videoTrack.onended = () => {
+                            isScreenSharing = false;
+                            document.getElementById('screen-share').innerHTML = '<i class="fas fa-desktop mr-2"></i>Share Screen';
+                            showNotification('Screen sharing stopped', 'info');
+                        };
+                    }
+                    
+                    isScreenSharing = true;
+                    document.getElementById('screen-share').innerHTML = '<i class="fas fa-desktop mr-2"></i>Stop Sharing';
+                }
+                
+                // Notify host
+                socket.emit('guest_media_change', {
+                    guest_id: guestId,
+                    action: 'screen_share',
+                    state: isScreenSharing ? 'on' : 'off'
+                });
+                
+            } catch (error) {
+                console.error('Screen sharing error:', error);
+                showNotification('Failed to start screen sharing', 'error');
+            }
+        });
+
+        document.getElementById('hand-raise').addEventListener('click', () => {
+            isHandRaised = !isHandRaised;
+            const btn = document.getElementById('hand-raise');
+            
+            if (isHandRaised) {
+                btn.className = 'control-btn bg-red-500 hover:bg-red-600 px-6 py-3 rounded-lg';
+                btn.innerHTML = '<i class="fas fa-hand-paper mr-2"></i>Lower Hand';
+            } else {
+                btn.className = 'control-btn bg-yellow-500 hover:bg-yellow-600 px-6 py-3 rounded-lg';
+                btn.innerHTML = '<i class="fas fa-hand-paper mr-2"></i>Raise Hand';
+            }
+            
+            // Notify host
+            socket.emit('guest_interaction', {
+                guest_id: guestId,
+                action: 'hand_raise',
+                state: isHandRaised
+            });
+        });
+
+        // Chat functionality
+        document.getElementById('send-message').addEventListener('click', sendMessage);
+        document.getElementById('chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                socket.emit('guest_message', {
+                    guest_id: guestId,
+                    message: message
+                });
+                
+                addChatMessage('You', message);
+                input.value = '';
+            }
+        }
+
+        // Settings modal
+        document.getElementById('settings-btn').addEventListener('click', () => {
+            document.getElementById('settings-modal').classList.remove('hidden');
+            
+            // Load saved settings
+            document.getElementById('display-name').value = localStorage.getItem('guest_display_name') || '';
+        });
+
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').classList.add('hidden');
+        }
+
+        function saveSettings() {
+            const displayName = document.getElementById('display-name').value;
+            const videoQuality = document.getElementById('video-quality').value;
+            
+            localStorage.setItem('guest_display_name', displayName);
+            localStorage.setItem('guest_video_quality', videoQuality);
+            
+            // Update display
+            document.getElementById('guest-name').textContent = displayName;
+            document.getElementById('quality-indicator').textContent = videoQuality;
+            
+            // Notify server
+            socket.emit('guest_settings_update', {
+                guest_id: guestId,
+                display_name: displayName,
+                video_quality: videoQuality
+            });
+            
+            closeSettingsModal();
+            showNotification('Settings saved', 'success');
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            initializeMedia();
+            
+            // Set initial display name
+            const savedName = localStorage.getItem('guest_display_name');
+            if (savedName) {
+                document.getElementById('guest-name').textContent = savedName;
+            }
+            
+            // Handle page visibility change
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    socket.emit('guest_status_change', {
+                        guest_id: guestId,
+                        status: 'away'
+                    });
+                } else {
+                    socket.emit('guest_status_change', {
+                        guest_id: guestId,
+                        status: 'active'
+                    });
+                }
+            });
+        });
+
+        // Cleanup on unload
+        window.addEventListener('beforeunload', () => {
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            
+            socket.emit('guest_disconnect', { guest_id: guestId });
+        });
+    </script>
+</body>
+</html>

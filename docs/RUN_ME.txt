@@ -1,0 +1,4 @@
+Runnable scripts:
+- tools/cleanup-assets.sh
+  - Usage: bash tools/cleanup-assets.sh -n (dry-run) | -D (delete)
+  - Optional: --keep-per-dir <N>

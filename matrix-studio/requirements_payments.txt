@@ -1,0 +1,38 @@
+# Payment Integration Requirements for Enhanced Matrix Studio
+# Add these to your existing requirements_enhanced.txt
+
+# Payment Processing
+stripe==6.6.0
+
+# Enhanced JWT and Security
+PyJWT==2.8.0
+cryptography==41.0.7
+
+# Database and Migration Support
+alembic==1.12.1
+
+# Enhanced Email for Billing
+sendgrid==6.10.0
+
+# Additional Validation and Forms
+marshmallow==3.20.1
+webargs==8.2.0
+
+# Enhanced Monitoring and Analytics
+prometheus-client==0.19.0
+
+# Enhanced Logging
+structlog==23.2.0
+
+# Webhook Processing
+hmac-compat==0.1.1
+
+# Currency and Financial Support
+forex-python==1.8
+
+# Enhanced Security
+python-decouple==3.8
+
+# Background Jobs for Subscription Management
+celery==5.3.4
+redis==5.0.1

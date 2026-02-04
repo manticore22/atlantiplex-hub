@@ -1,0 +1,25 @@
+{
+  "name": "atlantiplex-studio-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 5173",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "socket.io-client": "^4.6.1",
+    "react-router-dom": "^6.19.0"
+  },
+  "devDependencies": {
+    "vite": "^4.3.9",
+    "@vitejs/plugin-react": "^4.0.0",
+    "vitest": "^0.34.0",
+    "@testing-library/react": "^14.0.0"
+  }
+}

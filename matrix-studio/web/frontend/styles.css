@@ -1,0 +1,13 @@
+/* Production-like base styles for the frontend */
+:root{
+  --bg: #0b1020;
+  --surface: #11172a;
+  --text: #e9f0ff;
+  --brand: #0ad;
+}
+html,body,#root{ height:100%; }
+body{ margin:0; font-family: Inter, system-ui, Arial; background: #0b1020; color: var(--text); }
+.dashboard{ padding: 0; }
+.sidebar{ padding: 8px; }
+.stage-area{ padding: 8px; }
+.card{ background: rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,.08); border-radius:8px; padding:12px; }

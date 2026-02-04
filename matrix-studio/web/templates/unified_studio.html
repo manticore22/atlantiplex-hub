@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Unified Broadcasting Studio</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .pulse-dot {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .status-online { color: #10b981; }
+        .status-offline { color: #ef4444; }
+        .status-warning { color: #f59e0b; }
+        .guest-card {
+            transition: all 0.3s ease;
+        }
+        .guest-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .control-btn {
+            transition: all 0.2s ease;
+        }
+        .control-btn:hover {
+            transform: scale(1.05);
+        }
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    <!-- Header -->
+    <header class="glass-effect sticky top-0 z-50 px-6 py-4">
+        <div class="container mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <i class="fas fa-broadcast-tower text-3xl"></i>
+                <div>
+                    <h1 class="text-2xl font-bold">Matrix Studio</h1>
+                    <p class="text-sm opacity-80">Unified Broadcasting Platform</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-6">
+                <!-- System Status -->
+                <div class="flex items-center space-x-2">
+                    <div id="system-status" class="w-3 h-3 bg-green-500 rounded-full pulse-dot"></div>
+                    <span class="text-sm">System Online</span>
+                </div>
+                <!-- Viewer Count -->
+                <div class="text-right">
+                    <div class="text-2xl font-bold" id="viewer-count">0</div>
+                    <div class="text-xs opacity-80">Viewers</div>
+                </div>
+                <!-- User Menu -->
+                <button class="glass-effect px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-20">
+                    <i class="fas fa-user-circle mr-2"></i>
+                    <span id="user-name">Director</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        <!-- Main Control Panel -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Stream Controls -->
+            <div class="lg:col-span-2 glass-effect rounded-xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-bold flex items-center">
+                        <i class="fas fa-video mr-3"></i>
+                        Stream Controls
+                    </h2>
+                    <div id="stream-status" class="px-3 py-1 rounded-full text-sm bg-red-500">
+                        OFFLINE
+                    </div>
+                </div>
+
+                <!-- Main Controls -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <button id="start-stream" class="control-btn bg-green-500 hover:bg-green-600 px-6 py-3 rounded-lg font-bold">
+                        <i class="fas fa-play mr-2"></i>GO LIVE
+                    </button>
+                    <button id="stop-stream" class="control-btn bg-red-500 hover:bg-red-600 px-6 py-3 rounded-lg font-bold disabled:opacity-50" disabled>
+                        <i class="fas fa-stop mr-2"></i>END STREAM
+                    </button>
+                    <button id="record-toggle" class="control-btn bg-gray-600 hover:bg-gray-700 px-6 py-3 rounded-lg font-bold">
+                        <i class="fas fa-record-vinyl mr-2"></i>RECORD
+                    </button>
+                    <button id="settings-btn" class="control-btn bg-gray-600 hover:bg-gray-700 px-6 py-3 rounded-lg font-bold">
+                        <i class="fas fa-cog mr-2"></i>SETTINGS
+                    </button>
+                </div>
+
+                <!-- Stream Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Stream Title</label>
+                        <input type="text" id="stream-title" class="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Enter stream title">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Quality</label>
+                        <select id="quality-select" class="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <option value="720p">720p (Recommended)</option>
+                            <option value="1080p">1080p (High Quality)</option>
+                            <option value="480p">480p (Lower Bandwidth)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Platform Selection -->
+                <div class="mt-6">
+                    <label class="block text-sm font-medium mb-2">Streaming Platforms</label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <label class="platform-toggle">
+                            <input type="checkbox" class="hidden" value="youtube">
+                            <div class="platform-card bg-red-600 bg-opacity-20 border border-red-400 rounded-lg p-3 text-center cursor-pointer hover:bg-opacity-30">
+                                <i class="fab fa-youtube text-2xl mb-1"></i>
+                                <div class="text-sm">YouTube</div>
+                            </div>
+                        </label>
+                        <label class="platform-toggle">
+                            <input type="checkbox" class="hidden" value="twitch">
+                            <div class="platform-card bg-purple-600 bg-opacity-20 border border-purple-400 rounded-lg p-3 text-center cursor-pointer hover:bg-opacity-30">
+                                <i class="fab fa-twitch text-2xl mb-1"></i>
+                                <div class="text-sm">Twitch</div>
+                            </div>
+                        </label>
+                        <label class="platform-toggle">
+                            <input type="checkbox" class="hidden" value="facebook">
+                            <div class="platform-card bg-blue-600 bg-opacity-20 border border-blue-400 rounded-lg p-3 text-center cursor-pointer hover:bg-opacity-30">
+                                <i class="fab fa-facebook text-2xl mb-1"></i>
+                                <div class="text-sm">Facebook</div>
+                            </div>
+                        </label>
+                        <label class="platform-toggle">
+                            <input type="checkbox" class="hidden" value="linkedin">
+                            <div class="platform-card bg-blue-700 bg-opacity-20 border border-blue-500 rounded-lg p-3 text-center cursor-pointer hover:bg-opacity-30">
+                                <i class="fab fa-linkedin text-2xl mb-1"></i>
+                                <div class="text-sm">LinkedIn</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Stats -->
+            <div class="glass-effect rounded-xl p-6">
+                <h3 class="text-xl font-bold mb-4 flex items-center">
+                    <i class="fas fa-chart-line mr-3"></i>
+                    System Stats
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="stat-item">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm opacity-80">Uptime</span>
+                            <span id="uptime" class="font-mono">00:00:00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm opacity-80">CPU Usage</span>
+                            <span id="cpu-usage">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2 mt-1">
+                            <div id="cpu-bar" class="bg-green-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm opacity-80">Memory</span>
+                            <span id="memory-usage">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2 mt-1">
+                            <div id="memory-bar" class="bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm opacity-80">Active Guests</span>
+                            <span id="active-guests">0/6</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm opacity-80">Network</span>
+                            <span id="network-speed">0 Mbps</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scene Management -->
+        <section class="glass-effect rounded-xl p-6 mb-8">
+            <h2 class="text-xl font-bold mb-6 flex items-center">
+                <i class="fas fa-layer-group mr-3"></i>
+                Scene Management
+            </h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <button class="scene-btn bg-gradient-to-r from-blue-500 to-purple-600 p-4 rounded-lg hover:shadow-lg transition-all" data-scene="main">
+                    <i class="fas fa-users text-2xl mb-2"></i>
+                    <div class="font-semibold">Main Interview</div>
+                    <div class="text-xs opacity-80">Host + 2 Guests</div>
+                </button>
+                
+                <button class="scene-btn bg-gradient-to-r from-green-500 to-teal-600 p-4 rounded-lg hover:shadow-lg transition-all" data-scene="gaming">
+                    <i class="fas fa-gamepad text-2xl mb-2"></i>
+                    <div class="font-semibold">Gaming</div>
+                    <div class="text-xs opacity-80">Game + Webcam</div>
+                </button>
+                
+                <button class="scene-btn bg-gradient-to-r from-orange-500 to-red-600 p-4 rounded-lg hover:shadow-lg transition-all" data-scene="presentation">
+                    <i class="fas fa-presentation text-2xl mb-2"></i>
+                    <div class="font-semibold">Presentation</div>
+                    <div class="text-xs opacity-80">Slides + Speaker</div>
+                </button>
+                
+                <button class="scene-btn bg-gradient-to-r from-pink-500 to-purple-600 p-4 rounded-lg hover:shadow-lg transition-all" data-scene="solo">
+                    <i class="fas fa-user text-2xl mb-2"></i>
+                    <div class="font-semibold">Solo</div>
+                    <div class="text-xs opacity-80">Single Host</div>
+                </button>
+            </div>
+        </section>
+
+        <!-- Guest Management -->
+        <section class="glass-effect rounded-xl p-6 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold flex items-center">
+                    <i class="fas fa-users mr-3"></i>
+                    Guest Management
+                </h2>
+                <button id="add-guest" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg">
+                    <i class="fas fa-user-plus mr-2"></i>Invite Guest
+                </button>
+            </div>
+            
+            <div id="guests-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Guest slots will be populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Activity Log -->
+        <section class="glass-effect rounded-xl p-6">
+            <h2 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fas fa-list-alt mr-3"></i>
+                Activity Log
+            </h2>
+            
+            <div id="activity-log" class="space-y-2 max-h-40 overflow-y-auto">
+                <div class="text-sm opacity-80">System initialized and ready</div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modals -->
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="glass-effect rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4">Stream Settings</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Stream Description</label>
+                    <textarea class="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-purple-500" rows="3" placeholder="Describe your stream"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Category</label>
+                    <select class="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <option>Gaming</option>
+                        <option>Talk Show</option>
+                        <option>Education</option>
+                        <option>Music</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="mr-2">
+                        <span>Auto-start recording</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" class="mr-2">
+                        <span>Save VODs</span>
+                    </label>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeSettingsModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-700">Cancel</button>
+                <button onclick="saveSettings()" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Guest Modal -->
+    <div id="guest-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="glass-effect rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4">Invite Guest</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Guest Name</label>
+                    <input type="text" id="guest-name" class="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Enter guest name">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Email Address</label>
+                    <input type="email" id="guest-email" class="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="guest@example.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Role</label>
+                    <select id="guest-role" class="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 border border-white border-opacity-30 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <option value="guest">Guest</option>
+                        <option value="moderator">Moderator</option>
+                        <option value="co-host">Co-Host</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="closeGuestModal()" class="px-4 py-2 rounded-lg bg-gray-600 hover:bg-gray-700">Cancel</button>
+                <button onclick="inviteGuest()" class="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700">Send Invite</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Socket.IO connection
+        const socket = io();
+        let currentSessionId = null;
+        let isStreaming = false;
+        let guests = [];
+        let systemStats = {};
+
+        // Socket event handlers
+        socket.on('connect', () => {
+            console.log('Connected to Matrix Server');
+            logActivity('Connected to broadcasting server');
+            
+            // Join studio room
+            socket.emit('join_studio', { user_id: 'director' });
+        });
+
+        socket.on('system_stats', (stats) => {
+            updateSystemStats(stats);
+        });
+
+        socket.on('stream_status_update', (status) => {
+            updateStreamStatus(status);
+        });
+
+        socket.on('session_started', (data) => {
+            currentSessionId = data.session_id;
+            isStreaming = true;
+            updateStreamUI();
+            logActivity(`Stream started: ${data.title}`);
+        });
+
+        socket.on('session_stopped', (data) => {
+            currentSessionId = null;
+            isStreaming = false;
+            updateStreamUI();
+            logActivity(`Stream ended (Duration: ${formatDuration(data.duration)})`);
+        });
+
+        socket.on('guest_updated', (data) => {
+            updateGuestDisplay();
+            logActivity(`Guest ${data.guest_id} updated`);
+        });
+
+        // UI Functions
+        function updateSystemStats(stats) {
+            systemStats = stats;
+            
+            // Update uptime
+            if (stats.uptime) {
+                document.getElementById('uptime').textContent = formatDuration(stats.uptime);
+            }
+            
+            // Update CPU
+            if (stats.cpu_usage !== undefined) {
+                document.getElementById('cpu-usage').textContent = `${stats.cpu_usage}%`;
+                document.getElementById('cpu-bar').style.width = `${stats.cpu_usage}%`;
+            }
+            
+            // Update Memory
+            if (stats.memory_usage !== undefined) {
+                document.getElementById('memory-usage').textContent = `${stats.memory_usage}%`;
+                document.getElementById('memory-bar').style.width = `${stats.memory_usage}%`;
+            }
+            
+            // Update active guests
+            if (stats.active_guests !== undefined) {
+                document.getElementById('active-guests').textContent = `${stats.active_guests}/6`;
+            }
+        }
+
+        function updateStreamStatus(status) {
+            if (status.is_broadcasting && status.active_platforms) {
+                let totalViewers = 0;
+                Object.values(status.active_platforms).forEach(platform => {
+                    totalViewers += platform.viewer_count || 0;
+                });
+                document.getElementById('viewer-count').textContent = totalViewers;
+            }
+        }
+
+        function updateStreamUI() {
+            const startBtn = document.getElementById('start-stream');
+            const stopBtn = document.getElementById('stop-stream');
+            const statusElement = document.getElementById('stream-status');
+            
+            if (isStreaming) {
+                startBtn.disabled = true;
+                startBtn.classList.add('opacity-50');
+                stopBtn.disabled = false;
+                stopBtn.classList.remove('opacity-50');
+                statusElement.textContent = 'LIVE';
+                statusElement.className = 'px-3 py-1 rounded-full text-sm bg-green-500';
+            } else {
+                startBtn.disabled = false;
+                startBtn.classList.remove('opacity-50');
+                stopBtn.disabled = true;
+                stopBtn.classList.add('opacity-50');
+                statusElement.textContent = 'OFFLINE';
+                statusElement.className = 'px-3 py-1 rounded-full text-sm bg-red-500';
+            }
+        }
+
+        function updateGuestDisplay() {
+            const guestsGrid = document.getElementById('guests-grid');
+            guestsGrid.innerHTML = '';
+            
+            // Create 6 guest slots
+            for (let i = 0; i < 6; i++) {
+                const guest = guests[i] || { slot: i + 1, empty: true };
+                const guestCard = createGuestCard(guest);
+                guestsGrid.appendChild(guestCard);
+            }
+        }
+
+        function createGuestCard(guest) {
+            const card = document.createElement('div');
+            card.className = 'guest-card glass-effect rounded-lg p-4';
+            
+            if (guest.empty) {
+                card.innerHTML = `
+                    <div class="text-center opacity-50">
+                        <i class="fas fa-user-plus text-4xl mb-2"></i>
+                        <div class="text-sm">Guest Slot ${guest.slot}</div>
+                        <button class="mt-2 text-xs bg-green-500 px-2 py-1 rounded hover:bg-green-600">
+                            Invite Guest
+                        </button>
+                    </div>
+                `;
+            } else {
+                const statusColor = guest.status === 'online' ? 'text-green-400' : 
+                                   guest.status === 'connecting' ? 'text-yellow-400' : 'text-gray-400';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <img src="https://picsum.photos/seed/${guest.id}/40/40.jpg" class="w-10 h-10 rounded-full mr-3">
+                            <div>
+                                <div class="font-semibold">${guest.name}</div>
+                                <div class="text-xs opacity-80">${guest.role}</div>
+                            </div>
+                        </div>
+                        <i class="fas fa-circle ${statusColor} text-xs"></i>
+                    </div>
+                    <div class="flex justify-between space-x-2">
+                        <button class="control-btn bg-blue-500 hover:bg-blue-600 px-2 py-1 rounded text-xs">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <button class="control-btn bg-green-500 hover:bg-green-600 px-2 py-1 rounded text-xs">
+                            <i class="fas fa-video"></i>
+                        </button>
+                        <button class="control-btn bg-yellow-500 hover:bg-yellow-600 px-2 py-1 rounded text-xs">
+                            <i class="fas fa-hand-paper"></i>
+                        </button>
+                        <button class="control-btn bg-red-500 hover:bg-red-600 px-2 py-1 rounded text-xs">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            }
+            
+            return card;
+        }
+
+        function logActivity(message) {
+            const log = document.getElementById('activity-log');
+            const entry = document.createElement('div');
+            entry.className = 'text-sm opacity-80';
+            entry.innerHTML = `<span class="opacity-60">[${new Date().toLocaleTimeString()}]</span> ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function formatDuration(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Event Handlers
+        document.getElementById('start-stream').addEventListener('click', async () => {
+            const title = document.getElementById('stream-title').value || 'Untitled Stream';
+            const quality = document.getElementById('quality-select').value;
+            const platforms = Array.from(document.querySelectorAll('.platform-toggle input:checked')).map(cb => cb.value);
+            
+            if (platforms.length === 0) {
+                alert('Please select at least one streaming platform');
+                return;
+            }
+            
+            try {
+                const response = await axios.post('/api/session/start', {
+                    title: title,
+                    quality: quality,
+                    platforms: platforms,
+                    record: document.getElementById('record-toggle').classList.contains('bg-red-500')
+                });
+                
+                if (response.data.success) {
+                    logActivity('Stream session started successfully');
+                } else {
+                    alert('Failed to start stream: ' + response.data.error);
+                }
+            } catch (error) {
+                console.error('Error starting stream:', error);
+                alert('Failed to start stream');
+            }
+        });
+
+        document.getElementById('stop-stream').addEventListener('click', async () => {
+            try {
+                const response = await axios.post('/api/session/stop');
+                if (response.data.success) {
+                    logActivity('Stream session stopped');
+                } else {
+                    alert('Failed to stop stream: ' + response.data.error);
+                }
+            } catch (error) {
+                console.error('Error stopping stream:', error);
+                alert('Failed to stop stream');
+            }
+        });
+
+        document.getElementById('record-toggle').addEventListener('click', function() {
+            this.classList.toggle('bg-red-500');
+            this.classList.toggle('bg-gray-600');
+            const isRecording = this.classList.contains('bg-red-500');
+            this.innerHTML = isRecording ? 
+                '<i class="fas fa-stop mr-2"></i>STOP RECORDING' : 
+                '<i class="fas fa-record-vinyl mr-2"></i>RECORD';
+            logActivity(isRecording ? 'Recording started' : 'Recording stopped');
+        });
+
+        // Scene buttons
+        document.querySelectorAll('.scene-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const scene = btn.dataset.scene;
+                socket.emit('studio_action', {
+                    action: 'switch_scene',
+                    data: { scene_name: scene }
+                });
+                
+                // Update UI
+                document.querySelectorAll('.scene-btn').forEach(b => b.classList.remove('ring-2', 'ring-white'));
+                btn.classList.add('ring-2', 'ring-white');
+                logActivity(`Switched to scene: ${scene}`);
+            });
+        });
+
+        // Platform selection
+        document.querySelectorAll('.platform-toggle input').forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                const card = e.target.nextElementSibling;
+                if (e.target.checked) {
+                    card.classList.add('ring-2', 'ring-white');
+                } else {
+                    card.classList.remove('ring-2', 'ring-white');
+                }
+            });
+        });
+
+        // Modal functions
+        document.getElementById('settings-btn').addEventListener('click', () => {
+            document.getElementById('settings-modal').classList.remove('hidden');
+        });
+
+        document.getElementById('add-guest').addEventListener('click', () => {
+            document.getElementById('guest-modal').classList.remove('hidden');
+        });
+
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').classList.add('hidden');
+        }
+
+        function closeGuestModal() {
+            document.getElementById('guest-modal').classList.add('hidden');
+        }
+
+        function saveSettings() {
+            // Save settings logic here
+            logActivity('Settings updated');
+            closeSettingsModal();
+        }
+
+        function inviteGuest() {
+            const name = document.getElementById('guest-name').value;
+            const email = document.getElementById('guest-email').value;
+            const role = document.getElementById('guest-role').value;
+            
+            if (!name || !email) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            // Add guest logic here
+            guests.push({
+                id: Date.now().toString(),
+                name: name,
+                email: email,
+                role: role,
+                status: 'invited'
+            });
+            
+            updateGuestDisplay();
+            logActivity(`Invited guest: ${name}`);
+            closeGuestModal();
+            
+            // Clear form
+            document.getElementById('guest-name').value = '';
+            document.getElementById('guest-email').value = '';
+        }
+
+        // Initialize
+        updateGuestDisplay();
+        updateStreamUI();
+        
+        // Set initial scene
+        document.querySelector('.scene-btn[data-scene="main"]').classList.add('ring-2', 'ring-white');
+        
+        // Load initial system status
+        fetchSystemStatus();
+        
+        async function fetchSystemStatus() {
+            try {
+                const response = await axios.get('/api/system/status');
+                if (response.data.system) {
+                    updateSystemStats(response.data.system.stats || {});
+                }
+            } catch (error) {
+                console.error('Error fetching system status:', error);
+            }
+        }
+
+        // Periodic status updates
+        setInterval(fetchSystemStatus, 30000); // Update every 30 seconds
+    </script>
+</body>
+</html>

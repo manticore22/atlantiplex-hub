@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ATLANTIPLEX BROADCAST STUDIO</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 50%, #0f0f1f 100%);
+            color: #00ff41;
+            font-family: 'Orbitron', 'Courier New', monospace;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+            image-rendering: pixelated;
+            text-shadow: 0 0 5px rgba(0, 255, 65, 0.3);
+        }
+
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 65, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 1;
+            animation: grid-move 10s linear infinite;
+        }
+
+        .matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.15;
+            z-index: 2;
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                transparent 50%,
+                rgba(0, 255, 65, 0.03) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 3;
+            animation: scanlines 8s linear infinite;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(10, 10, 26, 0.8) 100%);
+        }
+
+        .game-ui {
+            border: 3px solid #00ff41;
+            background: rgba(0, 20, 40, 0.9);
+            padding: 40px;
+            box-shadow: 
+                0 0 30px rgba(0, 255, 65, 0.3),
+                inset 0 0 20px rgba(0, 255, 65, 0.1);
+            position: relative;
+            max-width: 600px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .game-ui::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(45deg, #00ff41, #00cc33, #00ff41);
+            z-index: -1;
+            opacity: 0.5;
+            animation: glow-pulse 2s ease-in-out infinite;
+        }
+
+        .title {
+            font-size: 4em;
+            font-weight: 900;
+            text-shadow: 
+                0 0 20px #00ff41,
+                0 0 40px #00ff41,
+                2px 2px 0 #ff0041,
+                -2px -2px 0 #41ff00;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+            animation: glitch-title 3s infinite;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.8;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            animation: text-flicker 5s infinite;
+            text-align: center;
+        }
+
+        .controls {
+            background: rgba(0, 255, 65, 0.05);
+            border: 2px solid #00ff41;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: rgba(0, 20, 40, 0.8);
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            padding: 15px;
+            font-family: 'Orbitron', monospace;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .input-group input:focus {
+            box-shadow: 
+                0 0 20px rgba(0, 255, 65, 0.5),
+                inset 0 0 10px rgba(0, 255, 65, 0.2);
+            background: rgba(0, 30, 60, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #00ff41, #00cc33);
+            border: 2px solid #00ff41;
+            color: #000;
+            padding: 15px 30px;
+            font-family: 'Orbitron', monospace;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 
+                0 10px 30px rgba(0, 255, 65, 0.4),
+                0 0 30px rgba(0, 255, 65, 0.3);
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        .status {
+            background: rgba(0, 255, 65, 0.05);
+            border: 2px solid #00ff41;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .status::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: #00ff41;
+            animation: status-sweep 2s linear infinite;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+
+        .loading.active {
+            display: block;
+            animation: pulse-loading 1s infinite;
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes grid-move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes glitch-title {
+            0%, 100% { 
+                text-shadow: 
+                    0 0 20px #00ff41,
+                    0 0 40px #00ff41,
+                    2px 2px 0 #ff0041,
+                    -2px -2px 0 #41ff00;
+            }
+            25% { 
+                text-shadow: 
+                    -2px 0 20px #ff0041,
+                    -2px 0 40px #ff0041,
+                    2px 2px 0 #00ff41,
+                    -2px -2px 0 #41ff00;
+            }
+            50% { 
+                text-shadow: 
+                    2px 0 20px #41ff00,
+                    2px 0 40px #41ff00,
+                    2px 2px 0 #00ff41,
+                    -2px -2px 0 #ff0041;
+            }
+            75% { 
+                text-shadow: 
+                    0 2px 20px #ff0041,
+                    0 2px 40px #ff0041,
+                    2px 2px 0 #00ff41,
+                    -2px -2px 0 #41ff00;
+            }
+        }
+
+        @keyframes text-flicker {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+            75% { opacity: 0.9; }
+        }
+
+        @keyframes pulse-loading {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+
+        @keyframes status-sweep {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        @keyframes success-glow {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 30px rgba(0, 255, 65, 0.3),
+                    inset 0 0 20px rgba(0, 255, 65, 0.1);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 50px rgba(0, 255, 65, 0.6),
+                    inset 0 0 30px rgba(0, 255, 65, 0.3),
+                    0 0 80px rgba(0, 255, 65, 0.2);
+            }
+        }
+
+        .version-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            padding: 8px 15px;
+            font-size: 0.8em;
+            z-index: 100;
+        }
+
+        .power-indicator {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00ff41;
+            border-radius: 50%;
+            z-index: 100;
+        }
+
+        .power-indicator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: #00ff41;
+            border-radius: 50%;
+            animation: power-pulse 2s infinite;
+        }
+
+        @keyframes power-pulse {
+            0%, 100% { box-shadow: 0 0 5px #00ff41; }
+            50% { box-shadow: 0 0 20px #00ff41; }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-grid"></div>
+    <canvas class="matrix-rain" id="matrix"></canvas>
+    <div class="scanlines"></div>
+    
+    <div class="power-indicator"></div>
+    <div class="version-badge">SYSTEM v2.0</div>
+    
+    <div class="container">
+        <div class="scanner"></div>
+        
+        <div class="game-ui">
+            <h1 class="title" style="text-align: center; width: 100%;">ATLANTIPLEX</h1>
+            <p class="subtitle">// NEURAL BROADCAST INTERFACE INITIALIZED</p>
+            
+            <div class="controls">
+                <div class="input-group">
+                    <label for="hostName">[ USER IDENTIFICATION ]</label>
+                    <input type="text" id="hostName" placeholder="ENTER DESIGNATION..." value="ADMIN">
+                </div>
+                
+                <button class="btn" onclick="createSession()">
+                    [ ENTER MODERATOR STUDIO ]
+                </button>
+                
+                <button class="btn" onclick="joinAsGuest()">
+                    [ ENTER AS GUEST ]
+                </button>
+                
+                <div class="status" id="status">
+                    SYSTEM READY // AWAITING COMMAND INPUT
+                </div>
+                
+                <div class="loading" id="loading">
+                    CONNECTING TO NEURAL NETWORK
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced matrix rain with cyber colors
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const cyberChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|:;,<>?/~`';
+        const matrixArray = cyberChars.split('');
+
+        const fontSize = 10;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+
+        for(let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+
+        function drawCyberRain() {
+            ctx.fillStyle = 'rgba(10, 10, 26, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px Orbitron, monospace';
+
+            for(let i = 0; i < drops.length; i++) {
+                const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawCyberRain, 50);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Enhanced session management
+        let currentSession = null;
+
+        async function createSession() {
+            const hostName = document.getElementById('hostName').value || 'Anonymous';
+            const status = document.getElementById('status');
+            const loading = document.getElementById('loading');
+            
+            loading.classList.add('active');
+            status.innerHTML = `// INITIALIZING NEURAL CONNECTION FOR ${hostName.toUpperCase()}...`;
+            
+            try {
+                const response = await fetch('/api/session/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ hostName })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentSession = data;
+                    status.innerHTML = `
+                        // CONNECTION ESTABLISHED<br>
+                        SESSION ID: ${data.sessionId}<br>
+                        STUDIO: <a href="${data.studioUrl}" target="_blank" style="color: #00ff41;">[ENTER STUDIO]</a><br>
+                        GUEST ACCESS: <a href="${data.guestUrl}" target="_blank" style="color: #00ff41;">[GENERATE INVITE]</a>
+                    `;
+                    
+                    // Add success effects
+                    document.querySelector('.game-ui').style.animation = 'success-glow 0.5s';
+                    
+                    setTimeout(() => {
+                        window.open(data.studioUrl, '_blank');
+                    }, 2000);
+                } else {
+                    status.innerHTML = '// ERROR: NEURAL CONNECTION FAILED';
+                }
+            } catch (error) {
+                status.innerHTML = `// ERROR: ${error.message}`;
+            }
+            
+            loading.classList.remove('active');
+        }
+
+        function joinAsGuest() {
+            const sessionId = prompt('// ENTER SESSION ACCESS CODE:');
+            if (sessionId) {
+                window.location.href = `/guest/${sessionId}`;
+            }
+        }
+
+        // Add success animation
+        const successStyle = document.createElement('style');
+        successStyle.textContent = `
+            @keyframes success-glow {
+                0% { box-shadow: 0 0 30px rgba(0, 255, 65, 0.3); }
+                50% { box-shadow: 0 0 50px rgba(0, 255, 65, 0.6); }
+                100% { box-shadow: 0 0 30px rgba(0, 255, 65, 0.3); }
+            }
+        `;
+        document.head.appendChild(successStyle);
+
+        // Add typing sound effect simulation
+        document.getElementById('hostName').addEventListener('input', () => {
+            // In a real implementation, you could add typing sounds here
+            document.querySelector('.game-ui').style.transform = 'scale(1.02)';
+            setTimeout(() => {
+                document.querySelector('.game-ui').style.transform = 'scale(1)';
+            }, 100);
+        });
+
+        // Add hover sound simulation
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                btn.style.transition = 'all 0.1s';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+/* Typography tokens for LIVE Atlantiplex branding */
+@font-face {
+  font-family: 'BrandSans';
+  src: local('Arial');
+}
+:root {
+  --font-display: BrandSans, Arial, sans-serif;
+  --font-body: BrandSans, Arial, sans-serif;
+}
+body {
+  font-family: var(--font-body);
+  color: var(--brand-text);
+}

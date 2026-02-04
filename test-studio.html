@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Atlantiplex Lightning Studio - Test</title>
+    <script>
+        // Test branding system
+        const brandName = 'Atlantiplex Lightning Studio';
+        const logoPath = '/static/atlantiplex-lightning-logo.svg';
+        
+        console.log('✅ Branding loaded:', brandName);
+        console.log('✅ Logo path:', logoPath);
+        
+        // Test logo loading
+        function testLogo() {
+            const img = new Image();
+            img.onload = () => console.log('✅ Logo loaded successfully');
+            img.onerror = () => console.error('❌ Logo failed to load');
+            img.src = logoPath;
+        }
+        
+        // Test CSS variables
+        function testCSS() {
+            const root = document.documentElement;
+            const primaryColor = '#1e3c72';
+            const accentColor = '#ffeb3b';
+            console.log('✅ Primary color:', primaryColor);
+            console.log('✅ Accent color:', accentColor);
+        }
+        
+        window.onload = () => {
+            testLogo();
+            testCSS();
+            console.log('🚀 Atlantiplex Lightning Studio test complete');
+        };
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0f1b 0%, #1a2942 50%, #0a0f1b 100%);
+            color: #eaf6ff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .test-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+        }
+        
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+        
+        .title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #eaf6ff;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 235, 59, 0.4);
+        }
+        
+        .subtitle {
+            color: #b8c5d6;
+            margin-bottom: 20px;
+        }
+        
+        .status {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .status:hover {
+            background: linear-gradient(135deg, #2a5298, #1e3c72);
+            box-shadow: 0 4px 16px rgba(30, 60, 114, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-card">
+        <img src="/static/atlantiplex-lightning-logo.svg" alt="Atlantiplex Lightning Studio" class="logo">
+        <h1 class="title">Atlantiplex Lightning Studio</h1>
+        <p class="subtitle">Professional Broadcasting Platform</p>
+        <button class="status" onclick="window.open('/static/index.html', '_blank')">
+            🚀 Open Studio Interface
+        </button>
+    </div>
+</body>
+</html>
