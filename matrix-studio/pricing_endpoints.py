@@ -20,137 +20,160 @@ class PricingManager:
     
     def __init__(self):
         self.plans = {
-            'free': {
-                'id': 'free',
-                'name': 'Free',
+            'basic': {
+                'id': 'basic',
+                'name': 'Basic',
                 'price': 0,
                 'currency': 'usd',
                 'interval': 'month',
-                'description': 'Get started with basic streaming',
-                'features': [
-                    '1 concurrent guest',
-                    'SD streaming quality',
-                    'YouTube platform only',
-                    'Basic scene templates',
-                    '10GB bandwidth/month',
-                    'Community support'
-                ],
-                'limitations': [
-                    'No HD streaming',
-                    'No API access',
-                    'No cloud storage',
-                    'Basic analytics only'
-                ],
-                'stripe_price_id': None,
-                'popular': False
-            },
-            'starter': {
-                'id': 'starter',
-                'name': 'Starter',
-                'price': 9.99,
-                'currency': 'usd',
-                'interval': 'month',
-                'description': 'Perfect for small creators',
+                'description': 'Perfect for getting started',
                 'features': [
                     '3 concurrent guests',
                     'HD streaming quality (720p)',
-                    'YouTube + Twitch platforms',
-                    'Basic + Premium scenes',
-                    '100GB bandwidth/month',
-                    '10GB cloud storage',
-                    'Email support',
-                    'Basic analytics',
-                    'Unlimited stream duration'
+                    'YouTube platform',
+                    'Basic scene templates',
+                    '20 hours live streaming per month',
+                    'Community support'
                 ],
                 'limitations': [
+                    '⚡ Lightning bolt watermark on streams',
+                    'Max 20 hours streaming per month',
+                    'Single platform (YouTube)',
                     'No custom scenes',
-                    'No API access',
-                    'Standard support only'
+                    'No API access'
                 ],
-                'stripe_price_id': 'price_starter_monthly',
-                'paypal_plan_id': 'P-STARTER-MONTHLY',
+                'watermark': {
+                    'enabled': True,
+                    'type': 'lightning_bolt',
+                    'text': 'Powered by Atlantiplex',
+                    'position': 'bottom_right',
+                    'opacity': 0.7
+                },
+                'usage_limits': {
+                    'streaming_hours_per_month': 20,
+                    'concurrent_guests': 2,
+                    'max_quality': '720p',
+                    'storage_gb': 5
+                },
+                'stripe_price_id': None,
+                'paypal_plan_id': None,
                 'popular': False
             },
-            'professional': {
-                'id': 'professional',
-                'name': 'Professional',
-                'price': 29.99,
+            'creator': {
+                'id': 'creator',
+                'name': 'Creator',
+                'price': 9.99,
+                'currency': 'usd',
+                'interval': 'month',
+                'description': 'For content creators',
+                'features': [
+                    '6 concurrent guests',
+                    'Full HD streaming (1080p)',
+                    'YouTube + Twitch + Facebook',
+                    'All scene templates',
+                    'Unlimited streaming hours',
+                    'No watermark',
+                    '50GB cloud storage',
+                    'Email support',
+                    'Basic analytics'
+                ],
+                'limitations': [
+                    'No custom branding',
+                    'No API access'
+                ],
+                'watermark': {
+                    'enabled': False
+                },
+                'stripe_price_id': 'price_creator_monthly',
+                'paypal_plan_id': 'P-CREATOR-MONTHLY',
+                'popular': True
+            },
+            'pro': {
+                'id': 'pro',
+                'name': 'Pro',
+                'price': 100.00,
                 'currency': 'usd',
                 'interval': 'month',
                 'description': 'For serious streamers and professionals',
                 'features': [
-                    '10 concurrent guests (was 8)',
+                    '8 concurrent guests',
                     'Full HD streaming (1080p)',
                     '4 platforms: YouTube, Twitch, Facebook, Instagram',
                     'All scene templates including custom',
-                    '500GB bandwidth/month',
+                    'Unlimited streaming hours',
+                    'No watermark',
                     '100GB cloud storage',
                     'Priority email support',
-                    'Advanced analytics dashboard',
+                    'Advanced analytics',
                     'API access',
-                    'Stream recording',
                     'Custom branding',
-                    'OBS integration'
+                    'OBS integration',
+                    'Stream recording'
                 ],
                 'limitations': [],
-                'stripe_price_id': 'price_professional_monthly',
-                'paypal_plan_id': 'P-PROFESSIONAL-MONTHLY',
-                'popular': True
+                'watermark': {
+                    'enabled': False
+                },
+                'stripe_price_id': 'price_pro_monthly',
+                'paypal_plan_id': 'P-PRO-MONTHLY',
+                'popular': False
             },
-            'enterprise': {
-                'id': 'enterprise',
-                'name': 'Enterprise',
-                'price': 99.99,
+            'business': {
+                'id': 'business',
+                'name': 'Business',
+                'price': 20.00,
                 'currency': 'usd',
                 'interval': 'month',
-                'description': 'For businesses and large organizations',
+                'description': 'For teams and organizations',
                 'features': [
-                    '50 concurrent guests',
+                    '8 concurrent guests',
                     '4K Ultra HD streaming',
-                    'All 6 platforms including LinkedIn & Twitter',
+                    'All platforms including LinkedIn & Twitter',
                     'Unlimited custom scenes',
-                    '2TB bandwidth/month',
-                    '1TB cloud storage',
+                    'Unlimited streaming',
+                    'No watermark',
+                    '500GB cloud storage',
                     '24/7 phone support',
-                    'Dedicated account manager',
-                    'White-label options',
-                    'Custom integrations',
-                    'SLA guarantee',
                     'Team management',
-                    'Advanced security features'
+                    'White-label options',
+                    'Priority API access',
+                    'Custom integrations'
                 ],
                 'limitations': [],
-                'stripe_price_id': 'price_enterprise_monthly',
-                'paypal_plan_id': 'P-ENTERPRISE-MONTHLY',
+                'watermark': {
+                    'enabled': False
+                },
+                'stripe_price_id': 'price_business_monthly',
+                'paypal_plan_id': 'P-BUSINESS-MONTHLY',
                 'popular': False
             }
         }
         
-        # Annual plans (20% discount)
+        # Annual plans (2 months free = ~17% discount)
         self.annual_plans = {
-            'starter': {
-                **self.plans['starter'],
-                'price': 95.90,  # ~20% discount
+            'creator': {
+                **self.plans['creator'],
+                'price': 89.00,  # $89 yearly
                 'interval': 'year',
-                'description': 'Starter plan - Annual billing (Save 20%)',
-                'stripe_price_id': 'price_starter_yearly',
-                'paypal_plan_id': 'P-STARTER-YEARLY'
+                'description': 'Creator plan - Annual billing (Best value)',
+                'stripe_price_id': 'price_creator_yearly',
+                'paypal_plan_id': 'P-CREATOR-YEARLY'
             },
-            'professional': {
-                **self.plans['professional'],
-                'price': 287.90,  # ~20% discount
+            'pro': {
+                **self.plans['pro'],
+                'price': 110.00,  # $110 per year
                 'interval': 'year',
-                'description': 'Professional plan - Annual billing (Save 20%)',
-                'stripe_price_id': 'price_professional_yearly',
-                'paypal_plan_id': 'P-PROFESSIONAL-YEARLY'
+                'description': 'Pro plan - $110 per year',
+                'stripe_price_id': 'price_pro_yearly',
+                'paypal_plan_id': 'P-PRO-YEARLY'
             },
-            'enterprise': {
-                **self.plans['enterprise'],
-                'price': 959.90,  # ~20% discount
+            'business': {
+                **self.plans['business'],
+                'price': 150.00,  # $150 yearly max
                 'interval': 'year',
-                'description': 'Enterprise plan - Annual billing (Save 20%)',
-                'stripe_price_id': 'price_enterprise_yearly',
-                'paypal_plan_id': 'P-ENTERPRISE-YEARLY'
+                'description': 'Business plan - Annual billing (Best value)',
+                'stripe_price_id': 'price_business_yearly',
+                'paypal_plan_id': 'P-BUSINESS-YEARLY'
             }
         }
         
@@ -180,58 +203,64 @@ class PricingManager:
             'plans': self.plans,
             'features': {
                 'guests': {
-                    'free': '1',
-                    'starter': '3',
-                    'professional': '10',
-                    'enterprise': '50'
+                    'basic': '3',
+                    'creator': '6',
+                    'pro': '10',
+                    'business': '25'
                 },
                 'quality': {
-                    'free': 'SD (480p)',
-                    'starter': 'HD (720p)',
-                    'professional': 'Full HD (1080p)',
-                    'enterprise': '4K Ultra HD'
+                    'basic': 'HD (720p)',
+                    'creator': 'Full HD (1080p)',
+                    'pro': 'Full HD (1080p)',
+                    'business': '4K Ultra HD'
+                },
+                'streaming_hours': {
+                    'basic': '20 hours/month',
+                    'creator': 'Unlimited',
+                    'pro': 'Unlimited',
+                    'business': 'Unlimited'
+                },
+                'watermark': {
+                    'basic': '⚡ Lightning bolt',
+                    'creator': 'None',
+                    'pro': 'None',
+                    'business': 'None'
                 },
                 'platforms': {
-                    'free': 'YouTube',
-                    'starter': 'YouTube, Twitch',
-                    'professional': '4 platforms',
-                    'enterprise': 'All 6 platforms'
-                },
-                'bandwidth': {
-                    'free': '10GB/month',
-                    'starter': '100GB/month',
-                    'professional': '500GB/month',
-                    'enterprise': '2TB/month'
+                    'basic': 'YouTube',
+                    'creator': 'YouTube, Twitch, Facebook',
+                    'pro': '4 platforms',
+                    'business': 'All platforms'
                 },
                 'storage': {
-                    'free': 'None',
-                    'starter': '10GB',
-                    'professional': '100GB',
-                    'enterprise': '1TB'
+                    'basic': '5GB',
+                    'creator': '50GB',
+                    'pro': '100GB',
+                    'business': '500GB'
                 },
                 'support': {
-                    'free': 'Community',
-                    'starter': 'Email',
-                    'professional': 'Priority Email',
-                    'enterprise': '24/7 Phone'
+                    'basic': 'Community',
+                    'creator': 'Email',
+                    'pro': 'Priority Email',
+                    'business': '24/7 Phone'
                 },
                 'api_access': {
-                    'free': False,
-                    'starter': False,
-                    'professional': True,
-                    'enterprise': True
+                    'basic': False,
+                    'creator': False,
+                    'pro': True,
+                    'business': True
                 },
                 'custom_branding': {
-                    'free': False,
-                    'starter': False,
-                    'professional': True,
-                    'enterprise': True
+                    'basic': False,
+                    'creator': False,
+                    'pro': True,
+                    'business': True
                 },
                 'white_label': {
-                    'free': False,
-                    'starter': False,
-                    'professional': False,
-                    'enterprise': True
+                    'basic': False,
+                    'creator': False,
+                    'pro': False,
+                    'business': True
                 }
             }
         }
