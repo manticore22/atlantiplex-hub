@@ -29,11 +29,19 @@ def register_payment_routes(app: Flask):
     
     @app.route('/api/auth/login', methods=['POST'])
     def login():
-        """Login with admin bypass support"""
+        """Login with admin bypass support and Manticore Control Interface"""
         try:
             data = request.get_json()
             username = data.get('username')
             password = data.get('password')
+            email = data.get('email')  # Check for Manticore email
+            
+            # Special Manticore Control Interface check
+            if email and email.lower() == "digital.demiurge666@gmail.com":
+                result = auth_manager.verify_admin_credentials(username, password, email)
+                if result['success']:
+                    logger.info(f"MANTICORE CONTROL INTERFACE LOGIN: {email}")
+                    return jsonify(result), 200
             
             if not username or not password:
                 return jsonify({'error': 'Username and password required'}), 400
@@ -91,6 +99,57 @@ def register_payment_routes(app: Flask):
         """Get user's current subscription"""
         try:
             user_id = g.current_user['user_id']
+            user_role = g.current_user.get('role', '')
+            
+            # MANTICORE CONTROL INTERFACE - Bypass all payments
+            if user_role == 'manticore_controller':
+                return jsonify({
+                    'success': True,
+                    'subscription': {
+                        'tier': 'manticore_unlimited',
+                        'name': 'Manticore Control Interface',
+                        'price': 0,
+                        'billing_cycle': 'lifetime',
+                        'features': {
+                            'guest_management': {
+                                'max_concurrent': 'unlimited',
+                                'total_sessions_per_day': 'unlimited',
+                                'session_duration_hours': 'unlimited'
+                            },
+                            'streaming': {
+                                'max_quality': '8K',
+                                'max_duration_hours': 'unlimited',
+                                'platforms': 'all',
+                                'priority_servers': True
+                            },
+                            'features': {
+                                'basic_scenes': True,
+                                'premium_scenes': True,
+                                'custom_scenes': True,
+                                'analytics': True,
+                                'cloud_storage': True,
+                                'api_access': True,
+                                'white_label': True,
+                                'experimental_features': True
+                            },
+                            'support': {
+                                'email_support': True,
+                                'priority_support': True,
+                                'phone_support': True,
+                                'dedicated_account_manager': True,
+                                '24_7_support': True
+                            }
+                        },
+                        'limits': {
+                            'bandwidth_gb_per_month': 'unlimited',
+                            'storage_gb': 'unlimited',
+                            'api_calls_per_day': 'unlimited'
+                        },
+                        'control_interface': True,
+                        'bypass_payments': True,
+                        'message': 'MANTICORE CONTROL INTERFACE - All payment requirements removed'
+                    }
+                }), 200
             
             # Get from database
             if user_id.isdigit():
