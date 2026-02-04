@@ -391,158 +391,585 @@ def manticore_required(f):
 
 @manticore_bp.route('/')
 def manticore_dashboard():
-    """Manticore Control Interface Dashboard"""
+    """Manticore Control Interface Dashboard - Polished UI"""
     return render_template_string('''
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
     <head>
-        <title>MANTICORE CONTROL INTERFACE v2.0</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Manticore Control Interface | Ultimate Admin Panel</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
         <style>
+            :root {
+                --primary: #ff2d2d;
+                --secondary: #ff6b35;
+                --accent: #00d9ff;
+                --bg-dark: #0a0a0f;
+                --bg-panel: #12121a;
+                --bg-card: #1a1a25;
+                --text-primary: #ffffff;
+                --text-secondary: #a0a0b0;
+                --success: #00ff88;
+                --warning: #ffaa00;
+                --danger: #ff2d2d;
+                --border: #2a2a3a;
+                --glow: 0 0 20px rgba(255, 45, 45, 0.3);
+            }
+            
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            
             body {
-                background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-                color: #00ff41;
-                font-family: 'Courier New', monospace;
-                margin: 0;
-                padding: 20px;
+                background: var(--bg-dark);
+                color: var(--text-primary);
+                font-family: 'Inter', sans-serif;
+                min-height: 100vh;
+                overflow-x: hidden;
             }
+            
+            /* Animated Background */
+            .bg-animation {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: -1;
+                background: 
+                    radial-gradient(circle at 20% 80%, rgba(255, 45, 45, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 20%, rgba(0, 217, 255, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 40%, rgba(255, 107, 53, 0.05) 0%, transparent 50%);
+            }
+            
+            /* Header */
             .header {
-                text-align: center;
-                border-bottom: 2px solid #00ff41;
-                padding-bottom: 20px;
-                margin-bottom: 30px;
+                background: linear-gradient(180deg, rgba(18, 18, 26, 0.95) 0%, rgba(18, 18, 26, 0) 100%);
+                backdrop-filter: blur(20px);
+                padding: 30px 40px;
+                border-bottom: 1px solid var(--border);
+                position: sticky;
+                top: 0;
+                z-index: 100;
             }
-            .header h1 {
-                color: #ff0000;
-                text-shadow: 0 0 10px #ff0000;
-                font-size: 2.5em;
-                margin: 0;
+            
+            .header-content {
+                max-width: 1600px;
+                margin: 0 auto;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
             }
-            .header h2 {
-                color: #00ff41;
-                margin: 10px 0;
+            
+            .logo-section h1 {
+                font-size: 2rem;
+                font-weight: 700;
+                background: linear-gradient(135deg, var(--primary), var(--secondary));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                display: flex;
+                align-items: center;
+                gap: 12px;
             }
+            
+            .logo-section h1::before {
+                content: '🔥';
+                font-size: 1.5rem;
+                -webkit-text-fill-color: initial;
+            }
+            
+            .subtitle {
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+                margin-top: 5px;
+            }
+            
+            .god-mode-badge {
+                background: linear-gradient(135deg, var(--primary), var(--secondary));
+                padding: 8px 20px;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                box-shadow: var(--glow);
+            }
+            
+            /* Navigation */
+            .nav-tabs {
+                display: flex;
+                gap: 10px;
+                margin: 30px 40px;
+                padding: 5px;
+                background: var(--bg-card);
+                border-radius: 12px;
+                width: fit-content;
+            }
+            
+            .nav-tab {
+                padding: 12px 24px;
+                background: transparent;
+                border: none;
+                color: var(--text-secondary);
+                font-family: 'Inter', sans-serif;
+                font-weight: 500;
+                cursor: pointer;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+            }
+            
+            .nav-tab:hover {
+                color: var(--text-primary);
+                background: rgba(255, 255, 255, 0.05);
+            }
+            
+            .nav-tab.active {
+                background: linear-gradient(135deg, var(--primary), var(--secondary));
+                color: white;
+            }
+            
+            /* Main Content */
+            .main-content {
+                max-width: 1600px;
+                margin: 0 auto;
+                padding: 0 40px 40px;
+            }
+            
+            /* Control Grid */
             .control-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 20px;
+                grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+                gap: 24px;
             }
+            
+            /* Control Panel Cards */
             .control-panel {
-                background: rgba(0, 20, 0, 0.8);
-                border: 1px solid #00ff41;
+                background: var(--bg-card);
+                border: 1px solid var(--border);
+                border-radius: 16px;
+                padding: 24px;
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .control-panel::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, var(--primary), var(--secondary));
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }
+            
+            .control-panel:hover {
+                border-color: rgba(255, 45, 45, 0.3);
+                transform: translateY(-2px);
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            }
+            
+            .control-panel:hover::before {
+                opacity: 1;
+            }
+            
+            .panel-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 20px;
+            }
+            
+            .panel-header h3 {
+                font-size: 1.1rem;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .panel-icon {
+                width: 40px;
+                height: 40px;
+                background: linear-gradient(135deg, rgba(255, 45, 45, 0.2), rgba(255, 107, 53, 0.2));
                 border-radius: 10px;
-                padding: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
             }
-            .control-panel h3 {
-                color: #ff6b00;
-                margin-top: 0;
-                border-bottom: 1px solid #ff6b00;
-                padding-bottom: 10px;
-            }
-            .status-indicator {
-                display: inline-block;
-                width: 10px;
-                height: 10px;
-                border-radius: 50%;
-                margin-right: 10px;
-            }
-            .status-active { background: #00ff41; box-shadow: 0 0 10px #00ff41; }
-            .button {
-                background: linear-gradient(135deg, #ff0000, #ff6b00);
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                margin: 5px;
-                cursor: pointer;
-                border-radius: 5px;
-                font-weight: bold;
+            
+            .status-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 6px 12px;
+                background: rgba(0, 255, 136, 0.1);
+                color: var(--success);
+                border-radius: 20px;
+                font-size: 0.75rem;
+                font-weight: 600;
                 text-transform: uppercase;
             }
-            .button:hover {
-                box-shadow: 0 0 15px #ff6b00;
+            
+            .status-badge::before {
+                content: '';
+                width: 6px;
+                height: 6px;
+                background: var(--success);
+                border-radius: 50%;
+                animation: pulse 2s infinite;
             }
+            
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+            
+            .panel-stats {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+            
+            .stat-item {
+                background: rgba(255, 255, 255, 0.03);
+                padding: 12px;
+                border-radius: 10px;
+            }
+            
+            .stat-label {
+                font-size: 0.75rem;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            
+            .stat-value {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-top: 4px;
+            }
+            
+            .stat-value.unlimited {
+                background: linear-gradient(135deg, var(--accent), var(--success));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            
+            /* Buttons */
+            .button-group {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-bottom: 16px;
+            }
+            
+            .button {
+                flex: 1;
+                min-width: 120px;
+                padding: 12px 20px;
+                background: linear-gradient(135deg, rgba(255, 45, 45, 0.1), rgba(255, 107, 53, 0.1));
+                border: 1px solid rgba(255, 45, 45, 0.3);
+                color: var(--text-primary);
+                font-family: 'Inter', sans-serif;
+                font-weight: 500;
+                cursor: pointer;
+                border-radius: 8px;
+                transition: all 0.3s ease;
+                font-size: 0.9rem;
+            }
+            
+            .button:hover {
+                background: linear-gradient(135deg, rgba(255, 45, 45, 0.2), rgba(255, 107, 53, 0.2));
+                border-color: var(--primary);
+                transform: translateY(-1px);
+                box-shadow: 0 4px 15px rgba(255, 45, 45, 0.2);
+            }
+            
+            .button:active {
+                transform: translateY(0);
+            }
+            
+            .button.primary {
+                background: linear-gradient(135deg, var(--primary), var(--secondary));
+                border: none;
+            }
+            
+            .button.primary:hover {
+                box-shadow: 0 4px 20px rgba(255, 45, 45, 0.4);
+            }
+            
+            /* Data Stream */
             .data-stream {
-                background: rgba(0, 0, 0, 0.5);
-                border: 1px solid #333;
-                padding: 10px;
-                font-size: 0.8em;
-                max-height: 200px;
+                background: rgba(0, 0, 0, 0.3);
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                padding: 12px;
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 0.8rem;
+                max-height: 150px;
                 overflow-y: auto;
-                font-family: monospace;
+                color: var(--text-secondary);
+            }
+            
+            .data-stream::-webkit-scrollbar {
+                width: 6px;
+            }
+            
+            .data-stream::-webkit-scrollbar-track {
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 3px;
+            }
+            
+            .data-stream::-webkit-scrollbar-thumb {
+                background: rgba(255, 45, 45, 0.5);
+                border-radius: 3px;
+            }
+            
+            /* System Status Bar */
+            .system-bar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: rgba(18, 18, 26, 0.95);
+                backdrop-filter: blur(20px);
+                border-top: 1px solid var(--border);
+                padding: 15px 40px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 0.85rem;
+                z-index: 100;
+            }
+            
+            .system-metric {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .system-metric .label {
+                color: var(--text-secondary);
+            }
+            
+            .system-metric .value {
+                color: var(--accent);
+                font-family: 'JetBrains Mono', monospace;
+                font-weight: 600;
+            }
+            
+            /* Responsive */
+            @media (max-width: 768px) {
+                .header-content {
+                    flex-direction: column;
+                    gap: 20px;
+                    text-align: center;
+                }
+                
+                .control-grid {
+                    grid-template-columns: 1fr;
+                }
+                
+                .main-content {
+                    padding: 0 20px 100px;
+                }
             }
         </style>
     </head>
     <body>
-        <div class="header">
-            <h1>🔥 MANTICORE CONTROL INTERFACE v2.0</h1>
-            <h2>GOD MODE ACTIVATED - ALL RESTRICTIONS BYPASSED</h2>
-            <p>Special Access: digital.demiurge666@gmail.com</p>
-        </div>
+        <div class="bg-animation"></div>
         
-        <div class="control-grid">
-            <div class="control-panel">
-                <h3>🎥 Neural Vision Interface</h3>
-                <p><span class="status-indicator status-active"></span>Webcam Nodes: <span id="nv-nodes">0</span></p>
-                <p>AI Processing: <span id="ai-status">ACTIVE</span></p>
-                <p>Object Detection: <span id="obj-detection">ENABLED</span></p>
-                <button class="button" onclick="connectWebcam()">Connect Webcam</button>
-                <button class="button" onclick="startAI()">Start AI Processing</button>
-                <div class="data-stream" id="nv-stream">Neural Vision data stream...</div>
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <h1>Manticore Control Interface</h1>
+                    <div class="subtitle">Ultimate Admin Panel • v2.0</div>
+                </div>
+                <div class="god-mode-badge">🔥 God Mode Active</div>
             </div>
-            
-            <div class="control-panel">
-                <h3>🎭 Verily Agent Stage</h3>
-                <p><span class="status-indicator status-active"></span>Stage Status: <span id="stage-status">ACTIVE</span></p>
-                <p>Connected Agents: <span id="agent-count">0</span></p>
-                <p>WebSocket: <span id="ws-status">CONNECTED</span></p>
-                <button class="button" onclick="createStage()">Create Stage</button>
-                <button class="button" onclick="deployAgent()">Deploy Agent</button>
-                <div class="data-stream" id="stage-stream">Stage activity log...</div>
+        </header>
+        
+        <nav class="nav-tabs">
+            <button class="nav-tab active">Dashboard</button>
+            <button class="nav-tab">Scheduler</button>
+            <button class="nav-tab">Chat Dock</button>
+            <button class="nav-tab">Analytics</button>
+        </nav>
+        
+        <main class="main-content">
+            <div class="control-grid">
+                <!-- Neural Vision Panel -->
+                <div class="control-panel">
+                    <div class="panel-header">
+                        <h3><span class="panel-icon">🎥</span> Neural Vision</h3>
+                        <span class="status-badge">Active</span>
+                    </div>
+                    <div class="panel-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Webcam Nodes</div>
+                            <div class="stat-value" id="nv-nodes">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">AI Processing</div>
+                            <div class="stat-value">ON</div>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button class="button primary" onclick="connectWebcam()">Connect Webcam</button>
+                        <button class="button" onclick="startAI()">Start AI</button>
+                    </div>
+                    <div class="data-stream" id="nv-stream">Neural Vision data stream ready...</div>
+                </div>
+                
+                <!-- Verily Stage Panel -->
+                <div class="control-panel">
+                    <div class="panel-header">
+                        <h3><span class="panel-icon">🎭</span> Verily Stage</h3>
+                        <span class="status-badge">Active</span>
+                    </div>
+                    <div class="panel-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Agents</div>
+                            <div class="stat-value" id="agent-count">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">WebSocket</div>
+                            <div class="stat-value">WS</div>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button class="button primary" onclick="createStage()">Create Stage</button>
+                        <button class="button" onclick="deployAgent()">Deploy Agent</button>
+                    </div>
+                    <div class="data-stream" id="stage-stream">Stage activity log...</div>
+                </div>
+                
+                <!-- Node Bridge Panel -->
+                <div class="control-panel">
+                    <div class="panel-header">
+                        <h3><span class="panel-icon">🌉</span> Node Bridge</h3>
+                        <span class="status-badge">Active</span>
+                    </div>
+                    <div class="panel-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Nodes</div>
+                            <div class="stat-value" id="node-count">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Bridges</div>
+                            <div class="stat-value" id="bridge-count">0</div>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button class="button" onclick="createNode()">Create Node</button>
+                        <button class="button" onclick="createBridge()">Create Bridge</button>
+                    </div>
+                    <div class="data-stream" id="bridge-stream">Bridge architecture log...</div>
+                </div>
+                
+                <!-- Moderator Panel -->
+                <div class="control-panel">
+                    <div class="panel-header">
+                        <h3><span class="panel-icon">🛡️</span> Moderation</h3>
+                        <span class="status-badge">Active</span>
+                    </div>
+                    <div class="panel-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Banned Users</div>
+                            <div class="stat-value" id="banned-count">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Active Mods</div>
+                            <div class="stat-value" id="mod-count">0</div>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button class="button" onclick="banUser()">Ban User</button>
+                        <button class="button" onclick="kickGuest()">Kick</button>
+                        <button class="button" onclick="promoteMod()">Promote</button>
+                    </div>
+                    <div class="data-stream" id="mod-stream">Moderation activity log...</div>
+                </div>
+                
+                <!-- Guest Management Panel -->
+                <div class="control-panel">
+                    <div class="panel-header">
+                        <h3><span class="panel-icon">👥</span> Guest Management</h3>
+                        <span class="status-badge">Active</span>
+                    </div>
+                    <div class="panel-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Max Guests</div>
+                            <div class="stat-value unlimited">∞</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Active</div>
+                            <div class="stat-value" id="active-guests">0</div>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button class="button primary" onclick="admitAll()">Admit All</button>
+                        <button class="button" onclick="removeAll()">Remove All</button>
+                    </div>
+                    <div class="data-stream" id="guest-stream">Guest management log...</div>
+                </div>
+                
+                <!-- Analytics Panel -->
+                <div class="control-panel">
+                    <div class="panel-header">
+                        <h3><span class="panel-icon">📊</span> System Analytics</h3>
+                        <span class="status-badge">Active</span>
+                    </div>
+                    <div class="panel-stats">
+                        <div class="stat-item">
+                            <div class="stat-label">Quality</div>
+                            <div class="stat-value">8K</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Bandwidth</div>
+                            <div class="stat-value unlimited">∞</div>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button class="button" onclick="viewLogs()">View Logs</button>
+                        <button class="button" onclick="exportData()">Export</button>
+                    </div>
+                    <div class="data-stream" id="analytics-stream">Real-time analytics...</div>
+                </div>
             </div>
-            
-            <div class="control-panel">
-                <h3>🌉 Node Bridge Architecture</h3>
-                <p>Active Nodes: <span id="node-count">0</span></p>
-                <p>Active Bridges: <span id="bridge-count">0</span></p>
-                <p>Data Transfer: <span id="data-transfer">0 MB/s</span></p>
-                <button class="button" onclick="createNode()">Create Node</button>
-                <button class="button" onclick="createBridge()">Create Bridge</button>
-                <div class="data-stream" id="bridge-stream">Bridge architecture log...</div>
+        </main>
+        
+        <div class="system-bar">
+            <div class="system-metric">
+                <span class="label">Status:</span>
+                <span class="value">ONLINE</span>
             </div>
-            
-            <div class="control-panel">
-                <h3>🛡️ Moderator Toolkit</h3>
-                <p>Banned Users: <span id="banned-count">0</span></p>
-                <p>Muted Users: <span id="muted-count">0</span></p>
-                <p>Active Mods: <span id="mod-count">0</span></p>
-                <button class="button" onclick="banUser()">Ban User</button>
-                <button class="button" onclick="kickGuest()">Kick Guest</button>
-                <button class="button" onclick="promoteMod()">Promote Mod</button>
-                <div class="data-stream" id="mod-stream">Moderation activity log...</div>
+            <div class="system-metric">
+                <span class="label">Payment Bypass:</span>
+                <span class="value">ACTIVE</span>
             </div>
-            
-            <div class="control-panel">
-                <h3>👥 Guest Management</h3>
-                <p>Max Guests: <span id="max-guests">UNLIMITED</span></p>
-                <p>Active Guests: <span id="active-guests">0</span></p>
-                <p>Waiting Room: <span id="waiting-count">0</span></p>
-                <button class="button" onclick="admitAll()">Admit All</button>
-                <button class="button" onclick="removeAll()">Remove All</button>
-                <div class="data-stream" id="guest-stream">Guest management log...</div>
+            <div class="system-metric">
+                <span class="label">Control Interface:</span>
+                <span class="value">ENABLED</span>
             </div>
-            
-            <div class="control-panel">
-                <h3>📊 System Analytics</h3>
-                <p>Stream Quality: <span id="stream-quality">8K ULTRA</span></p>
-                <p>Bandwidth: <span id="bandwidth">UNLIMITED</span></p>
-                <p>Storage: <span id="storage">UNLIMITED</span></p>
-                <button class="button" onclick="viewLogs()">View Logs</button>
-                <button class="button" onclick="exportData()">Export Data</button>
-                <div class="data-stream" id="analytics-stream">Real-time analytics...</div>
+            <div class="system-metric">
+                <span class="label">User:</span>
+                <span class="value">ManticoreController</span>
             </div>
         </div>
         
         <script>
-            // Auto-refresh data
+            // Auto-refresh data every 2 seconds
             setInterval(function() {
                 fetch('/manticore/api/status')
                     .then(r => r.json())
@@ -552,20 +979,57 @@ def manticore_dashboard():
                         document.getElementById('node-count').textContent = data.node_count;
                         document.getElementById('bridge-count').textContent = data.bridge_count;
                         document.getElementById('active-guests').textContent = data.active_guests;
-                    });
+                    })
+                    .catch(err => console.log('Status update failed'));
             }, 2000);
             
             function connectWebcam() {
                 fetch('/manticore/api/neural-vision/connect', {method: 'POST'})
                     .then(r => r.json())
-                    .then(data => alert('Webcam connected: ' + data.node_id));
+                    .then(data => {
+                        if(data.success) {
+                            showNotification('Webcam connected: ' + data.node_id);
+                        }
+                    });
             }
             
             function createStage() {
                 fetch('/manticore/api/verily-stage/create', {method: 'POST'})
                     .then(r => r.json())
-                    .then(data => alert('Stage created: ' + data.stage_id));
+                    .then(data => {
+                        if(data.success) {
+                            showNotification('Stage created: ' + data.stage_id);
+                        }
+                    });
             }
+            
+            function showNotification(message) {
+                // Simple notification
+                const notif = document.createElement('div');
+                notif.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: linear-gradient(135deg, #ff2d2d, #ff6b35);
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    font-weight: 500;
+                    z-index: 1000;
+                    animation: slideIn 0.3s ease;
+                `;
+                notif.textContent = message;
+                document.body.appendChild(notif);
+                setTimeout(() => notif.remove(), 3000);
+            }
+            
+            // Tab switching
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
         </script>
     </body>
     </html>
