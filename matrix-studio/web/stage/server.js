@@ -1,9 +1,11 @@
 // Stage display server with basic signaling (socket.io)
 // Serves the stage_display.html on a dedicated port (default 9001)
+require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const path = require('path');
 const jwt = require('jsonwebtoken');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 const { Issuer } = require('openid-client');
@@ -19,7 +21,34 @@ const JWT_SECRET = process.env.JWT_SECRET || 'atlantiplex-secret';
 const USERS = {
   alice: 'password123',
   bob: 'letmein',
+  admin: 'admin123', // Admin user
 };
+
+// Admin middleware
+const requireAdmin = (req, res, next) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded.username !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+};
+
+// Mock data for demo
+let mockUsers = [
+  { id: 1, username: 'alice', email: 'alice@example.com', plan: 'Free', joinDate: '2024-01-15', lastActive: '2024-02-05', totalSpent: 0 },
+  { id: 2, username: 'bob', email: 'bob@example.com', plan: 'Pro', joinDate: '2024-01-20', lastActive: '2024-02-04', totalSpent: 29.99 },
+  { id: 3, username: 'charlie', email: 'charlie@example.com', plan: 'Enterprise', joinDate: '2024-01-10', lastActive: '2024-02-05', totalSpent: 99.99 },
+];
 
 // Serve static assets from the shared static folder
 app.use('/static', express.static(path.join(__dirname, '../static')));
@@ -38,11 +67,272 @@ app.post('/api/login', (req, res) => {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
   const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '1h' });
-  return res.json({ token });
+  return res.json({ token, username });
 });
 
 // Health check for orchestration
 app.get('/health', (req, res) => res.json({ ok: true }));
+
+// Stripe payment intent endpoint
+app.post('/api/create-payment-intent', async (req, res) => {
+  try {
+    const { amount, currency = 'usd', planId, email } = req.body;
+    
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ error: 'Invalid amount' });
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100), // Convert to cents
+      currency,
+      automatic_payment_methods: {
+        enabled: true,
+      },
+      metadata: {
+        plan_id: planId || 'one-time',
+        user_email: email || ''
+      }
+    });
+
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (error) {
+    console.error('Stripe error:', error);
+    res.status(500).json({ error: 'Failed to create payment intent' });
+  }
+});
+
+// Webhook endpoint for Stripe events
+app.post('/api/webhooks/stripe', express.raw({type: 'application/json'}), async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+  } catch (err) {
+    console.log(`Webhook signature verification failed.`, err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Handle the event
+  switch (event.type) {
+    case 'payment_intent.succeeded':
+      const paymentIntent = event.data.object;
+      console.log('PaymentIntent was successful!');
+      
+      // Update user subscription status
+      if (paymentIntent.metadata.plan_id && paymentIntent.metadata.plan_id !== 'one-time') {
+        console.log(`User subscribed to plan: ${paymentIntent.metadata.plan_id}`);
+        // Here you would update the user's subscription in your database
+      }
+      
+      break;
+    case 'payment_intent.payment_failed':
+      console.log('PaymentIntent failed!');
+      break;
+    case 'invoice.payment_succeeded':
+      console.log('Invoice payment succeeded - subscription renewed');
+      break;
+    case 'customer.subscription.deleted':
+      console.log('Subscription cancelled');
+      break;
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  // Return a 200 response to acknowledge receipt of the event
+  res.json({received: true});
+});
+
+// Get Stripe publishable key
+app.get('/api/stripe-config', (req, res) => {
+  res.json({
+    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY,
+  });
+});
+
+// Get customer billing history
+app.get('/api/billing-history', async (req, res) => {
+  try {
+    // In a real app, you'd get the customer ID from the authenticated user
+    const payments = await stripe.paymentIntents.list({
+      limit: 10,
+      expand: ['data.customer']
+    });
+
+    const history = payments.data.map(payment => ({
+      id: payment.id,
+      amount: payment.amount / 100, // Convert from cents
+      currency: payment.currency,
+      status: payment.status,
+      created: new Date(payment.created * 1000).toLocaleDateString(),
+      description: payment.description || 'Payment'
+    }));
+
+    res.json({ history });
+  } catch (error) {
+    console.error('Billing history error:', error);
+    res.status(500).json({ error: 'Failed to retrieve billing history' });
+  }
+});
+
+// Get customer payment methods
+app.get('/api/payment-methods', async (req, res) => {
+  try {
+    // In a real app, you'd get the customer ID from the authenticated user
+    // For demo purposes, return empty since we don't have customer setup
+    res.json({ paymentMethods: [] });
+  } catch (error) {
+    console.error('Payment methods error:', error);
+    res.status(500).json({ error: 'Failed to retrieve payment methods' });
+  }
+});
+
+// Create customer and setup intent for adding payment method
+app.post('/api/create-setup-intent', async (req, res) => {
+  try {
+    const setupIntent = await stripe.setupIntents.create({
+      usage: 'off_session'
+    });
+
+    res.json({ clientSecret: setupIntent.client_secret });
+  } catch (error) {
+    console.error('Setup intent error:', error);
+    res.status(500).json({ error: 'Failed to create setup intent' });
+  }
+});
+
+// Verify payment endpoint
+app.get('/api/verify-payment', async (req, res) => {
+  try {
+    const { payment_intent } = req.query;
+    
+    if (!payment_intent) {
+      return res.status(400).json({ error: 'Payment intent ID required' });
+    }
+
+    const paymentIntent = await stripe.paymentIntents.retrieve(payment_intent);
+    
+    res.json({
+      paymentIntent,
+      status: paymentIntent.status,
+      amount: paymentIntent.amount / 100,
+      currency: paymentIntent.currency
+    });
+  } catch (error) {
+    console.error('Payment verification error:', error);
+    res.status(500).json({ error: 'Failed to verify payment' });
+  }
+});
+
+// Admin API endpoints
+app.get('/api/admin/users', requireAdmin, (req, res) => {
+  const { page = 1, limit = 10, search = '', plan = '' } = req.query;
+  
+  let filteredUsers = mockUsers;
+  
+  if (search) {
+    filteredUsers = filteredUsers.filter(user => 
+      user.username.toLowerCase().includes(search.toLowerCase()) ||
+      user.email.toLowerCase().includes(search.toLowerCase())
+    );
+  }
+  
+  if (plan) {
+    filteredUsers = filteredUsers.filter(user => user.plan === plan);
+  }
+  
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + parseInt(limit);
+  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+  
+  res.json({
+    users: paginatedUsers,
+    total: filteredUsers.length,
+    page: parseInt(page),
+    limit: parseInt(limit),
+    totalPages: Math.ceil(filteredUsers.length / limit)
+  });
+});
+
+app.get('/api/admin/analytics', requireAdmin, async (req, res) => {
+  try {
+    // Get Stripe analytics
+    const balance = await stripe.balance.retrieve();
+    const payments = await stripe.paymentIntents.list({
+      limit: 100,
+      expand: ['data.customer']
+    });
+    
+    const totalRevenue = payments.data
+      .filter(p => p.status === 'succeeded')
+      .reduce((sum, p) => sum + p.amount, 0) / 100;
+    
+    const monthlyRevenue = payments.data
+      .filter(p => p.status === 'succeeded')
+      .reduce((sum, p) => sum + p.amount, 0) / 100;
+    
+    const analytics = {
+      totalUsers: mockUsers.length,
+      activeUsers: mockUsers.filter(u => {
+        const lastActive = new Date(u.lastActive);
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return lastActive > weekAgo;
+      }).length,
+      totalRevenue,
+      monthlyRevenue,
+      totalTransactions: payments.data.length,
+      successfulTransactions: payments.data.filter(p => p.status === 'succeeded').length,
+      failedTransactions: payments.data.filter(p => p.status === 'failed').length,
+      balance: balance.available.reduce((sum, b) => sum + b.amount, 0) / 100,
+      plans: {
+        Free: mockUsers.filter(u => u.plan === 'Free').length,
+        Pro: mockUsers.filter(u => u.plan === 'Pro').length,
+        Enterprise: mockUsers.filter(u => u.plan === 'Enterprise').length
+      }
+    };
+    
+    res.json(analytics);
+  } catch (error) {
+    console.error('Analytics error:', error);
+    res.status(500).json({ error: 'Failed to retrieve analytics' });
+  }
+});
+
+app.get('/api/admin/users/:id', requireAdmin, (req, res) => {
+  const user = mockUsers.find(u => u.id === parseInt(req.params.id));
+  if (!user) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+  res.json(user);
+});
+
+app.put('/api/admin/users/:id', requireAdmin, (req, res) => {
+  const userIndex = mockUsers.findIndex(u => u.id === parseInt(req.params.id));
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+  
+  const { plan, email } = req.body;
+  if (plan) mockUsers[userIndex].plan = plan;
+  if (email) mockUsers[userIndex].email = email;
+  
+  res.json(mockUsers[userIndex]);
+});
+
+app.delete('/api/admin/users/:id', requireAdmin, (req, res) => {
+  const userIndex = mockUsers.findIndex(u => u.id === parseInt(req.params.id));
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+  
+  const deletedUser = mockUsers.splice(userIndex, 1)[0];
+  res.json({ message: 'User deleted successfully', user: deletedUser });
+});
 
 // Serve the stage page from this directory
 app.get('/', (req, res) => {
