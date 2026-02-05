@@ -57,6 +57,49 @@ app.use('/app', express.static(path.join(__dirname, '../app')));
 
 // Lightweight API endpoints for auth (production should use a proper identity provider)
 app.use(express.json());
+
+// Add comprehensive logging middleware
+app.use((req, res, next) => {
+  const timestamp = new Date().toISOString();
+  console.log(`[${timestamp}] ${req.method} ${req.path} - IP: ${req.ip || 'unknown'}`);
+  
+  // Log request body for payment endpoints (excluding sensitive data)
+  if (req.path.includes('/payment') || req.path.includes('/stripe')) {
+    const logBody = { ...req.body };
+    if (logBody.payment_method) delete logBody.payment_method;
+    if (logBody.card) delete logBody.card;
+    console.log('Request body:', JSON.stringify(logBody, null, 2));
+  }
+  
+  next();
+});
+
+// Rate limiting middleware
+const rateLimit = {};
+const RATE_LIMIT = 100; // requests per minute per IP
+app.use((req, res, next) => {
+  const ip = req.ip || 'unknown';
+  const now = Date.now();
+  
+  if (!rateLimit[ip]) {
+    rateLimit[ip] = { count: 0, resetTime: now + 60000 };
+  }
+  
+  if (now > rateLimit[ip].resetTime) {
+    rateLimit[ip] = { count: 0, resetTime: now + 60000 };
+  }
+  
+  rateLimit[ip].count++;
+  
+  if (rateLimit[ip].count > RATE_LIMIT) {
+    return res.status(429).json({ 
+      error: 'Too many requests. Please try again later.',
+      resetTime: rateLimit[ip].resetTime 
+    });
+  }
+  
+  next();
+});
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body || {};
   if (!username || !password) {

@@ -6,6 +6,7 @@ import PaymentPage from './PaymentPage.jsx'
 import PaymentSuccess from './PaymentSuccess.jsx'
 import AccountPage from './AccountPage.jsx'
 import AdminDashboard from './AdminDashboard.jsx'
+import PaymentTestRunner from './PaymentTestRunner.jsx'
 import { getPalette, getFontFamily } from './branding.ts'
 import VerilyHub from './VerilyHub.jsx'
 
@@ -15,12 +16,17 @@ export default function App() {
   const payment = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('payment') : null
   const account = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('account') : null
   const admin = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('admin') : null
+  const testing = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('testing') : null
   const success = typeof window !== 'undefined' ? window.location.pathname === '/payment-success' : false
   const palette = getPalette()
   
   // Check if user is admin (simplified check)
   const username = typeof window !== 'undefined' ? sessionStorage.getItem('username') : null
   const isAdmin = username === 'admin'
+
+  if (testing && testing.toLowerCase() === 'true') {
+    return <PaymentTestRunner />
+  }
 
   if (!token && !success) {
     return (
