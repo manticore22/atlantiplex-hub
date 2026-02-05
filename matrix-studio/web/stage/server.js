@@ -334,6 +334,255 @@ app.delete('/api/admin/users/:id', requireAdmin, (req, res) => {
   res.json({ message: 'User deleted successfully', user: deletedUser });
 });
 
+// Advanced Stripe Admin Operations
+
+// Create customer
+app.post('/api/admin/create-customer', requireAdmin, async (req, res) => {
+  try {
+    const { name, email, phone } = req.body;
+    
+    const customer = await stripe.customers.create({
+      name,
+      email,
+      phone,
+      metadata: {
+        created_by: req.user.username
+      }
+    });
+
+    res.json({ customer });
+  } catch (error) {
+    console.error('Error creating customer:', error);
+    res.status(500).json({ error: 'Failed to create customer' });
+  }
+});
+
+// Get all customers
+app.get('/api/admin/customers', requireAdmin, async (req, res) => {
+  try {
+    const { limit = 50, starting_after } = req.query;
+    
+    const customers = await stripe.customers.list({
+      limit: parseInt(limit),
+      starting_after: starting_after,
+      expand: ['data.default_source']
+    });
+
+    res.json({ customers: customers.data });
+  } catch (error) {
+    console.error('Error fetching customers:', error);
+    res.status(500).json({ error: 'Failed to fetch customers' });
+  }
+});
+
+// Create subscription
+app.post('/api/admin/create-subscription', requireAdmin, async (req, res) => {
+  try {
+    const { customerId, priceId, trialPeriodDays = 0 } = req.body;
+    
+    const subscription = await stripe.subscriptions.create({
+      customer: customerId,
+      items: [{ price: priceId }],
+      trial_period_days: trialPeriodDays > 0 ? trialPeriodDays : undefined,
+      payment_behavior: 'default_incomplete',
+      payment_settings: {
+        save_default_payment_method: 'on_subscription',
+        payment_method_types: ['card'],
+      },
+      expand: ['latest_invoice.payment_intent'],
+      metadata: {
+        created_by: req.user.username
+      }
+    });
+
+    res.json({ subscription });
+  } catch (error) {
+    console.error('Error creating subscription:', error);
+    res.status(500).json({ error: 'Failed to create subscription' });
+  }
+});
+
+// Get all subscriptions
+app.get('/api/admin/subscriptions', requireAdmin, async (req, res) => {
+  try {
+    const { limit = 50, status = 'all' } = req.query;
+    
+    const subscriptions = await stripe.subscriptions.list({
+      limit: parseInt(limit),
+      status: status !== 'all' ? status : undefined,
+      expand: ['data.customer', 'data.plan.product', 'latest_invoice.payment_intent']
+    });
+
+    res.json({ subscriptions: subscriptions.data });
+  } catch (error) {
+    console.error('Error fetching subscriptions:', error);
+    res.status(500).json({ error: 'Failed to fetch subscriptions' });
+  }
+});
+
+// Cancel subscription
+app.post('/api/admin/cancel-subscription/:subscriptionId', requireAdmin, async (req, res) => {
+  try {
+    const { subscriptionId } = req.params;
+    const { at_period_end = false } = req.body;
+    
+    const subscription = await stripe.subscriptions.update(subscriptionId, {
+      cancel_at_period_end: at_period_end,
+      metadata: {
+        canceled_by: req.user.username
+      }
+    });
+
+    res.json({ subscription });
+  } catch (error) {
+    console.error('Error canceling subscription:', error);
+    res.status(500).json({ error: 'Failed to cancel subscription' });
+  }
+});
+
+// Process refund
+app.post('/api/admin/refund', requireAdmin, async (req, res) => {
+  try {
+    const { paymentIntentId, amount } = req.body;
+    
+    const refund = await stripe.refunds.create({
+      payment_intent: paymentIntentId,
+      amount: amount || undefined, // If undefined, full refund
+      reason: 'requested_by_customer',
+      metadata: {
+        processed_by: req.user.username
+      }
+    });
+
+    res.json({ refund });
+  } catch (error) {
+    console.error('Error processing refund:', error);
+    res.status(500).json({ error: 'Failed to process refund' });
+  }
+});
+
+// Create payment method for customer
+app.post('/api/admin/create-payment-method', requireAdmin, async (req, res) => {
+  try {
+    const { customerId, paymentMethodId } = req.body;
+    
+    const paymentMethod = await stripe.paymentMethods.attach(
+      paymentMethodId,
+      { customer: customerId }
+    );
+
+    // Set as default payment method
+    await stripe.customers.update(customerId, {
+      invoice_settings: {
+        default_payment_method: paymentMethodId,
+      },
+    });
+
+    res.json({ paymentMethod });
+  } catch (error) {
+    console.error('Error creating payment method:', error);
+    res.status(500).json({ error: 'Failed to create payment method' });
+  }
+});
+
+// Get customer payment methods
+app.get('/api/admin/customer-payment-methods/:customerId', requireAdmin, async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    
+    const paymentMethods = await stripe.paymentMethods.list({
+      customer: customerId,
+      type: 'card',
+    });
+
+    res.json({ paymentMethods: paymentMethods.data });
+  } catch (error) {
+    console.error('Error fetching payment methods:', error);
+    res.status(500).json({ error: 'Failed to fetch payment methods' });
+  }
+});
+
+// Create invoice for customer
+app.post('/api/admin/create-invoice', requireAdmin, async (req, res) => {
+  try {
+    const { customerId, description } = req.body;
+    
+    const invoice = await stripe.invoices.create({
+      customer: customerId,
+      description,
+      auto_advance: true,
+      collection_method: 'charge_automatically',
+      metadata: {
+        created_by: req.user.username
+      }
+    });
+
+    // Finalize the invoice
+    const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id);
+
+    res.json({ invoice: finalizedInvoice });
+  } catch (error) {
+    console.error('Error creating invoice:', error);
+    res.status(500).json({ error: 'Failed to create invoice' });
+  }
+});
+
+// Get list of prices
+app.get('/api/admin/prices', requireAdmin, async (req, res) => {
+  try {
+    const { active = true, product } = req.query;
+    
+    const prices = await stripe.prices.list({
+      active: active === 'true',
+      product: product,
+      expand: ['data.product']
+    });
+
+    res.json({ prices: prices.data });
+  } catch (error) {
+    console.error('Error fetching prices:', error);
+    res.status(500).json({ error: 'Failed to fetch prices' });
+  }
+});
+
+// Create product
+app.post('/api/admin/create-product', requireAdmin, async (req, res) => {
+  try {
+    const { name, description, images = [] } = req.body;
+    
+    const product = await stripe.products.create({
+      name,
+      description,
+      images,
+      metadata: {
+        created_by: req.user.username
+      }
+    });
+
+    res.json({ product });
+  } catch (error) {
+    console.error('Error creating product:', error);
+    res.status(500).json({ error: 'Failed to create product' });
+  }
+});
+
+// Get list of products
+app.get('/api/admin/products', requireAdmin, async (req, res) => {
+  try {
+    const { active = true } = req.query;
+    
+    const products = await stripe.products.list({
+      active: active === 'true',
+      expand: ['data.default_price']
+    });
+
+    res.json({ products: products.data });
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ error: 'Failed to fetch products' });
+  }
+});
+
 // Serve the stage page from this directory
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'stage_display.html'));

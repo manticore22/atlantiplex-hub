@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import SubscriptionManager from './SubscriptionManager.jsx';
 import { getPalette, getFontFamily } from './branding.ts';
 
 export default function AdminDashboard() {
@@ -342,17 +343,24 @@ export default function AdminDashboard() {
           >
             Dashboard
           </button>
-          <button 
-            className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
-            onClick={() => setActiveTab('users')}
-          >
-            Users
-          </button>
+        <button 
+          className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
+          onClick={() => setActiveTab('users')}
+        >
+          Users
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === 'subscriptions' ? 'active' : ''}`}
+          onClick={() => setActiveTab('subscriptions')}
+        >
+          Subscriptions
+        </button>
         </div>
 
         <div className="tab-content">
           {activeTab === 'dashboard' && <DashboardTab />}
           {activeTab === 'users' && <UsersTab />}
+          {activeTab === 'subscriptions' && <SubscriptionManager />}
         </div>
       </div>
 
