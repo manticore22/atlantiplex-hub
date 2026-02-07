@@ -7,6 +7,14 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+// Import system optimizations
+const { eventLoopMonitor, unicodeConsole, systemOptimizer } = require('./system-optimizations');
+
+// Apply optimizations
+unicodeConsole.fix();
+systemOptimizer.setupOptimizations();
+eventLoopMonitor.start();
+
 const app = express();
 const { Issuer } = require('openid-client');
 const crypto = require('crypto');
