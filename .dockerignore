@@ -1,0 +1,147 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+.github
+.gitlab-ci.yml
+
+# Package managers
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+pnpm-lock.yaml
+yarn.lock
+package-lock.json.bak
+
+# IDE & Editor
+.vscode
+.vscode-server
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+
+# Build outputs
+dist
+build
+coverage
+.nyc_output
+htmlcov
+*.tsbuildinfo
+
+# Logs
+logs
+*.log
+.pnpm-debug.log
+lerna-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+.env.example
+
+# Temporary & Cache files
+tmp
+temp
+*.tmp
+*.bak
+.cache
+.eslintcache
+
+# Testing
+tests
+test
+.mocha
+.jest
+playwright
+cypress
+.coverage
+
+# CI/CD
+.circleci
+.travis.yml
+azure-pipelines.yml
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+docker-compose*.yaml
+.dockerignore
+
+# Documentation & Assets
+*.md
+README*
+CHANGELOG*
+LICENSE*
+docs
+.docs
+*.pdf
+
+# System
+.vscode-server
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+dist
+*.egg
+.Python
+venv
+env
+.venv
+
+# OS Specific
+.DS_Store
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Project specific
+launchers
+*.bat
+tools
+branding
+ATLANTIPLEX*.md
+DEPLOYMENT*.md
+ENHANCEMENT*.md
+LAUNCH*.bat
+QUICK_DEPLOY.md
+BARE_METAL*.md
+GITHUB_SETUP.md
+COMMAND_CENTRE*.md
+$20_BUDGET_HOSTING_GUIDE.md
+AUSTRALIAN_HOSTING_OPTIONS.md
+ORACLE_CLOUD_SETUP_GUIDE.md
+GOOGLE_CLOUD_MELBOURNE_DEPLOYMENT.md
+PAYMENT_INTEGRATION_GUIDE.md
+PROFESSIONAL_EDITION.md
+UPGRADE_CHECKLIST.md
+FINAL_COMPLETE.py
+DEBUG_*.py
+WORKING_*.py
+MATRIX_STUDIO_PRO.py
+PRODUCTION_READY.py
+final/
+clean_project/
+plugins/
+
+# Node/Python dev files
+.eslintrc*
+.prettierrc*
+.editorconfig
+.prettierignore
+setup.py
+setup.cfg
+pyproject.toml
+tox.ini
+pytest.ini

@@ -9,6 +9,7 @@ import AdminDashboard from './AdminDashboard.jsx'
 import PaymentTestRunner from './PaymentTestRunner.jsx'
 import { getPalette, getFontFamily } from './branding.ts'
 import VerilyHub from './VerilyHub.jsx'
+import AbyssalBridge from './AbyssalBridge.jsx'
 
 export default function App() {
   const token = typeof window !== 'undefined' ? sessionStorage.getItem('token') : null
@@ -17,12 +18,6 @@ export default function App() {
   const account = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('account') : null
   const admin = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('admin') : null
   const testing = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('testing') : null
-  const aiclips = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('aiclips') : null
-  const camera = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('camera') : null
-  const recording = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('recording') : null
-  const darkmode = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('darkmode') : null
-  const screenshare = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('screenshare') : null
-  const vertical = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('vertical') : null
   const success = typeof window !== 'undefined' ? window.location.pathname === '/payment-success' : false
   const palette = getPalette()
   
@@ -55,15 +50,15 @@ export default function App() {
   if (admin && admin.toLowerCase() === 'true' && isAdmin) {
     return <AdminDashboard />
   }
-  
-  if (account && account.toLowerCase() === 'true') {
-    return <AccountPage />
-  }
-  
+
   if (payment && payment.toLowerCase() === 'true') {
     return <PaymentPage />
   }
   
+  if (account && account.toLowerCase() === 'true') {
+    return <AccountPage />
+  }
+
   if (hub && hub.toLowerCase() === 'verily') {
     return (
       <MainLayout>
@@ -71,35 +66,10 @@ export default function App() {
       </MainLayout>
     )
   }
-  
-    if (account && account.toLowerCase() === 'true') {
-    return <AccountPage />
-    }
-    if (payment && payment.toLowerCase() === 'true') {
-      return <PaymentPage />
-    }
-    if (aiclips && aiclips.toLowerCase() === 'true') {
-      return <AIClipsGenerator />
-    }
-    if (camera && camera.toLowerCase() === 'true') {
-      return <CameraEffectsEngine />
-    }
-    if (recording && recording.toLowerCase() === 'true') {
-      return <FourKRecordingEngine />
-    }
-    if (darkmode && darkmode.toLowerCase() === 'true') {
-      return <DarkModeSystem />
-    }
-    if (screenshare && screenshare.toLowerCase() === 'true') {
-      return <EnhancedScreenSharing />
-    }
-    if (vertical && vertical.toLowerCase() === 'true') {
-      return <VerticalContentOptimizer />
-    }
-    return (
-      <MainLayout>
-        <StageDashboard />
-      </MainLayout>
-    )
-  }
+
+  return (
+    <MainLayout>
+      <StageDashboard />
+    </MainLayout>
+  )
 }

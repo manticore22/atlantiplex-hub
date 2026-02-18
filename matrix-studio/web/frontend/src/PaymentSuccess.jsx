@@ -207,7 +207,7 @@ export default function PaymentSuccess() {
           padding: '24px',
           background: '#f0f9ff',
           borderRadius: '8px',
-          border: '1px solid '#bae6fd'
+          border: '1px solid #bae6fd'
         }}>
           <h4 style={{ color: '#0369a1', marginBottom: '12px' }}>What's Next?</h4>
           <ul style={{
@@ -215,7 +215,7 @@ export default function PaymentSuccess() {
             color: '#6b7280',
             paddingLeft: '20px'
           }}>
-            <li>Your subscription is now active</li>
+        <li>Your subscription is now active</li>
             <li>You'll receive a confirmation email shortly</li>
             <li>Access all premium features immediately</li>
             <li>Manage your subscription in Account Settings</li>

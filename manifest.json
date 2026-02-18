@@ -1,0 +1,16 @@
+{
+  "id": "atlantiplex-hub",
+  "title": "Atlantiplex Hub",
+  "version": "1.0.0",
+  "summary": "Central command interface for the Atlantiplex facility with Matrix Studio integration",
+  "docs": ["./README.md", "./docs/"],
+  "owners": ["@verily"],
+  "dependencies": ["docker", "node18", "matrix-studio"],
+  "tags": ["hub", "interface", "command", "matrix"],
+  "type": "api",
+  "status": "production",
+  "deployable": true,
+  "port": 3000,
+  "created": "2025-02-09",
+  "updated": "2025-02-09"
+}

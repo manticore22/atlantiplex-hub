@@ -1,0 +1,282 @@
+version: '3.9'
+
+services:
+  # PostgreSQL Database with security hardening
+  postgres:
+    image: postgres:15-alpine
+    container_name: atlantiplex-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-atlantiplex}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-change-me-in-production}
+      POSTGRES_DB: ${DB_NAME:-atlantiplex}
+      POSTGRES_INITDB_ARGS: "-c max_connections=200"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d:ro
+    networks:
+      - atlantiplex-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-atlantiplex} -d ${DB_NAME:-atlantiplex}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    security_opt:
+      - no-new-privileges:true
+    read_only_root_filesystem: false
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+
+  # Redis Cache & Session Store
+  redis:
+    image: redis:7-alpine
+    container_name: atlantiplex-redis
+    restart: unless-stopped
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --requirepass ${REDIS_PASSWORD:-change-me-in-production}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - atlantiplex-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETUID
+      - SETGID
+
+  # Node.js Stage Server (WebSocket + API)
+  stage-server:
+    build:
+      context: ./matrix-studio/web/stage
+      dockerfile: Dockerfile
+      cache_from:
+        - type=local,src=/tmp/buildcache
+    image: atlantiplex-stage:latest
+    container_name: atlantiplex-stage
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 9001
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-change-me-in-production}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      DATABASE_URL: postgresql://${DB_USER:-atlantiplex}:${DB_PASSWORD:-change-me-in-production}@postgres:5432/${DB_NAME:-atlantiplex}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-change-me-in-production}@redis:6379/0
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
+      LOG_LEVEL: info
+      NODE_OPTIONS: --max-old-space-size=512
+    ports:
+      - "9001:9001"
+    volumes:
+      - stage_logs:/app/logs
+      - stage_uploads:/app/uploads
+    networks:
+      - atlantiplex-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+
+  # Python Flask Backend
+  flask-backend:
+    build:
+      context: ./matrix-studio
+      dockerfile: Dockerfile.python
+      cache_from:
+        - type=local,src=/tmp/buildcache
+    image: atlantiplex-flask:latest
+    container_name: atlantiplex-flask
+    restart: unless-stopped
+    environment:
+      FLASK_ENV: production
+      FLASK_PORT: 5000
+      DATABASE_URL: postgresql://${DB_USER:-atlantiplex}:${DB_PASSWORD:-change-me-in-production}@postgres:5432/${DB_NAME:-atlantiplex}
+      JWT_SECRET_KEY: ${JWT_SECRET}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-change-me-in-production}@redis:6379/1
+      LOG_LEVEL: INFO
+      PYTHONUNBUFFERED: 1
+      PYTHONDONTWRITEBYTECODE: 1
+    ports:
+      - "5000:5000"
+    volumes:
+      - flask_logs:/app/logs
+      - flask_recordings:/app/core/recordings
+    networks:
+      - atlantiplex-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+
+  # Nginx Reverse Proxy & Load Balancer
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: atlantiplex-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/sites-enabled:/etc/nginx/sites-enabled:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - frontend_build:/usr/share/nginx/html:ro
+      - nginx_logs:/var/log/nginx
+    networks:
+      - atlantiplex-network
+    depends_on:
+      stage-server:
+        condition: service_healthy
+      flask-backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - NET_BIND_SERVICE
+    read_only_root_filesystem: true
+    tmpfs:
+      - /var/run
+      - /var/cache/nginx
+      - /var/log/nginx
+
+  # Frontend Builder (builds static files once at startup)
+  frontend-builder:
+    build:
+      context: ./matrix-studio/web/frontend
+      dockerfile: Dockerfile
+    image: atlantiplex-frontend:latest
+    container_name: atlantiplex-frontend-builder
+    volumes:
+      - frontend_build:/usr/share/nginx/html
+    environment:
+      VITE_API_URL: ${API_URL:-http://localhost}
+      VITE_STRIPE_KEY: ${STRIPE_PUBLISHABLE_KEY}
+      NODE_ENV: production
+      NODE_OPTIONS: --max-old-space-size=256
+    command: npm run build
+    networks:
+      - atlantiplex-network
+    profiles:
+      - build
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+volumes:
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/postgres
+  redis_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/redis
+  stage_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./logs/stage
+  stage_uploads:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/stage/uploads
+  flask_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./logs/flask
+  flask_recordings:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/flask/recordings
+  frontend_build:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/frontend/dist
+  nginx_logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./logs/nginx
+
+networks:
+  atlantiplex-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
