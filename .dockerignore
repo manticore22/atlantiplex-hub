@@ -1,19 +1,26 @@
-# Version control
+# Version Control
 .git
 .gitignore
 .gitattributes
 .github
-.gitlab-ci.yml
 
-# Package managers
+# CI/CD
+.gitlab-ci.yml
+.circleci
+.travis.yml
+azure-pipelines.yml
+
+# Package Managers & Lock Files
 node_modules
 npm-debug.log*
+npm-error.log*
 yarn-debug.log*
 yarn-error.log*
 .npm
+.pnpm-debug.log*
+lerna-debug.log*
 pnpm-lock.yaml
 yarn.lock
-package-lock.json.bak
 
 # IDE & Editor
 .vscode
@@ -26,22 +33,26 @@ package-lock.json.bak
 Thumbs.db
 *.sublime-project
 *.sublime-workspace
+.prettierrc*
+.eslintrc*
+.editorconfig
 
-# Build outputs
+# Build Outputs
 dist
 build
 coverage
 .nyc_output
 htmlcov
 *.tsbuildinfo
+.next
+out
 
 # Logs
 logs
 *.log
-.pnpm-debug.log
 lerna-debug.log*
 
-# Environment files
+# Environment Files
 .env
 .env.local
 .env.*.local
@@ -50,27 +61,25 @@ lerna-debug.log*
 .env.production
 .env.example
 
-# Temporary & Cache files
+# Temporary & Cache Files
 tmp
 temp
 *.tmp
 *.bak
 .cache
 .eslintcache
+.parcel-cache
+.next
+out
 
 # Testing
 tests
 test
+cypress
 .mocha
 .jest
 playwright
-cypress
 .coverage
-
-# CI/CD
-.circleci
-.travis.yml
-azure-pipelines.yml
 
 # Docker
 Dockerfile*
@@ -83,38 +92,76 @@ docker-compose*.yaml
 README*
 CHANGELOG*
 LICENSE*
+CONTRIBUTING*
 docs
 .docs
 *.pdf
 
-# System
-.vscode-server
+# Python
 __pycache__
-*.pyc
-*.pyo
-*.egg-info
-dist
-*.egg
+*.py[cod]
+*$py.class
+*.so
 .Python
-venv
-env
+egg-info/
+dist/
+*.egg
 .venv
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
 
-# OS Specific
-.DS_Store
-Thumbs.db
+# System & OS
+.vscode-server
 .AppleDouble
 .LSOverride
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
 
-# Project specific
+# Project Specific
 launchers
 *.bat
 tools
 branding
+init-scripts
+
+# Documentation Files (keep build-related only)
 ATLANTIPLEX*.md
 DEPLOYMENT*.md
 ENHANCEMENT*.md
 LAUNCH*.bat
+LAUNCH*.md
 QUICK_DEPLOY.md
 BARE_METAL*.md
 GITHUB_SETUP.md
@@ -126,22 +173,34 @@ GOOGLE_CLOUD_MELBOURNE_DEPLOYMENT.md
 PAYMENT_INTEGRATION_GUIDE.md
 PROFESSIONAL_EDITION.md
 UPGRADE_CHECKLIST.md
+BEFORE_AFTER_METRICS.md
+E2E_TEST_*.md
+HOSTINGER_DEPLOYMENT_GUIDE.md
+LIVESTREAM_*.md
+MATRIX_CURTAIN_SUMMARY.md
+PRE_LAUNCH_CHECKLIST.md
+PRODUCTION_*.md
+VULNERABILITY_*.md
+WEB_HOSTING_STRATEGY.md
+API_DOCUMENTATION.md
+
+# Development & Debug
 FINAL_COMPLETE.py
 DEBUG_*.py
 WORKING_*.py
 MATRIX_STUDIO_PRO.py
 PRODUCTION_READY.py
-final/
-clean_project/
-plugins/
-
-# Node/Python dev files
-.eslintrc*
-.prettierrc*
-.editorconfig
-.prettierignore
+pre_flight_test.py
+test-studio.html
 setup.py
 setup.cfg
 pyproject.toml
 tox.ini
 pytest.ini
+conftest.py
+
+# Cleanup Directories
+final/
+clean_project/
+plugins/
+scripts/

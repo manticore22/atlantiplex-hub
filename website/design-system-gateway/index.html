@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" data-ds-theme="deep">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Design System Gateway</title>
+  <link rel="stylesheet" href="../design-system/styles.css" />
+  <style>
+    html, body { height: 100%; }
+    body { margin:0; background: #04101a; color: #eaf7ff; font-family: Inter, system-ui, -apple-system, Roboto, Arial, sans-serif; }
+    .gateway { display:flex; height:100%; }
+    .sidebar {
+      width: 320px; padding: 20px; border-right: 1px solid rgba(128,210,255,.2);
+      background: rgba(6,20,40,.92); display:flex; flex-direction:column; gap:10px;
+    }
+    .sidebar h1 { font-size: 1.1rem; margin:0 0 8px; }
+    .nav-btn { padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(128,210,255,.25); background: rgba(6,20,40,.8); color:#eaf7ff; text-align:left; cursor:pointer; }
+    .nav-btn.active { outline: 2px solid #5ef1ff; background: rgba(6,20,40,.95); }
+    .content { flex:1; padding: 20px; overflow:auto; }
+    .section { display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:16px; }
+    .panel { padding: 16px; border-radius: 12px; border:1px solid rgba(128,210,255,.25); background: rgba(6,20,40,.8); min-height: 110px; }
+    .panel h2 { margin: 0 0 8px; font-size: 1rem; }
+    .field { display:flex; align-items:center; gap:8px; margin:6px 0; }
+    .field label { min-width: 120px; }
+    input[type="text"], textarea { width: 100%; padding: 6px 8px; border-radius: 6px; border:1px solid rgba(128,210,255,.4); background:#0b2030; color:#eaffff; }
+    button { cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="gateway">
+    <aside class="sidebar" aria-label="Gateway navigation">
+      <h1>Design System Gateway</h1>
+      <button class="nav-btn active" data-route="overview">Overview</button>
+      <button class="nav-btn" data-route="playground">Live Playground</button>
+      <button class="nav-btn" data-route="docs">Docs</button>
+      <button class="nav-btn" data-route="a11y">Accessibility</button>
+    </aside>
+    <main class="content" id="gateway-content" aria-label="Gateway content">
+      <section id="overview" class="panel" style="min-height:120px;">
+        <h2>Gateway Overview</h2>
+        <p>Welcome to the Design System Gateway. A living nexus for exploring, testing, and extending UI tokens and components in real-time.</p>
+        <p>Navigate to Live Playground to tweak components, or to Docs for token references and usage guidelines. Accessibility checks and a11y samples are included in the gateway.</p>
+      </section>
+      <section id="playground" class="panel" style="display:none;">
+        <h2>Live Playground</h2>
+        <div class="section" id="playground-grid"></div>
+      </section>
+      <section id="docs" class="panel" style="display:none;">
+        <h2>Documentation</h2>
+        <p>Design tokens, typography, spacing, and component API surface live here. This gateway is a living doc you can remix and extend.</p>
+        <pre style="background:#051a2b;color:#e6f2ff;padding:12px;border-radius:8px;">{
+  "tokens": "colors, typography, spacing, radii"
+}</pre>
+      </section>
+      <section id="a11y" class="panel" style="display:none;">
+        <h2>Accessibility</h2>
+        <p>ARIA roles, keyboard navigation samples, and high-contrast guidelines are integrated into the components in both CSS-only and React variants.</p>
+      </section>
+    </main>
+  </div>
+
+  <script src="design-system-gateway/gateway.js"></script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+/* Stream Controls */
+.stream-controls {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-6);
+  align-items: center;
+  padding: var(--space-5) var(--space-6);
+  background: linear-gradient(135deg,
+    rgba(0, 255, 136, 0.1) 0%,
+    rgba(0, 214, 255, 0.05) 100%);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.controls-primary {
+  display: flex;
+  align-items: center;
+}
+
+.control-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-8);
+  background: linear-gradient(135deg,
+    rgba(255, 0, 136, 0.2) 0%,
+    rgba(255, 0, 100, 0.15) 100%);
+  border: 2px solid rgba(255, 0, 136, 0.4);
+  border-radius: 8px;
+  color: #ff0088;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.control-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent);
+  transition: left 0.6s ease;
+}
+
+.control-btn:hover::before {
+  left: 100%;
+}
+
+.control-btn.btn-primary:hover {
+  background: linear-gradient(135deg,
+    rgba(255, 0, 136, 0.3) 0%,
+    rgba(255, 0, 100, 0.25) 100%);
+  border-color: rgba(255, 0, 136, 0.7);
+  box-shadow: 0 0 20px rgba(255, 0, 136, 0.5);
+  transform: translateY(-2px);
+}
+
+.control-btn.btn-primary.active {
+  background: linear-gradient(135deg,
+    rgba(255, 0, 136, 0.4) 0%,
+    rgba(255, 0, 100, 0.3) 100%);
+  border-color: rgba(255, 0, 136, 0.8);
+  box-shadow: 0 0 25px rgba(255, 0, 136, 0.7);
+  animation: broadcastActive 1.5s ease-in-out infinite;
+}
+
+@keyframes broadcastActive {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(255, 0, 136, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(255, 0, 136, 1);
+  }
+}
+
+.btn-icon {
+  font-size: var(--text-lg);
+}
+
+.btn-label {
+  font-size: var(--text-sm);
+}
+
+.controls-secondary {
+  display: flex;
+  gap: var(--space-8);
+  justify-content: center;
+}
+
+.control-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: rgba(0, 255, 136, 0.08);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  border-radius: 6px;
+}
+
+.indicator-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.indicator-value {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: #00ff88;
+  font-family: var(--font-family-mono);
+  min-width: 24px;
+  text-align: center;
+}
+
+.controls-tertiary {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.control-btn.secondary {
+  padding: var(--space-3) var(--space-5);
+  background: rgba(0, 255, 136, 0.08);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+}
+
+.control-btn.secondary:hover {
+  background: rgba(0, 255, 136, 0.15);
+  border-color: rgba(0, 255, 136, 0.4);
+  color: #00ff88;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+  .stream-controls {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .controls-secondary {
+    gap: var(--space-4);
+  }
+
+  .controls-tertiary {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 768px) {
+  .stream-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .control-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .controls-secondary {
+    width: 100%;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .control-indicator {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .controls-tertiary {
+    flex-direction: column;
+  }
+
+  .control-btn.secondary {
+    width: 100%;
+  }
+}

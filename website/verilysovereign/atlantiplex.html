@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATLANTIPLEX STUDIO — Seraphonix</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .atlantiplex-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-xl);
+        }
+        
+        .atlantiplex-header {
+            text-align: center;
+            padding: var(--space-xl) 0;
+            border-bottom: var(--border-dim);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .atlantiplex-logo {
+            font-size: 4rem;
+            color: #00d4ff;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+            margin-bottom: var(--space-md);
+        }
+        
+        .studio-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .feature-card {
+            background: var(--bg-surface);
+            border: var(--border-dim);
+            padding: var(--space-lg);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: #00d4ff;
+            margin-bottom: var(--space-md);
+        }
+        
+        .feature-title {
+            color: #00d4ff;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .usage-meter {
+            background: var(--bg-surface);
+            border: var(--border-dim);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .meter-bar {
+            height: 24px;
+            background: var(--bg-deep);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: var(--space-md) 0;
+        }
+        
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .studio-actions {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .studio-btn {
+            padding: var(--space-md) var(--space-xl);
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            border: 2px solid #00d4ff;
+            background: transparent;
+            color: #00d4ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .studio-btn:hover {
+            background: #00d4ff;
+            color: var(--bg-deep);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+        
+        .studio-btn.primary {
+            background: #00d4ff;
+            color: var(--bg-deep);
+        }
+        
+        .studio-btn.primary:hover {
+            background: #00ff88;
+            border-color: #00ff88;
+        }
+        
+        .not-logged-in {
+            text-align: center;
+            padding: var(--space-xl);
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="nav-brand">SERAPHONIX</div>
+        <ul class="nav-links">
+            <li><a href="/" class="nav-link">GATEWAY</a></li>
+            <li><a href="/lore.html" class="nav-link">ARCHIVE</a></li>
+            <li><a href="/about.html" class="nav-link">SANCTUM</a></li>
+            <li><a href="/membership.html" class="nav-link">COVENANT</a></li>
+        </ul>
+        <div class="nav-auth" id="nav-auth">
+            <a href="/signup.html" class="nav-btn btn-initiate">INITIATE</a>
+            <a href="/login.html" class="nav-btn btn-reenter">RE-ENTER</a>
+        </div>
+    </nav>
+
+    <main class="atlantiplex-container" id="app">
+        <div class="not-logged-in" id="login-prompt">
+            <div class="atlantiplex-logo">◈</div>
+            <h1>ATLANTIPLEX STUDIO</h1>
+            <p style="color: var(--text-secondary); margin: var(--space-md) 0;">
+                Authentication required to access streaming studio
+            </p>
+            <div class="studio-actions">
+                <a href="/login.html" class="studio-btn">RE-ENTER</a>
+                <a href="/signup.html" class="studio-btn primary">INITIATE</a>
+            </div>
+        </div>
+
+        <div id="studio-dashboard" style="display: none;">
+            <div class="atlantiplex-header">
+                <div class="atlantiplex-logo">◈</div>
+                <h1 class="page-title">ATLANTIPLEX STUDIO</h1>
+                <p class="page-subtitle">Live Streaming Platform</p>
+            </div>
+
+            <section class="usage-meter">
+                <h3>Monthly Streaming Usage</h3>
+                <div class="meter-bar">
+                    <div class="meter-fill" id="usage-fill" style="width: 0%;"></div>
+                </div>
+                <p id="usage-text">0 / 16 hours used</p>
+            </section>
+
+            <section class="studio-features">
+                <div class="feature-card">
+                    <div class="feature-icon">◈</div>
+                    <h3 class="feature-title">2 Hosts/Panelists</h3>
+                    <p style="color: var(--text-secondary);">Support for 2 concurrent hosts or panelists in your stream</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">◈</div>
+                    <h3 class="feature-title">16 Hours Free</h3>
+                    <p style="color: var(--text-secondary);">Free streaming hours included every month</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">◈</div>
+                    <h3 class="feature-title">OBS Integration</h3>
+                    <p style="color: var(--text-secondary);">Seamless connection with OBS Studio</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">◈</div>
+                    <h3 class="feature-title">Guest Management</h3>
+                    <p style="color: var(--text-secondary);">Invite and manage live guests</p>
+                </div>
+            </section>
+
+            <section class="studio-actions">
+                <a href="#" class="studio-btn primary" id="btn-start-stream">◈ START STREAM</a>
+                <a href="#" class="studio-btn" id="btn-guests">◈ GUESTS</a>
+                <a href="#" class="studio-btn" id="btn-settings">◈ SETTINGS</a>
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-glyph">◇</div>
+        <p>SERAPHONIX © 2026 — All Rights Reserved</p>
+    </footer>
+
+    <script src="scripts/auth.js"></script>
+    <script>
+        // Check authentication and show appropriate UI
+        document.addEventListener('DOMContentLoaded', () => {
+            const isAuth = window.SeraphonixAuth && window.SeraphonixAuth.isAuthenticated();
+            const user = window.SeraphonixAuth ? window.SeraphonixAuth.getCurrentUser() : null;
+
+            if (isAuth && user) {
+                // Show dashboard
+                document.getElementById('login-prompt').style.display = 'none';
+                document.getElementById('studio-dashboard').style.display = 'block';
+                
+                // Update nav
+                document.getElementById('nav-auth').innerHTML = `
+                    <span class="user-greeting">${user.email}</span>
+                    <a href="#" class="nav-btn btn-logout" onclick="window.SeraphonixAuth.logout(); return false;">LOGOUT</a>
+                `;
+                
+                // Fetch usage
+                fetchUsage();
+            }
+        });
+
+        async function fetchUsage() {
+            const token = window.SeraphonixAuth.getToken();
+            if (!token) return;
+
+            try {
+                const res = await fetch('/api/user/usage', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    updateUsageMeter(data.hoursUsed || 0, data.hoursLimit || 16);
+                }
+            } catch (e) {
+                // Default to 0 if API not available
+                updateUsageMeter(0, 16);
+            }
+        }
+
+        function updateUsageMeter(used, limit) {
+            const percentage = Math.min((used / limit) * 100, 100);
+            document.getElementById('usage-fill').style.width = percentage + '%';
+            document.getElementById('usage-text').textContent = 
+                `${used.toFixed(1)} / ${limit} hours used`;
+        }
+    </script>
+</body>
+</html>

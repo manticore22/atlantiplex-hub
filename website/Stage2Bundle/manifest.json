@@ -1,0 +1,23 @@
+{
+  "name": "seraphonix-stage2-bundle",
+  "version": "0.1.0",
+  "description": "Stage 2 patch: Atlantiplex Studio + Admin UI + API wiring",
+  "files": [
+    "docker-compose.stage2.yml",
+    "nginx-stage2.conf",
+    "verilysovereign-backend/server.js",
+    "verilysovereign-backend/admin_login_google.js",
+    "verilysovereign-backend/.env.template",
+    "verilysovereign-backend/data/products.json",
+    "verilysovereign/admin-login.html",
+    "verilysovereign/admin.html",
+    "verilysovereign/admin-dashboard.html",
+    "verilysovereign/scripts/admin.js",
+    "verilysovereign/images/atlantiplex-studio-logo-2.svg",
+    "verilysovereign/images/atlantiplex-studio-logo-3.svg",
+    "verilysovereign/images/atlantiplex-studio-logo-4.svg",
+    "HOSTINGER_STAGE2_DEPLOY_GUIDE.md",
+    "STAGE2_VERIFY.md",
+    "verilysovereign/contact.html"
+  ]
+}

@@ -1,0 +1,67 @@
+# Python cache and compiled files
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+
+# IDEs
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache
+.hypothesis
+
+# Version control
+.git
+.gitignore
+.github
+
+# Documentation
+docs/
+*.md
+
+# Database files
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Logs (exclude from build, use volumes instead)
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Development
+.env
+.env.*
+!.env.production
+
+# Test and debug files
+tests/
+test_*.py
+
+# Node/build artifacts
+node_modules/
+dist/
+build/

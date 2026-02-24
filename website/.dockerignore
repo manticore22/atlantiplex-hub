@@ -1,0 +1,24 @@
+# Docker build context exclusions
+node_modules/
+npm-debug.log
+.git
+.gitignore
+README.md
+*.md
+.env.local
+.env
+.DS_Store
+ssl/
+test-docker.sh
+*.html
+!index.html
+verilysovereign/
+verilysovereign-backend/
+vps-backend/
+design-system/
+design-system-demo/
+design-system-gateway/
+design-system-playground/
+studio-website/
+stripe/
+.docker/

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="240" height="240" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Manticore Logo">
+  <defs>
+    <linearGradient id="grad-mant" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF8C00"/>
+      <stop offset="100%" stop-color="#F5C14A"/>
+    </linearGradient>
+  </defs>
+  <!-- Flame mane around head -->
+  <path d="M60 130 C75 90, 105 70, 140 85 C168 100, 184 125, 188 150" fill="none" stroke="url(#grad-mant)" stroke-width="8" stroke-linecap="round"/>
+  <path d="M70 140 C90 110, 120 100, 150 110 C170 120, 190 140, 200 160" fill="none" stroke="url(#grad-mant)" stroke-width="6" stroke-linecap="round"/>
+  <!-- Lion head silhouette -->
+  <path d="M110 60 C90 70, 70 100, 82 128 C98 152, 131 164, 142 150 C150 134, 140 112, 134 96 C128 82, 116 68, 110 60 Z" fill="#C64B00" stroke="#8A3100" stroke-width="2"/>
+  <!-- Eye -->
+  <circle cx="125" cy="92" r="4" fill="#000" />
+  <!-- Orb / Eye of power -->
+  <circle cx="170" cy="170" r="40" fill="url(#grad-mant)" />
+</svg>

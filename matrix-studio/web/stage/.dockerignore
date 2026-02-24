@@ -1,0 +1,47 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+package-lock.json.backup
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Documentation and configs
+README.md
+*.md
+.eslintrc*
+.prettierrc*
+tsconfig*.json
+jest.config.js
+vitest.config.ts
+
+# Testing
+tests/
+.test/
+coverage/
+*.test.js
+*.spec.js
+
+# Artifacts
+dist/
+build/
+.cache/
+.next/
+.nuxt/
+
+# OS
+.DS_Store
+Thumbs.db

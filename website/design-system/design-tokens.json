@@ -1,0 +1,92 @@
+{
+  "color": {
+    "obsidian": "#0A0A0C",
+    "seraphic": "#F5C14A",
+    "ophanim": "#3A7FFF",
+    "osiric": "#00A676",
+    "void": "#F2F2F2",
+    "bg": "#FFFFFF",
+    "text": "#0A0A0A"
+  },
+  "typography": {
+    "fontFamily": {
+      "display": "\"Montserrat\", Inter, system-ui, sans-serif",
+      "body": "\"Inter\", system-ui, sans-serif",
+      "monospace": "\"JetBrains Mono\", ui-mono, SFMono-Regular, Menlo, monospace"
+    },
+    "fontSizes": {
+      "h1": {"base": 40},
+      "h2": {"base": 28},
+      "body": {"base": 16},
+      "code": {"base": 14}
+    },
+    "fontWeights": {
+      "bold": 700,
+      "semibold": 600
+    },
+    "lineHeight": 1.5
+  },
+  "layout": {
+    "maxW": "1100px",
+    "spacing": {
+      "xs": 8,
+      "sm": 12,
+      "md": 24,
+      "lg": 40
+    },
+    "radius": 12
+  },
+  "breakpoints": {
+    "mobile": 0,
+    "tablet": 768,
+    "desktop": 1024
+  },
+  "shadow": {
+    "soft": "0 2px 12px rgba(0,0,0,.04)"
+  },
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 16,
+    "lg": 24,
+    "xl": 40,
+    "xxl": 64
+  },
+  "motion": {
+    "durations": {
+      "fast": 150,
+      "normal": 300,
+      "slow": 600
+    },
+    "easing": {
+      "ease": "cubic-bezier(.22,.61,.36,1)",
+      "easeIn": "cubic-bezier(.42,0,.58,1)",
+      "easeOut": "cubic-bezier(0,0,.2,1)",
+      "easeInOut": "cubic-bezier(.42,0,.58,1)"
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "display": "\"Montserrat\", Inter, system-ui, sans-serif",
+      "body": "\"Inter\", system-ui, sans-serif",
+      "monospace": "\"JetBrains Mono\", ui-monospace, SFMono-Regular, Menlo, monospace"
+    },
+    "fontSizes": {
+      "h1": {"base": 40},
+      "h2": {"base": 28},
+      "h3": {"base": 20},
+      "body": {"base": 16},
+      "caption": {"base": 12},
+      "code": {"base": 14}
+    },
+    "fontWeights": {
+      "regular": 400,
+      "semibold": 600,
+      "bold": 700
+    },
+    "lineHeight": {
+      "normal": 1.5,
+      "tight": 1.25
+    }
+  }
+}

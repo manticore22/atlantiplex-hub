@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SERAPHONIX — Gateway</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="icon" type="image/svg+xml" href="images/seraphonix-icon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="nav-brand">
+            <img src="images/seraphonix-studios-logo.svg" alt="Seraphonix Studios" height="40" style="vertical-align: middle;">
+        </div>
+        <ul class="nav-links">
+            <li><a href="/" class="nav-link active">GATEWAY</a></li>
+            <li><a href="/lore.html" class="nav-link">ARCHIVE</a></li>
+            <li><a href="/about.html" class="nav-link">SANCTUM</a></li>
+            <li><a href="/membership.html" class="nav-link">COVENANT</a></li>
+        </ul>
+        <div class="nav-auth">
+            <a href="/signup.html" class="nav-btn btn-initiate">INITIATE</a>
+            <a href="/login.html" class="nav-btn btn-reenter">RE-ENTER</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <section class="hero">
+            <img src="images/seraphonix-studios-logo.svg" alt="Seraphonix Studios" class="hero-logo">
+            <h1 class="hero-title">GATEWAY</h1>
+            <p class="hero-subtitle">Threshold to the Abyssal Lattice</p>
+        </section>
+
+        <section class="modules-grid" id="modules-grid">
+            <!-- Atlantiplex Studio (Active) -->
+            <div class="module-card" data-product="atlantiplex-studio">
+                <div class="module-icon">
+                    <img id="atlasLogo" src="images/atlantiplex-studio-logo-2.svg" alt="Atlantiplex" height="40">
+                </div>
+                <h3 class="module-title">ATLANTIPLEX STUDIO</h3>
+                <p class="module-desc">Live streaming platform</p>
+                <div class="module-features">
+                    <span>◈ 2 Hosts/Panelists</span>
+                    <span>◈ 16 Hrs Free/Month</span>
+                </div>
+                <div class="module-status active">LAUNCH</div>
+            </div>
+
+            <!-- Coming Soon Modules -->
+            <div class="module-card coming-soon">
+                <div class="module-icon">◇</div>
+                <h3 class="module-title">NEURAL TRENCH</h3>
+                <p class="module-desc">Deep learning subsystems</p>
+                <div class="module-status">COMING SOON</div>
+                <div class="coming-soon-ring"></div>
+            </div>
+
+            <div class="module-card coming-soon">
+                <div class="module-icon">◇</div>
+                <h3 class="module-title">GLYPH ENGINE</h3>
+                <p class="module-desc">Automated sigil generation</p>
+                <div class="module-status">COMING SOON</div>
+                <div class="coming-soon-ring"></div>
+            </div>
+
+            <div class="module-card coming-soon">
+                <div class="module-icon">◇</div>
+                <h3 class="module-title">VOID PROTOCOL</h3>
+                <p class="module-desc">Classified operations</p>
+                <div class="module-status">COMING SOON</div>
+                <div class="coming-soon-ring"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-glyph">◇</div>
+        <p>SERAPHONIX © 2026 — All Rights Reserved</p>
+        <p class="footer-tagline">Sovereign Intelligence Forged in the Abyss</p>
+    </footer>
+
+    <script src="scripts/auth.js"></script>
+    <script src="scripts/shop.js"></script>
+    <script>
+        // Handle module clicks
+        document.querySelectorAll('.module-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const productId = card.dataset.product;
+                
+                if (card.classList.contains('coming-soon')) {
+                    return; // Do nothing for coming soon
+                }
+
+                // Check auth
+                if (!window.SeraphonixAuth || !window.SeraphonixAuth.isAuthenticated()) {
+                    window.location.href = '/login.html?redirect=' + encodeURIComponent('/?product=' + productId);
+                    return;
+                }
+
+                // Redirect to Atlantiplex Studio (containerized service)
+                if (productId === 'atlantiplex-studio') {
+                    window.location.href = '/atlantiplex/';
+                }
+            });
+        });
+    </script>
+    <script>
+      // Logo switcher: ?logo=3 or ?logo=4 switches Atlantiplex Studio logo visuals
+      (function(){
+        try {
+          const u = new URL(window.location.href);
+          const logo = u.searchParams.get('logo');
+          if (!logo) return;
+          const img = document.getElementById('atlasLogo');
+          if (!img) return;
+          if (logo === '3') img.src = 'images/atlantiplex-studio-logo-3.svg';
+          if (logo === '4') img.src = 'images/atlantiplex-studio-logo-4.svg';
+        } catch(e) { /* ignore */ }
+      })();
+    </script>
+</body>
+</html>

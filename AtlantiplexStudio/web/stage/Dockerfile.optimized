@@ -1,0 +1,69 @@
+# Multi-stage Dockerfile for Node.js Stage Server
+# Optimized for production: reduced image size, security hardening, efficient builds
+
+# ============================================================================
+# STAGE 1: DEPENDENCIES - Install and cache node_modules
+# ============================================================================
+FROM node:20-alpine AS dependencies
+
+WORKDIR /app
+
+# Install system dependencies if needed for native modules
+# dumb-init for proper signal handling in runtime stage
+RUN apk add --no-cache dumb-init
+
+# Copy only package files (maximizes layer caching)
+COPY package*.json ./
+
+# Install production dependencies only
+# Use --omit=dev to exclude devDependencies (saves ~200MB)
+RUN npm ci --omit=dev && npm cache clean --force
+
+# ============================================================================
+# STAGE 2: RUNTIME - Minimal production image
+# ============================================================================
+FROM node:20-alpine
+
+LABEL maintainer="Atlantiplex Studio" \
+      version="1.0.0" \
+      description="Atlantiplex Studio Stage Server - Production optimized"
+
+WORKDIR /app
+
+# Install only runtime essentials
+RUN apk add --no-cache dumb-init curl tini && \
+    addgroup -g 1001 nodejs 2>/dev/null || true
+
+# Copy node_modules and dependencies from builder stage
+COPY --from=dependencies --chown=node:node /app/node_modules ./node_modules
+
+# Copy package files for reference
+COPY --chown=node:node package*.json ./
+
+# Copy application code
+COPY --chown=node:node . .
+
+# Create and secure required directories
+RUN mkdir -p /app/logs /app/uploads && \
+    chown -R node:node /app && \
+    chmod -R 755 /app/logs /app/uploads && \
+    chmod -R 500 /app/node_modules
+
+# Switch to built-in node user (UID 1000)
+USER node
+
+# Set environment variables
+ENV NODE_ENV=production \
+    NODE_OPTIONS="--max-old-space-size=512"
+
+# Expose port
+EXPOSE 9001
+
+# Health check with appropriate timeouts
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD wget --quiet --tries=1 --spider http://localhost:9001/health || exit 1
+
+# Use dumb-init to handle signals properly
+# Ensures clean shutdowns and proper zombie process handling
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["node", "server.js"]

@@ -1,0 +1,243 @@
+version: '3.9'
+
+services:
+  # ============================================================================
+  # GATEWAY LAYER - Shared Header & Routing (Top of Diagram)
+  # ============================================================================
+  gateway:
+    build:
+      context: ./
+      dockerfile: ./gateway/Dockerfile
+    image: atlantiplex-gateway:${IMAGE_TAG:-latest}
+    container_name: atlantiplex-gateway
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      VITE_STUDIO_URL: http://studio:5173
+      VITE_CATALOG_URL: http://catalog:5174
+      VITE_ADMIN_URL: http://admin:5175
+      VITE_DASHBOARD_URL: http://dashboard:5176
+    networks:
+      - atlantiplex-hub
+    depends_on:
+      - studio
+      - catalog
+      - admin
+      - dashboard
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+
+  # ============================================================================
+  # APP LAYER 1: Atlantiplex Studio (Creative Suite)
+  # ============================================================================
+  studio:
+    build:
+      context: ./apps/atlantiplex-studio
+      dockerfile: Dockerfile
+    image: atlantiplex-studio:${IMAGE_TAG:-latest}
+    container_name: atlantiplex-studio
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 5173
+      VITE_API_BASE: /api
+    expose:
+      - "5173"
+    networks:
+      - atlantiplex-hub
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5173"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8'
+          memory: 512M
+        reservations:
+          cpus: '0.4'
+          memory: 256M
+
+  # ============================================================================
+  # APP LAYER 2: Product Catalog (E-Commerce/Shop)
+  # ============================================================================
+  catalog:
+    build:
+      context: ./apps/product-catalog
+      dockerfile: Dockerfile
+    image: atlantiplex-catalog:${IMAGE_TAG:-latest}
+    container_name: atlantiplex-catalog
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 5174
+      VITE_API_BASE: /api
+      VITE_STRIPE_KEY: ${STRIPE_PUBLISHABLE_KEY}
+    expose:
+      - "5174"
+    networks:
+      - atlantiplex-hub
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5174"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8'
+          memory: 512M
+        reservations:
+          cpus: '0.4'
+          memory: 256M
+
+  # ============================================================================
+  # APP LAYER 3: Admin Dashboard (Management)
+  # ============================================================================
+  admin:
+    build:
+      context: ./apps/admin-dashboard
+      dockerfile: Dockerfile
+    image: atlantiplex-admin:${IMAGE_TAG:-latest}
+    container_name: atlantiplex-admin
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 5175
+      VITE_API_BASE: /api
+    expose:
+      - "5175"
+    networks:
+      - atlantiplex-hub
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5175"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8'
+          memory: 512M
+        reservations:
+          cpus: '0.4'
+          memory: 256M
+
+  # ============================================================================
+  # APP LAYER 4: Dashboard & Social (User Engagement)
+  # ============================================================================
+  dashboard:
+    build:
+      context: ./apps/dashboard-social
+      dockerfile: Dockerfile
+    image: atlantiplex-dashboard:${IMAGE_TAG:-latest}
+    container_name: atlantiplex-dashboard
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 5176
+      VITE_API_BASE: /api
+    expose:
+      - "5176"
+    networks:
+      - atlantiplex-hub
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5176"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8'
+          memory: 512M
+        reservations:
+          cpus: '0.4'
+          memory: 256M
+
+  # ============================================================================
+  # BACKEND SERVICES (Shared)
+  # ============================================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: atlantiplex-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-atlantiplex}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?error: DB_PASSWORD not set}
+      POSTGRES_DB: ${DB_NAME:-atlantiplex}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - atlantiplex-hub
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-atlantiplex}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: atlantiplex-redis
+    restart: always
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:?error: REDIS_PASSWORD not set}
+    volumes:
+      - redis_data:/data
+    networks:
+      - atlantiplex-hub
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Backend API Server
+  api:
+    build:
+      context: ./matrix-studio
+      dockerfile: Dockerfile.python
+    image: atlantiplex-api:${IMAGE_TAG:-latest}
+    container_name: atlantiplex-api
+    restart: always
+    environment:
+      FLASK_ENV: production
+      DATABASE_URL: postgresql://${DB_USER:-atlantiplex}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-atlantiplex}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+    expose:
+      - "5000"
+    networks:
+      - atlantiplex-hub
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  atlantiplex-hub:
+    driver: bridge

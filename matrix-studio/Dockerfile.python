@@ -1,61 +1,84 @@
-# Multi-stage Dockerfile for Python Flask Backend
-# Stage 1: Builder
-FROM python:3.11-slim AS builder
+# Builder stage - compile dependencies
+FROM python:3.11-alpine AS builder
 
-# Install build dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Create virtual environment
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-
-# Copy requirements and install dependencies
-COPY ./web/requirements_unified.txt /tmp/
-RUN pip install --no-cache-dir -r /tmp/requirements_unified.txt
-
-# Stage 2: Runtime
-FROM python:3.11-slim
-
-# Install runtime dependencies only
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq5 \
-    ffmpeg \
-    wget \
-    dumb-init \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy virtual environment from builder
-COPY --from=builder /opt/venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH" \
-    PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
-
-# Create non-root user
-RUN useradd --create-home --shell /bin/bash app
-
-# Set working directory
 WORKDIR /app
 
+# Install build dependencies
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    libffi-dev \
+    openssl-dev
+
+# Copy requirements
+COPY requirements.txt .
+
+# Install Python dependencies with BuildKit cache
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade pip setuptools wheel && \
+    pip install --user --no-cache-dir -r requirements.txt
+
+# Runtime stage - minimal image with only runtime dependencies
+FROM python:3.11-alpine
+
+WORKDIR /app
+
+# Install runtime dependencies only
+RUN apk add --no-cache \
+    libffi \
+    openssl \
+    postgresql-client \
+    dumb-init \
+    curl
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S appuser && \
+    adduser -S appuser -u 1001
+
+# Copy Python dependencies from builder with proper ownership
+COPY --from=builder --chown=appuser:appuser /root/.local /home/appuser/.local
+
 # Copy application code
-COPY --chown=app:app . .
+COPY --chown=appuser:appuser . .
 
-# Create necessary directories with proper permissions
-RUN mkdir -p /app/logs /app/core/recordings /app/data && \
-    chown -R app:app /app
+# Exclude unnecessary files
+RUN rm -rf \
+    .git \
+    .gitignore \
+    *.md \
+    tests \
+    docs \
+    __pycache__ \
+    .pytest_cache \
+    .venv
 
-# Switch to non-root user
-USER app
+# Clean Python cache
+RUN find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true && \
+    find . -type f -name "*.pyc" -delete && \
+    find . -type f -name "*.pyo" -delete
+
+# Create application directories with proper permissions
+RUN mkdir -p logs core/recordings && \
+    chown -R appuser:appuser logs core/recordings . && \
+    chmod 755 logs core/recordings
+
+# Set Python environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH=/home/appuser/.local/bin:$PATH \
+    FLASK_ENV=production \
+    FLASK_APP=app
 
 # Expose port
 EXPOSE 5000
 
+# Switch to non-root user
+USER appuser
+
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD wget --quiet --tries=1 --spider http://localhost:5000/api/health || exit 1
+    CMD curl -f http://localhost:5000/api/health || exit 1
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=5000"]
+CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]

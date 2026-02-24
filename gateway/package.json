@@ -1,0 +1,22 @@
+{
+  "name": "atlantiplex-gateway",
+  "version": "1.0.0",
+  "description": "Atlantiplex Hub - Unified Gateway & Router",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node gateway/server.js",
+    "dev": "nodemon gateway/server.js",
+    "build": "echo 'Gateway is pre-built'"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-http-proxy": "^1.6.15"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

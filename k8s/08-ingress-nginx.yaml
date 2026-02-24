@@ -1,0 +1,54 @@
+---
+# Kubernetes Ingress for external access (alternative to LoadBalancer)
+# Use this if your cluster has an Ingress Controller installed (nginx-ingress, traefik, etc.)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: atlantiplex-ingress
+  namespace: atlantiplex
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - atlantiplex.example.com
+    - api.atlantiplex.example.com
+    secretName: atlantiplex-tls-cert
+  rules:
+  - host: atlantiplex.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 80
+  - host: api.atlantiplex.example.com
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: stage-server
+            port:
+              number: 9001
+      - path: /flask
+        pathType: Prefix
+        backend:
+          service:
+            name: flask-backend
+            port:
+              number: 5000
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 80

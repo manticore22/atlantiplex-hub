@@ -1,0 +1,13 @@
+{
+  "name": "atlantiplex-ai",
+  "version": "1.0.0",
+  "description": "Atlantiplex AI-powered website with local Ollama integration",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["ollama", "ai", "atlantiplex", "seraphonix"],
+  "author": "Seraphonix Studios",
+  "license": "MIT"
+}

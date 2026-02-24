@@ -1,0 +1,9 @@
+{
+  "name": "Seraphonix Bundle",
+  "version": "0.1.0",
+  "description": "Brand-site + Design system bundle ready for patch/zip distribution.",
+  "contents": [
+    "brand-site/",
+    "design-system/"
+  ]
+}

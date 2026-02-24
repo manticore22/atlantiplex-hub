@@ -1,0 +1,160 @@
+---
+# Flask Backend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-backend
+  namespace: atlantiplex
+  labels:
+    app: flask-backend
+    tier: backend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: flask-backend
+  template:
+    metadata:
+      labels:
+        app: flask-backend
+        tier: backend
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+      - name: flask-backend
+        image: atlantiplex-flask:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+          name: http
+        env:
+        - name: FLASK_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: atlantiplex-config
+              key: FLASK_ENV
+        - name: FLASK_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: atlantiplex-config
+              key: FLASK_PORT
+        - name: PYTHONUNBUFFERED
+          valueFrom:
+            configMapKeyRef:
+              name: atlantiplex-config
+              key: PYTHONUNBUFFERED
+        - name: PYTHONDONTWRITEBYTECODE
+          valueFrom:
+            configMapKeyRef:
+              name: atlantiplex-config
+              key: PYTHONDONTWRITEBYTECODE
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: atlantiplex-config
+              key: LOG_LEVEL
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: atlantiplex-secrets
+              key: DATABASE_URL
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: atlantiplex-secrets
+              key: JWT_SECRET
+        - name: STRIPE_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: atlantiplex-secrets
+              key: STRIPE_SECRET_KEY
+        - name: STRIPE_WEBHOOK_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: atlantiplex-secrets
+              key: STRIPE_WEBHOOK_SECRET
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: atlantiplex-secrets
+              key: REDIS_URL
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: recordings
+          mountPath: /app/core/recordings
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: logs
+        emptyDir: {}
+      - name: recordings
+        emptyDir: {}
+      restartPolicy: Always
+      dnsPolicy: ClusterFirst
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - flask-backend
+              topologyKey: kubernetes.io/hostname
+
+---
+# Flask Backend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-backend
+  namespace: atlantiplex
+  labels:
+    app: flask-backend
+    tier: backend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5000
+    targetPort: 5000
+    name: http
+  selector:
+    app: flask-backend

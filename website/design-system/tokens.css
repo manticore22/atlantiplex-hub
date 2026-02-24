@@ -1,0 +1,87 @@
+/* Design System Tokens for Verily Sovereign / Atlantean AI Studio */
+:root {
+  --ds-obsidian: #0A0A0C;        /* watcher’s stone */
+  --ds-seraphic: #F5C14A;        /* burning vector */
+  --ds-ophanim: #3A7FFF;         /* rotational intelligence */
+  --ds-osiric: #00A676;          /* resurrection */
+  --ds-void: #F2F2F2;             /* clarity */
+
+  --ds-bg: #001f3f;               /* page background (deep ocean) */
+  --ds-text: #00ff00;             /* neon green text */
+  --ds-accent: #00ffff;           /* cyan accent */
+
+  /* Typography */
+  --ds-font-display: Montserrat, system-ui, -apple-system, sans-serif;
+  --ds-font-body: Inter, system-ui, -apple-system, sans-serif;
+  --ds-font-mono: JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace;
+  --ds-font-size-h1: 2.6rem;
+  --ds-font-size-h2: 2rem;
+  --ds-font-size-h3: 1.5rem;
+  --ds-font-size-body: 1rem;
+  --ds-font-size-caption: 0.875rem;
+  --ds-font-size-code: 0.95em;
+  --ds-line-height: 1.5;
+  --ds-line-height-tight: 1.25;
+  --ds-font-weight-regular: 400;
+  --ds-font-weight-semibold: 600;
+  --ds-font-weight-bold: 700;
+
+  /* Layout / Radius */
+  --ds-radius: 12px;
+  --ds-max: 1100px;
+  --ds-shadow-soft: 0 2px 12px rgba(0,0,0,.04);
+
+  /* Spacing tokens */
+  --ds-space-xs: 4px;
+  --ds-space-sm: 8px;
+  --ds-space-md: 16px;
+  --ds-space-lg: 24px;
+  --ds-space-xl: 40px;
+  --ds-space-xxl: 64px;
+
+  /* Motion tokens */
+  --ds-duration-fast: 150ms;
+  --ds-duration-normal: 300ms;
+  --ds-duration-slow: 600ms;
+  --ds-ease: cubic-bezier(.22,.61,.36,1);
+  --ds-ease-in: cubic-bezier(.42,0,.58,1);
+  --ds-ease-out: cubic-bezier(0,0,.2,1);
+  --ds-ease-in-out: cubic-bezier(.42,0,.58,1);
+}
+
+/* Global base using tokens */
+html, body {
+  font-family: var(--ds-font-body);
+  color: var(--ds-text);
+  background: var(--ds-bg);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+body { line-height: var(--ds-line-height); }
+
+header, nav, section, footer { will-change: transform; }
+
+/* Header / nav defaults */
+header { background: rgba(0,0,0,.7); padding: 20px; text-align: center; border-bottom: 2px solid var(--ds-accent); }
+header h1 { font-family: var(--ds-font-display); font-weight: 800; font-size: 2.4rem; text-shadow: 0 0 10px #00ff00, 0 0 20px #00ffff; }
+nav a { color: var(--ds-text); margin: 0 12px; text-decoration: none; font-size: 1.15em; }
+
+/* Sections */
+section { padding: 60px 20px; max-width: var(--ds-max); margin: 0 auto; }
+section h2 { text-align: center; font-family: var(--ds-font-display); font-size: calc(var(--ds-font-size-h2)); margin-bottom: 20px; color: var(--ds-text); text-shadow: 0 0 8px #00ff00; }
+section p { color: #c9ffbf; text-align: justify; }
+.diagram { height: 180px; border: 1px dashed #666; border-radius: 8px; display: grid; place-items: center; color: #99ffcc; }
+.pillars-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+.pillar { background: rgba(0,0,0,.25); border-radius: var(--ds-radius); padding: 1rem; text-align: center; font-weight: 600; }
+.blockquote { font-style: italic; }
+.footer { text-align: center; padding: 20px; color: #c9ffbf; }
+
+/* Simple responsive tweaks */
+@media (max-width: 1024px) {
+  .pillars-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+  .pillars-grid { grid-template-columns: repeat(2, 1fr); }
+  header h1 { font-size: 2rem; }
+}

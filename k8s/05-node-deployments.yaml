@@ -1,0 +1,272 @@
+---
+# Stage Server (Node.js) Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stage-server
+  namespace: atlantiplex
+  labels:
+    app: stage-server
+    tier: backend
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: stage-server
+  template:
+    metadata:
+      labels:
+        app: stage-server
+        tier: backend
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+      - name: stage-server
+        image: atlantiplex-stage:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 9001
+          name: http
+        env:
+        - name: NODE_ENV
+          value: production
+        - name: PORT
+          value: "9001"
+        - name: NODE_OPTIONS
+          value: "--max-old-space-size=512 --no-deprecation"
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: atlantiplex-config
+              key: LOG_LEVEL
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: atlantiplex-secrets
+              key: JWT_SECRET
+        - name: JWT_REFRESH_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: atlantiplex-secrets
+              key: JWT_REFRESH_SECRET
+        - name: STRIPE_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: atlantiplex-secrets
+              key: STRIPE_SECRET_KEY
+        - name: STRIPE_PUBLISHABLE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: atlantiplex-secrets
+              key: STRIPE_PUBLISHABLE_KEY
+        - name: STRIPE_WEBHOOK_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: atlantiplex-secrets
+              key: STRIPE_WEBHOOK_SECRET
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: atlantiplex-secrets
+              key: DATABASE_URL
+        - name: REDIS_URL
+          valueFrom:
+            secretKeyRef:
+              name: atlantiplex-secrets
+              key: REDIS_URL
+        - name: CORS_ORIGIN
+          valueFrom:
+            configMapKeyRef:
+              name: atlantiplex-config
+              key: CORS_ORIGIN
+        volumeMounts:
+        - name: logs
+          mountPath: /app/logs
+        - name: uploads
+          mountPath: /app/uploads
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 9001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 9001
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+            add:
+            - NET_BIND_SERVICE
+      volumes:
+      - name: logs
+        emptyDir: {}
+      - name: uploads
+        emptyDir: {}
+      restartPolicy: Always
+      dnsPolicy: ClusterFirst
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - stage-server
+              topologyKey: kubernetes.io/hostname
+
+---
+# Stage Server Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: stage-server
+  namespace: atlantiplex
+  labels:
+    app: stage-server
+    tier: backend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9001
+    targetPort: 9001
+    name: http
+  selector:
+    app: stage-server
+
+---
+# Gateway (Node.js) Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: atlantiplex
+  labels:
+    app: gateway
+    tier: middleware
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+        tier: middleware
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 1001
+      containers:
+      - name: gateway
+        image: atlantiplex-gateway:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+        - name: NODE_ENV
+          value: production
+        - name: PORT
+          value: "3000"
+        - name: NODE_OPTIONS
+          value: "--max-old-space-size=256"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+            add:
+            - NET_BIND_SERVICE
+      restartPolicy: Always
+      dnsPolicy: ClusterFirst
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - gateway
+              topologyKey: kubernetes.io/hostname
+
+---
+# Gateway Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: atlantiplex
+  labels:
+    app: gateway
+    tier: middleware
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3000
+    targetPort: 3000
+    name: http
+  selector:
+    app: gateway

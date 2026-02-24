@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="flameGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff6600"/>
+      <stop offset="100%" style="stop-color:#ffcc00"/>
+    </linearGradient>
+    <radialGradient id="eyeGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffdd00"/>
+      <stop offset="100%" style="stop-color:#cc0000"/>
+    </radialGradient>
+    <linearGradient id="diamondGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff"/>
+      <stop offset="50%" style="stop-color:#d4a017"/>
+      <stop offset="100%" style="stop-color:#ff00aa"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Diamond -->
+  <polygon points="50,10 85,42.5 50,75 15,42.5" fill="none" stroke="url(#diamondGrad)" stroke-width="2" filter="url(#glow)"/>
+  
+  <!-- Inner diamond -->
+  <polygon points="50,20 70,42.5 50,65 30,42.5" fill="none" stroke="url(#diamondGrad)" stroke-width="1" opacity="0.6"/>
+  
+  <!-- Eye -->
+  <ellipse cx="50" cy="42.5" rx="18" ry="10" fill="none" stroke="#00f0ff" stroke-width="1.5" filter="url(#glow)"/>
+  
+  <!-- Pupil -->
+  <circle cx="50" cy="42.5" r="6" fill="url(#eyeGrad)"/>
+  
+  <!-- Flame -->
+  <path d="M50,46 L47,38 L50,35 L53,38 Z" fill="url(#flameGrad)" opacity="0.9">
+    <animate attributeName="d" dur="0.3s" repeatCount="indefinite"
+      values="M50,46 L47,38 L50,35 L53,38 Z;M50,46 L46,36 L50,32 L54,36 Z;M50,46 L47,38 L50,35 L53,38 Z"/>
+  </path>
+</svg>
