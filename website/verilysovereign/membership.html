@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COVENANT — Seraphonix</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="icon" type="image/svg+xml" href="images/seraphonix-icon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .current-status {
+            background: var(--bg-surface);
+            border: var(--border-dim);
+            padding: var(--space-lg);
+            margin-top: var(--space-xl);
+            text-align: center;
+        }
+        .tier-features {
+            list-style: none;
+            text-align: left;
+            margin: var(--space-md) 0;
+        }
+        .tier-features li {
+            padding: var(--space-xs) 0;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        .tier-features li::before {
+            content: "◈";
+            color: var(--neon-cyan);
+        }
+        .tier-features li.disabled {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+        .tier-features li.disabled::before {
+            content: "◇";
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="nav-brand">
+            <img src="images/seraphonix-studios-logo.svg" alt="Seraphonix Studios" height="40" style="vertical-align: middle;">
+        </div>
+        <ul class="nav-links">
+            <li><a href="/" class="nav-link">GATEWAY</a></li>
+            <li><a href="/lore.html" class="nav-link">ARCHIVE</a></li>
+            <li><a href="/about.html" class="nav-link">SANCTUM</a></li>
+            <li><a href="/membership.html" class="nav-link active">COVENANT</a></li>
+        </ul>
+        <div class="nav-auth" id="nav-auth">
+            <a href="/signup.html" class="nav-btn btn-initiate">INITIATE</a>
+            <a href="/login.html" class="nav-btn btn-reenter">RE-ENTER</a>
+        </div>
+    </nav>
+
+    <main class="page-content">
+        <section class="page-header">
+            <h1 class="page-title">COVENANT</h1>
+            <p class="page-subtitle">Choose your path to sovereignty</p>
+        </section>
+
+        <section class="covenant-grid">
+            <!-- Free Tier - Initiate Access -->
+            <div class="covenant-card">
+                <div class="card-glyph">◈</div>
+                <h2 class="card-title">INITIATE ACCESS</h2>
+                <div class="card-price">$0<span class="price-period">/month</span></div>
+                <ul class="tier-features">
+                    <li>Up to 2 Panelists</li>
+                    <li>16 Hours/Month Streaming</li>
+                    <li>720p Resolution</li>
+                    <li>Direct Broadcast to YouTube/Twitch</li>
+                    <li>Basic Overlays + Chat Tools</li>
+                    <li>Scene Switching (Limited)</li>
+                </ul>
+                <button class="covenant-btn btn-free" data-tier="free">INITIATE</button>
+            </div>
+
+            <!-- Studio Ascendant Tier -->
+            <div class="covenant-card featured">
+                <div class="card-badge">POPULAR</div>
+                <div class="card-glyph">◈</div>
+                <h2 class="card-title">STUDIO ASCENDANT</h2>
+                <div class="card-price">$9.99<span class="price-period">/month</span></div>
+                <ul class="tier-features">
+                    <li>Up to 6 Guests/Panelists</li>
+                    <li>1080p Streaming Resolution</li>
+                    <li>70+ Hours/Month Broadcast Time</li>
+                    <li>Director-grade Scene Switching</li>
+                    <li>Multi-layout Control</li>
+                    <li>Custom Overlays + Transitions</li>
+                    <li>Multistream to 2 Destinations</li>
+                    <li>Access to Automata AI Tools</li>
+                </ul>
+                <button class="covenant-btn btn-ascendant" data-tier="ascendant">ASCEND</button>
+            </div>
+
+            <!-- Covenant Tier -->
+            <div class="covenant-card featured">
+                <div class="card-badge">RECOMMENDED</div>
+                <div class="card-glyph">◈</div>
+                <h2 class="card-title">COVENANT</h2>
+                <div class="card-price">$29<span class="price-period">/month</span></div>
+                <ul class="tier-features">
+                    <li>Up to 6 Panelists</li>
+                    <li>Unlimited Streaming</li>
+                    <li>1080p Resolution</li>
+                    <li>Multi-Platform Broadcast</li>
+                    <li>Advanced Overlays + Custom Branding</li>
+                    <li>Full Scene Switching</li>
+                    <li>Priority Support</li>
+                    <li>Guest Management</li>
+                </ul>
+                <button class="covenant-btn btn-basic" data-tier="covenant">COVENANT</button>
+            </div>
+
+            <!-- Sovereign Tier -->
+            <div class="covenant-card sovereign">
+                <div class="card-badge">ULTIMATE</div>
+                <div class="card-glyph">◈</div>
+                <h2 class="card-title">TIER IV — INFINITE RELAY</h2>
+                <div class="card-price">$70<span class="price-period">/month</span></div>
+                <ul class="tier-features">
+                    <li>Up to 8 Guests/Panelists</li>
+                    <li>Full 4K Streaming Resolution</li>
+                    <li>Unlimited Monthly Broadcast Hours</li>
+                    <li>White-label Studio (Your Branding)</li>
+                    <li>Your Domain, Your Identity</li>
+                    <li>Multistream to 2 Destinations</li>
+                    <li>Director-grade Scene Switching</li>
+                    <li>Custom Overlays + Transitions</li>
+                    <li>Full Automata AI Suite</li>
+                    <li>Priority Routing + Enhanced Stability</li>
+                </ul>
+                <button class="covenant-btn btn-pro" data-tier="infinite">INFINITE RELAY</button>
+            </div>
+        </section>
+
+        <section class="current-status" id="subscription-status" style="display: none;">
+            <h3>Your Current Covenant</h3>
+            <p id="status-text">Loading...</p>
+            <p id="usage-text" style="margin-top: var(--space-sm); color: var(--text-secondary);"></p>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-glyph">◇</div>
+        <p>SERAPHONIX © 2026 — All Rights Reserved</p>
+    </footer>
+
+    <script src="scripts/auth.js"></script>
+    <script src="scripts/shop.js"></script>
+    <script>
+        // Update nav based on auth
+        document.addEventListener('DOMContentLoaded', () => {
+            const isAuth = window.SeraphonixAuth && window.SeraphonixAuth.isAuthenticated();
+            const user = window.SeraphonixAuth ? window.SeraphonixAuth.getCurrentUser() : null;
+            
+            if (isAuth && user) {
+                document.getElementById('nav-auth').innerHTML = `
+                    <span class="user-greeting">${user.email}</span>
+                    <a href="#" class="nav-btn btn-logout" onclick="window.SeraphonixAuth.logout(); return false;">LOGOUT</a>
+                `;
+                
+                checkSubscription();
+            }
+        });
+
+        async function checkSubscription() {
+            const token = window.SeraphonixAuth.getToken();
+            if (!token) return;
+
+            try {
+                const res = await fetch('/api/user/subscription', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const sub = await res.json();
+                
+                const statusEl = document.getElementById('subscription-status');
+                const textEl = document.getElementById('status-text');
+                const usageEl = document.getElementById('usage-text');
+                
+                statusEl.style.display = 'block';
+                
+                if (sub.tier) {
+                    textEl.innerHTML = `<strong>${sub.tier.toUpperCase()}</strong> — ${sub.status}`;
+                } else {
+                    textEl.innerHTML = '<strong>INITIATE ACCESS</strong> — Free tier';
+                }
+                
+                const usageRes = await fetch('/api/user/usage', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const usage = await usageRes.json();
+                usageEl.textContent = `Streaming: ${usage.hoursUsed} / ${usage.hoursLimit} hours`;
+            } catch (e) {
+                console.error('Failed to load subscription:', e);
+            }
+        }
+
+        document.querySelectorAll('.covenant-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const tier = btn.dataset.tier;
+                
+                if (tier === 'free') {
+                    window.location.href = '/signup.html';
+                    return;
+                }
+
+                const token = window.SeraphonixAuth.getToken();
+                if (!token) {
+                    window.location.href = '/login.html?redirect=' + encodeURIComponent('/membership.html');
+                    return;
+                }
+
+                try {
+                    const res = await fetch('/api/stripe/create-checkout-session', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ tier })
+                    });
+
+                    const data = await res.json();
+                    if (data.url) {
+                        window.location.href = data.url;
+                    } else {
+                        alert('Error initiating checkout');
+                    }
+                } catch (err) {
+                    alert('Connection error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

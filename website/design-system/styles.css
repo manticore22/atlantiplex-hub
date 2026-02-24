@@ -1,0 +1,56 @@
+/* Base tokens wired to CSS variables (fallback for CSS-only usage) */
+:root {
+  --bg: #04101a;
+  --surface: rgba(6, 20, 40, 0.88);
+  --text: #eaf7ff;
+  --muted: #a6d6e9;
+  --accent: #00ffd8;
+  --accent2: #13e6c6;
+  --grid: rgba(60, 120, 180, 0.4);
+  --radius: 12px;
+  --shadow: 0 10px 30px rgba(0,0,0,0.6);
+  --motion-duration: 200ms;
+  --motion-ease: cubic-bezier(.22,.61,.36,1);
+  --glow-color: rgba(0,255,216,.8);
+}
+
+.ds-panel {
+  background: var(--surface);
+  border: 1px solid rgba(128,210,255,.15);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  color: var(--text);
+  backdrop-filter: blur(6px);
+  position: relative;
+  overflow: hidden;
+}
+.ds-panel-title { font-family: var(--typography-ui, Inter, system-ui); margin: 0 0 8px; font-size: 1rem; }
+.ds-panel-content { display: block; }
+
+.ds-sonar-btn {
+  width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(0,255,216,.4);
+  background: rgba(6,20,40,.85); color: var(--text); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: transform var(--motion-duration) var(--motion-ease), box-shadow var(--motion-duration) var(--motion-ease);
+}
+.ds-sonar-btn:hover { transform: scale(1.05); box-shadow: 0 0 16px var(--glow-color); }
+.ds-theme-glow-hint{ display:none; }
+
+.ds-telemetry { display: block; width: 100%; height: auto; }
+
+.glyph-divider { height: 1px; border: none; background: linear-gradient(to right, transparent, rgba(0,255,216,.5), transparent); margin: 16px 0; }
+
+.grid { background-image: linear-gradient(var(--grid) 1px, transparent 1px); background-size: 100% 24px; }
+
+/* Basic responsive adaptions for underwater vibe */
+@media (max-width: 700px) {
+  .ds-panel { padding: 12px; }
+}
+
+/* Glow theme variant: stronger bioluminescent accents for the underwater glow mode */
+html[data-ds-theme="glow"] {
+  --glow-color: rgba(0,255,216,.95);
+  --accent: #5ef1ff;
+  --grid: rgba(0,180,230,.6);
+}

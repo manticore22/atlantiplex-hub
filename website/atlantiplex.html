@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atlantiplex - Seraphonix Studios</title>
+    <meta name="description" content="Dive into AI innovation with Seraphonix Studios in the underwater world of Atlantiplex.">
+    <meta name="keywords" content="Atlantiplex AI, underwater AI innovation, Seraphonix Studios">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ========================================
+           ATLANTIPLEX - EDITABLE CONFIGURATION
+           ======================================== */
+        
+        /* --- OLLAMA SETTINGS --- */
+        :root {
+            /* Change your Ollama host URL here */
+            --ollama-host: 'http://localhost:11434';
+            
+            /* Change your model name here (e.g., 'dolphin-llama3:30b', 'llama3.2', 'mistral', etc.) */
+            --ollama-model: 'dolphin-llama3:30b';
+        }
+
+        /* ========================================
+           THEME COLORS - EDIT THESE (Enhanced with Matrix green and sci-fi neon)
+           ======================================== */
+        :root {
+            --navy: #001F3F;
+            --deep-navy: #000d1a;
+            --blue: #0074D9;
+            --bright-blue: #00a8ff;
+            --aqua: #7FDBFF;
+            --teal: #39CCCC;
+            --coral: #ff6b6b;
+            --seaweed: #2d5a27;
+            --glow-blue: #00d4ff;
+            --glass-bg: rgba(0, 116, 217, 0.15);
+            --glass-border: rgba(127, 219, 255, 0.3);
+            --matrix-green: #00ff00; /* Matrix sci-fi green */
+            --neon-purple: #bb00ff; /* Sci-fi neon accents */
+            --holo-blue: rgba(0, 212, 255, 0.5); /* Holographic Atlantean tech glow */
+            --glitch-red: #ff0000; /* Max Headroom glitch red shift */
+            --holo-opacity: 0.7; /* Holographic transparency */
+            --holo-glow: 0 0 20px rgba(0, 212, 255, 0.8); /* Stronger glow for hologram */
+        }
+
+        /* ========================================
+           BRAND INFO - EDIT THESE
+           ======================================== */
+        const BRAND_INFO = {
+            name: 'Atlantiplex',
+            company: 'Seraphonix Studios',
+            email: 'support@seraphonix.com',
+            twitter: 'https://twitter.com/r1914514',
+            instagram: 'https://instagram.com',
+            discord: 'https://discord.com'
+        };
+
+        const SYSTEM_PROMPT = `You are Atlantiplex AI, an intelligent assistant for Seraphonix Studios. You represent an underwater AI innovation company. Be helpful, knowledgeable about AI tools, no-code solutions, and the Atlantiplex brand. Use an underwater/ocean theme in your responses. Keep responses concise but informative.`;
+
+        const QUICK_PROMPTS = [
+            'Tell me about your AI tools',
+            'What is Seraphonix Studios?',
+            'How do I get started?'
+        ];
+
+        /* ========================================
+           PRODUCTS - EDIT THESE
+           ======================================== */
+        const PRODUCTS = [
+            {
+                name: 'AI Chatbot Template',
+                price: 49.99,
+                description: 'Build custom AI chatbots with no-code solution for automated customer support.',
+                image: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=400&h=300&fit=crop'
+            },
+            {
+                name: 'No-Code Workflow',
+                price: 29.99,
+                description: 'Visual workflow builder. Connect apps, automate tasks without coding.',
+                image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop'
+            },
+            {
+                name: 'AI Content Generator',
+                price: 79.99,
+                description: 'Generate blog posts, social media content, and marketing copy instantly.',
+                image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=300&fit=crop'
+            },
+            {
+                name: 'Data Analysis Suite',
+                price: 99.99,
+                description: 'Visualize data, generate insights with AI assistance.',
+                image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=300&fit=crop'
+            },
+            {
+                name: 'API Integration Kit',
+                price: 39.99,
+                description: 'Pre-built connectors for 100+ services. No coding required.',
+                image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&h=300&fit=crop'
+            },
+            {
+                name: 'AI Image Generator',
+                price: 59.99,
+                description: 'Text-to-image generation with custom styles and templates.',
+                image: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=400&h=300&fit=crop'
+            },
+            {
+                name: 'Marketing Automation',
+                price: 69.99,
+                description: 'Email sequences, social media posting, and lead nurturing made easy.',
+                image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=300&fit=crop'
+            },
+            {
+                name: 'AI Voice Assistant',
+                price: 89.99,
+                description: 'Create custom voice assistants for apps, websites, and smart devices.',
+                image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=300&fit=crop'
+            }
+        ];
+
+        /* ========================================
+           LORE CONTENT - EDIT THESE
+           ======================================== */
+        const LORE_EVENTS = [
+            {
+                date: 'The Awakening',
+                title: '🔥 The Flames of Transformation',
+                content: `In the year 2024, as surface corporations tightened their grip on digital innovation, a group of rebel technologists descended into the depths. They carried with them the burning desire to democratize AI. From the flames of resistance, Seraphonix Studios was forged.<br><br><em>"We don't build for the surface world. We build for those who dare to dive deeper."</em>`
+            },
+            {
+                date: 'The Descent',
+                title: '🌊 The Great Migration',
+                content: `The founders chose the ocean as their sanctuary — not for isolation, but for its infinite capacity for transformation. Like the creatures of the deep, they learned to adapt, to evolve, to create beauty in the darkness.<br><br>Atlantiplex became their beacon — a digital Atlantis where AI flows like water.`
+            },
+            {
+                date: 'The Mission',
+                title: '🎯 Empowering the Depths',
+                content: `Seraphonix Studios exists to break down the barriers between creators and technology.<br><br>🦈 <strong>Agility</strong> — Move fast, adapt faster<br>🐙 <strong>Versatility</strong> — Reach every platform, every user<br>🐚 <strong>Innovation</strong> — Build what hasn't been built<br>🌊 <strong>Depth</strong> — Go beyond surface-level solutions`
+            },
+            {
+                date: 'The Prophecy',
+                title: '🔮 Rise from the Depths',
+                content: `The legend speaks of a time when Atlantiplex will surface — when the innovations born in the depths will transform the world above. Every tool we create brings us closer to that prophesied transformation.<br><br><em>"The surface world watches the waves. We are the tide."</em>`
+            }
+        ];
+
+        /* ========================================
+           END OF CONFIGURATION
+           DO NOT EDIT BELOW UNLESS NEEDED
+           ======================================== */
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: white;
+            background: linear-gradient(180deg, var(--navy) 0%, var(--blue) 50%, var(--deep-navy) 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .ocean-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+            background: 
+                radial-gradient(ellipse at 20% 80%, rgba(0, 116, 217, 0.3) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(57, 204, 204, 0.2) 0%, transparent 40%),
+                radial-gradient(ellipse at 50% 50%, rgba(0, 31, 63, 0.8) 0%, transparent 70%),
+                linear-gradient(180deg, var(--navy) 0%, #003366 50%, var(--deep-navy) 100%);
+        }
+
+        /* Enhanced: Matrix Code Rain Background */
+        .matrix-rain {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            pointer-events: none; overflow: hidden;
+            opacity: 0.15; /* Subtle integration */
+        }
+
+        .matrix-column {
+            position: absolute; height: 100%; font-family: monospace; color: var(--matrix-green);
+            font-size: 14px; letter-spacing: 2px; white-space: nowrap; animation: rain linear infinite;
+            text-shadow: 0 0 5px var(--matrix-green);
+        }
+
+        @keyframes rain {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100vh); }
+        }
+
+        .light-rays {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: repeating-linear-gradient(105deg, transparent 0px, transparent 40px, rgba(127, 219, 255, 0.03) 40px, rgba(127, 219, 255, 0.03) 80px);
+            animation: rayPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes rayPulse { 0%, 100% { opacity: 0.5; filter: hue-rotate(0deg); } 50% { opacity: 1; filter: hue-rotate(60deg); } } /* Enhanced color shift for sci-fi */
+
+        .bg-elements { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; pointer-events: none; }
+
+        .coral { position: absolute; bottom: 0; opacity: 0.15; animation: glowAtlantean 4s ease-in-out infinite; }
+        .coral.left { left: -50px; width: 200px; }
+        .coral.right { right: -50px; width: 180px; transform: scaleX(-1); }
+
+        @keyframes glowAtlantean { 0%, 100% { filter: drop-shadow(0 0 10px var(--holo-blue)); } 50% { filter: drop-shadow(0 0 20px var(--holo-blue)); } } /* Atlantean tech glow */
+
+        .seaweed { position: absolute; bottom: 0; width: 30px; animation: sway 4s ease-in-out infinite; }
+        .seaweed:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .seaweed:nth-child(2) { left: 25%; animation-delay: 1s; }
+        .seaweed:nth-child(3) { right: 15%; animation-delay: 0.5s; }
+        .seaweed:nth-child(4) { right: 30%; animation-delay: 1.5s; }
+
+        @keyframes sway { 0%, 100% { transform: rotate(-5deg) skewX(0deg); } 50% { transform: rotate(5deg) skewX(5deg); } } /* Enhanced skew for dynamic motion */
+
+        .bubbles { position: fixed; width: 100%; height: 100%; top: 0; left: 0; overflow: hidden; pointer-events: none; z-index: 1; }
+
+        .bubble {
+            position: absolute; bottom: -100px;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4), rgba(127, 219, 255, 0.1));
+            border-radius: 50%; animation: rise linear infinite;
+            box-shadow: 0 0 10px rgba(127, 219, 255, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .bubble::after {
+            content: ''; position: absolute; top: 15%; left: 20%; width: 30%; height: 30%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8), transparent); border-radius: 50%;
+        }
+
+        @keyframes rise {
+            0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; filter: blur(2px); }
+            10% { opacity: 0.6; filter: blur(1px); }
+            90% { opacity: 0.4; filter: blur(1px); }
+            100% { transform: translateY(-120vh) translateX(calc(100px * (var(--random, 0.5) - 0.5))) rotate(360deg); opacity: 0; filter: blur(2px); }
+        } /* Enhanced blur for depth */
+
+        svg.filters { position: absolute; width: 0; height: 0; }
+
+        .main-container { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; padding-bottom: 80px; }
+
+        .octagon-container { perspective: 1500px; margin: 20px; }
+        .octagon-3d { position: relative; width: 520px; height: 520px; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); animation: float 6s ease-in-out infinite; }
+
+        @keyframes float { 0%, 100% { transform: rotateX(5deg) rotateY(0deg) translateY(0) scale(1); } 50% { transform: rotateX(-5deg) rotateY(5deg) translateY(-15px) scale(1.02); } } /* Enhanced scale for pulse */
+
+        .octagon-3d:hover { transform: rotateX(0deg) rotateY(15deg) scale(1.02); animation: glitch 0.3s linear; } /* Max Headroom glitch on hover */
+
+        @keyframes glitch {
+            0% { transform: skew(0deg, 0deg); filter: hue-rotate(0deg); }
+            20% { transform: skew(5deg, 0deg); filter: hue-rotate(10deg); clip-path: inset(2% 0 5% 0); text-shadow: 2px 0 var(--glitch-red); }
+            40% { transform: skew(-5deg, 0deg); filter: hue-rotate(-10deg); clip-path: inset(5% 0 2% 0); text-shadow: -2px 0 var(--glitch-red); }
+            60% { transform: skew(5deg, 0deg); clip-path: inset(2% 0 5% 0); }
+            80% { transform: skew(-5deg, 0deg); clip-path: inset(5% 0 2% 0); }
+            100% { transform: skew(0deg, 0deg); filter: hue-rotate(0deg); clip-path: inset(0); text-shadow: none; }
+        } /* Max Headroom style glitch animation */
+
+        .octagon-face {
+            position: absolute; width: 100%; height: 100%;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            background: var(--glass-bg); backdrop-filter: blur(10px); border: 2px solid var(--glass-border);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px;
+            box-shadow: 0 0 60px rgba(0, 212, 255, 0.3), inset 0 0 60px rgba(0, 116, 217, 0.1);
+        }
+
+        .octagon-front { transform: translateZ(20px); background: linear-gradient(135deg, rgba(0, 116, 217, 0.2), rgba(57, 204, 204, 0.15)); }
+        .octagon-back { transform: translateZ(-20px) rotateY(180deg); background: linear-gradient(135deg, rgba(0, 31, 63, 0.4), rgba(0, 116, 217, 0.2)); }
+
+        .octagon-glow {
+            position: absolute; width: 110%; height: 110%; top: -5%; left: -5%;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            background: linear-gradient(135deg, var(--glow-blue), var(--teal), var(--blue), var(--matrix-green));
+            opacity: 0.3; filter: blur(20px); z-index: -1; animation: glowPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse { 0%, 100% { opacity: 0.3; filter: hue-rotate(0deg); } 50% { opacity: 0.5; filter: hue-rotate(90deg); } } /* Sci-fi hue rotation */
+
+        .mission { text-align: center; font-size: 1.4rem; font-weight: 400; padding: 20px; margin-bottom: 20px; filter: url(#wave); text-shadow: 0 0 20px rgba(127, 219, 255, 0.5); line-height: 1.6; max-width: 400px; animation: textGlitch 5s infinite alternate; }
+        .mission strong { color: var(--aqua); font-weight: 700; }
+
+        @keyframes textGlitch { 0% { text-shadow: 0 0 20px var(--holo-blue); } 50% { text-shadow: 2px 2px 2px var(--glitch-red), -2px -2px 2px var(--matrix-green); } 100% { text-shadow: 0 0 20px var(--holo-blue); } } /* Max Headroom text glitch */
+
+        .bible { list-style: none; padding: 0; width: 100%; max-width: 420px; }
+        .bible li { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; padding: 12px 15px; background: rgba(0, 0, 0, 0.2); border-radius: 10px; border-left: 3px solid var(--teal); transition: all 0.3s ease; }
+        .bible li:hover { background: rgba(0, 116, 217, 0.2); transform: translateX(5px) scale(1.05); border-left-color: var(--aqua); box-shadow: 0 0 15px var(--holo-blue); } /* Enhanced hover with scale and glow */
+        .bible-icon { font-size: 1.5rem; flex-shrink: 0; filter: drop-shadow(0 0 5px var(--aqua)); animation: iconPulse 2s infinite; }
+        @keyframes iconPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } } /* Pulse for sci-fi feel */
+        .bible-content strong { color: var(--aqua); display: block; margin-bottom: 3px; }
+        .bible-content span { font-size: 0.9rem; opacity: 0.9; line-height: 1.4; }
+
+        .nav-tentacles { position: absolute; bottom: -80px; left: 50%; transform: translateX(-50%); display: flex; gap: 30px; width: 100%; justify-content: center; }
+
+        .tentacle-btn {
+            padding: 15px 35px; font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 600;
+            color: white; text-decoration: none; background: linear-gradient(135deg, var(--teal), var(--blue));
+            border: none; border-radius: 30px; cursor: pointer; overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .tentacle-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 10px 40px rgba(0, 212, 255, 0.5); background: linear-gradient(135deg, var(--matrix-green), var(--neon-purple)); } /* Sci-fi color shift on hover */
+
+        footer {
+            position: fixed; bottom: 0; width: 100%;
+            background: linear-gradient(180deg, transparent, rgba(0, 15, 30, 0.9));
+            padding: 20px 0; text-align: center; z-index: 100;
+            backdrop-filter: blur(10px); border-top: 1px solid rgba(127, 219, 255, 0.2);
+        }
+
+        .footer-content { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        footer a { color: var(--aqua); text-decoration: none; transition: all 0.3s ease; font-size: 0.95rem; }
+        footer a:hover { color: var(--teal); text-shadow: 0 0 10px var(--aqua); transform: scale(1.1); } /* Enhanced hover */
+
+        .social-orbs { display: flex; gap: 15px; align-items: center; }
+
+        .social-orb {
+            display: flex; align-items: center; justify-content: center;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--blue), var(--teal));
+            box-shadow: 0 0 15px var(--glow-blue), inset 0 0 10px rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease; text-decoration: none;
+        }
+
+        .social-orb:hover { transform: scale(1.2); animation: ripple 0.6s ease-out; background: linear-gradient(135deg, var(--matrix-green), var(--neon-purple)); }
+        .social-orb svg { width: 20px; height: 20px; fill: white; }
+
+        @keyframes ripple { 0% { box-shadow: 0 0 15px var(--glow-blue), 0 0 0 0 rgba(0, 212, 255, 0.7); } 100% { box-shadow: 0 0 15px var(--glow-blue), 0 0 0 25px rgba(0, 212, 255, 0); } }
+
+        .legal-links { display: flex; gap: 20px; font-size: 0.85rem; opacity: 0.8; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 10, 20, 0.85); z-index: 200; backdrop-filter: blur(5px); }
+
+        .modal {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(0, 31, 63, var(--holo-opacity)), rgba(0, 60, 100, var(--holo-opacity)));
+            padding: 40px; border-radius: 20px; z-index: 201; width: 90%; max-width: 450px;
+            border: 1px solid var(--glass-border); box-shadow: var(--holo-glow);
+            animation: holoFadeIn 1s cubic-bezier(0.22, 1, 0.36, 1); /* Smoother easing for fluidity */
+            opacity: var(--holo-opacity); /* Semi-transparent for hologram */
+            backdrop-filter: blur(5px); /* Blur for depth */
+        }
+
+        @keyframes holoFadeIn { 
+            0% { transform: translate(-50%, -50%) scale(0.8) rotateX(10deg); opacity: 0; filter: brightness(0.5) blur(5px); } 
+            100% { transform: translate(-50%, -50%) scale(1) rotateX(0deg); opacity: var(--holo-opacity); filter: brightness(1) blur(0); } 
+        } /* Enhanced with rotateX for 3D fluidity */
+
+        .modal h2 { color: var(--aqua); margin-bottom: 25px; text-align: center; text-shadow: 0 0 10px var(--holo-blue); animation: holoScan 3s infinite ease-in-out; } /* Longer duration for fluid scan */
+        @keyframes holoScan { 0%, 100% { text-shadow: 0 0 10px var(--holo-blue); transform: translateY(0); } 50% { text-shadow: 0 2px 15px var(--holo-blue); transform: translateY(-2px); } } /* Added subtle translate for fluidity */
+        .modal form { display: flex; flex-direction: column; gap: 15px; }
+        .modal input, .modal textarea { padding: 15px 20px; border: 2px solid rgba(127, 219, 255, 0.3); border-radius: 10px; background: rgba(0, 0, 0, 0.3); color: white; font-family: 'Montserrat', sans-serif; font-size: 1rem; transition: border-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out; } /* Smoother transitions */
+        .modal input:focus, .modal textarea:focus { outline: none; border-color: var(--matrix-green); box-shadow: var(--holo-glow); } /* Holo glow on focus */
+        .modal textarea { min-height: 120px; resize: vertical; }
+        .modal button[type="submit"] { padding: 15px; border: none; border-radius: 10px; background: linear-gradient(135deg, var(--teal), var(--blue)); color: white; font-family: 'Montserrat', sans-serif; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.5s ease-in-out, box-shadow 0.5s ease-in-out; box-shadow: var(--holo-glow); }
+        .modal button[type="submit"]:hover { background: linear-gradient(135deg, var(--neon-purple), var(--matrix-green)); box-shadow: 0 0 30px rgba(187, 0, 255, 0.8); } /* Enhanced glow */
+        .modal-close { position: absolute; top: 15px; right: 20px; background: none; border: none; color: var(--aqua); font-size: 2rem; cursor: pointer; text-shadow: 0 0 5px var(--holo-blue); transition: text-shadow 0.5s ease-in-out, transform 0.3s ease-in-out; }
+        .modal-close:hover { text-shadow: 0 0 15px var(--holo-blue); transform: rotate(90deg); } /* Added rotate for interactive fluidity */
+
+        .page-header { text-align: center; padding: 60px 20px 30px; }
+        .page-header h1 { font-size: 3rem; color: var(--aqua); text-shadow: 0 0 30px var(--glow-blue); margin-bottom: 10px; animation: textGlitch 10s infinite; }
+        .back-link { display: inline-block; color: var(--aqua); text-decoration: none; margin-bottom: 20px; }
+        .back-link:hover { color: var(--teal); transform: translateX(-5px); }
+
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; padding: 40px; max-width: 1200px; margin: 0 auto; padding-bottom: 100px; }
+
+        .product {
+            background: linear-gradient(135deg, rgba(0, 31, 63, var(--holo-opacity)), rgba(0, 60, 100, var(--holo-opacity)));
+            border-radius: 20px; padding: 25px; text-align: center;
+            transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1); /* Smoother bezier for fluidity */
+            border: 1px solid rgba(127, 219, 255, 0.2); position: relative; box-shadow: var(--holo-glow); opacity: var(--holo-opacity);
+            backdrop-filter: blur(5px);
+        }
+
+        .product:hover { transform: translateY(-10px) scale(1.02) rotateZ(2deg); border-color: var(--matrix-green); box-shadow: 0 20px 50px rgba(0, 255, 0, 0.3); animation: glitch 0.5s; } /* Added subtle rotateZ for fluid hover */
+        .product-image { width: 100%; height: 200px; object-fit: cover; border-radius: 15px; margin-bottom: 20px; transition: transform 0.6s ease-in-out, filter 0.6s ease-in-out; } /* Longer transition */
+        .product:hover .product-image { transform: rotate(5deg) scale(1.05); filter: brightness(1.2) hue-rotate(30deg); }
+        .product h3 { color: var(--aqua); margin-bottom: 10px; text-shadow: 0 0 5px var(--holo-blue); }
+        .product p { color: var(--teal); font-size: 1.4rem; font-weight: 700; margin-bottom: 20px; }
+        .bubble-popup { display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255, 255, 255, 0.95); color: var(--navy); padding: 15px 20px; border-radius: 15px; width: 80%; font-size: 0.9rem; z-index: 10; box-shadow: 0 0 20px var(--holo-blue); animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); } /* Smoother pop animation */
+        .product:hover .bubble-popup { display: block; }
+        @keyframes pop { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 70% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+        .add-to-cart { width: 100%; padding: 15px; border: none; border-radius:

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 80" fill="none">
+  <!-- Seraphonix Logo -->
+  <defs>
+    <linearGradient id="seraphonixGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#d4a017;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff00aa;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Glyph / Sigil -->
+  <polygon points="30,5 35,25 55,25 38,37 45,57 30,45 15,57 22,37 5,25 25,25" fill="url(#seraphonixGrad)"/>
+  
+  <!-- Text -->
+  <text x="65" y="45" font-family="Arial Black, sans-serif" font-size="36" font-weight="900" letter-spacing="4" fill="url(#seraphonixGrad)">SERAPHONIX</text>
+  
+  <!-- Tagline -->
+  <text x="68" y="65" font-family="Arial, sans-serif" font-size="10" fill="#8ba4b8" letter-spacing="6">SOVEREIGN INTELLIGENCE</text>
+</svg>

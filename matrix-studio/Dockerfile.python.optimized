@@ -1,0 +1,86 @@
+# Python Flask Backend - Production Optimized
+FROM python:3.11-alpine AS builder
+
+WORKDIR /app
+
+# Install build dependencies only (minimal layer)
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    libffi-dev \
+    openssl-dev
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies with BuildKit cache mount
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade pip setuptools wheel && \
+    pip install --user --no-cache-dir -r requirements.txt
+
+# Cleanup build artifacts in builder stage
+RUN find /root/.local -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true && \
+    find /root/.local -type f -name "*.pyc" -delete
+
+# Runtime stage - minimal with only dependencies
+FROM python:3.11-alpine
+
+WORKDIR /app
+
+# Install only runtime dependencies (no dev tools, no curl since we use curl from Alpine for health check)
+RUN apk add --no-cache \
+    libffi \
+    openssl \
+    postgresql-client \
+    dumb-init
+
+# Clean apk cache
+RUN rm -rf /var/cache/apk/*
+
+# Create non-root user with no shell access for security
+RUN addgroup -g 1001 -S appuser && \
+    adduser -S appuser -u 1001 -h /nonexistent -s /sbin/nologin
+
+# Copy compiled Python dependencies from builder
+COPY --from=builder --chown=appuser:appuser /root/.local /home/appuser/.local
+
+# Copy application code
+COPY --chown=appuser:appuser . .
+
+# Remove unnecessary files from app code (keep only runtime essentials)
+RUN rm -rf \
+    .git \
+    .gitignore \
+    *.md \
+    tests \
+    docs \
+    __pycache__ \
+    .pytest_cache \
+    .venv
+
+# Ensure application directories exist with proper permissions
+RUN mkdir -p logs core/recordings && \
+    chown -R appuser:appuser logs core/recordings . && \
+    chmod 755 logs core/recordings
+
+# Set Python environment variables for production
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH=/home/appuser/.local/bin:$PATH \
+    FLASK_ENV=production \
+    FLASK_APP=app \
+    PYTHONHASHSEED=random
+
+# Expose application port
+EXPOSE 5000
+
+# Switch to non-root user before running
+USER appuser
+
+# Health check using Python HTTP client (no external tool dependency)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+    CMD python -c "import http.client; conn = http.client.HTTPConnection('localhost', 5000, timeout=5); conn.request('GET', '/api/health'); r = conn.getresponse(); exit(0 if r.status == 200 else 1)" || exit 1
+
+# Use dumb-init to properly handle signals (SIGTERM, SIGINT)
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]

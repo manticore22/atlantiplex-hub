@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stripe Playground</title>
+  <link rel="stylesheet" href="../design-system/styles.css" />
+  <style>
+    #root { padding: 16px; display: grid; grid-template-columns: 420px 1fr; gap: 16px; }
+    .panel { padding: 12px; border-radius: 12px; border:1px solid rgba(128,210,255,.25); background: rgba(6,20,40,.8); }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel">
+    const { useState } = React;
+
+    const Panel = ({ title, children }) => (
+      <div className="panel">
+        <h3 className="ds-panel-title" style={{margin:0}}>{title}</h3>
+        <div className="ds-panel-content">{children}</div>
+      </div>
+    );
+
+    const StatusBadge = ({ status, label }) => (
+      <span className={`ds-status-badge ds-${status}`} aria-label={label}>{label}</span>
+    );
+
+    const TelemetryChart = ({ data = [0.1,0.4,0.8,0.4] }) => {
+      const w = 420, h = 120; const pts = data.map((v,i)=>`${(i/(data.length-1))*w},${h - v*h}`).join(' ');
+      return (
+        <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-label="demo chart">
+          <polyline fill="none" stroke="var(--accent)" strokeWidth={2} points={pts} />
+        </svg>
+      );
+    };
+
+    const [title, setTitle] = useState('Panel Title');
+    const [body, setBody] = useState('Interactive content goes here.');
+
+    return (
+      <div id="playground">
+        <div style={{display:'flex', gap:16}}>
+          <div className="panel" style={{flex:0.4}}>
+            <h2>Knobs</h2>
+            <div className="field" style={{marginTop:8}}>
+              <label>Panel Title</label>
+              <input type="text" value={title} onChange={e=>setTitle(e.target.value)} />
+            </div>
+            <div className="field">
+              <label>Panel Body</label>
+              <input type="text" value={body} onChange={e=>setBody(e.target.value)} />
+            </div>
+          </div>
+          <Panel title={title}>
+            <p>{body}</p>
+            <TelemetryChart data={[0.1,0.6,0.3,0.9,0.5]} />
+          </Panel>
+        </div>
+      </div>
+    );
+  };
+
+  ReactDOM.render(
+    <div>
+      <h1 style={{margin:0, paddingBottom:8}}>Stripe Playground</h1>
+      <div style={{display:'flex', gap:12}}>
+        <div style={{width:420}}>
+          <Panel title="Live Knobs"><div>Use the controls to tweak the panel</div></Panel>
+        </div>
+        <div style={{flex:1}}><TelemetryChart data={[0.2,0.5,0.8,0.3]} /></div>
+      </div>
+    </div>,
+    document.getElementById('root')
+  );
+</script>
+</body>
+</html>

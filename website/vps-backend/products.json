@@ -1,0 +1,27 @@
+[
+  {
+    "id": "svc-telemetry",
+    "name": "Telemetry Analysis Pack",
+    "description": "Advanced telemetry data analysis for oceanic systems.",
+    "priceId": "free",
+    "price": 0,
+    "interval": "free",
+    "free": true
+  },
+  {
+    "id": "svc-script",
+    "name": "Custom Robot Script",
+    "description": "Tailored automation script for your submersible.",
+    "priceId": "price_script_monthly",
+    "price": 7999,
+    "interval": "month"
+  },
+  {
+    "id": "svc-consult",
+    "name": "Consultation Session",
+    "description": "One-hour strategy session with our engineers.",
+    "priceId": "price_consult_monthly",
+    "price": 2999,
+    "interval": "month"
+  }
+]
