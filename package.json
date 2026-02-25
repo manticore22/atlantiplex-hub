@@ -18,7 +18,9 @@
     "docker:run": "docker run -p 9001:9001 -p 5173:5173 atlantiplex-studio",
     "setup": "npm run setup:backend && npm run setup:frontend",
     "setup:backend": "cd matrix-studio/web/stage && npm install",
-    "setup:frontend": "cd matrix-studio/web/frontend && npm install"
+    "setup:frontend": "cd matrix-studio/web/frontend && npm install",
+    "batch-test": "./scripts/batch_clean_and_run.sh",
+    "build-and-push": "./scripts/build_and_push.sh"
   },
   "devDependencies": {
     "concurrently": "^8.2.0"
