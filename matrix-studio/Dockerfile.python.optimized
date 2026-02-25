@@ -1,7 +1,7 @@
 # Python Flask Backend - Production Optimized Multi-stage Build
 # Security hardened with minimal attack surface
 
-FROM python:3.11-alpine AS builder
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --user --no-cache-dir -r requirements.txt
 
 # Runtime stage - minimal image with only runtime dependencies
-FROM python:3.11-alpine
+FROM python:3.11-slim
 
 WORKDIR /app
 

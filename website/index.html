@@ -10,21 +10,164 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="neon.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+    <style>
+        /* Matrix Background Styles */
+        canvas#matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -2;
+            width: 100%;
+            height: 100%;
+            opacity: 0.5; /* Adjust opacity to blend with ocean background */
+        }
+
+        /* Glitch Effect for Text */
+        .glitch {
+            position: relative;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            animation: glitch 1s infinite linear alternate-reverse;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00ff;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #00ffff, 2px 2px #ff00ff;
+            animation: glitch-anim2 1s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% {
+                clip: rect(44px, 9999px, 56px, 0);
+                transform: skew(0.6deg);
+            }
+            5% {
+                clip: rect(49px, 9999px, 50px, 0);
+                transform: skew(0.35deg);
+            }
+            10% {
+                clip: rect(58px, 9999px, 29px, 0);
+                transform: skew(0.1deg);
+            }
+            /* Add more keyframes for randomness */
+            95% {
+                clip: rect(25px, 9999px, 94px, 0);
+                transform: skew(0.9deg);
+            }
+            100% {
+                clip: rect(12px, 9999px, 65px, 0);
+                transform: skew(0.7deg);
+            }
+        }
+
+        @keyframes glitch-anim2 {
+            0% {
+                clip: rect(65px, 9999px, 100px, 0);
+                transform: skew(0.3deg);
+            }
+            5% {
+                clip: rect(76px, 9999px, 90px, 0);
+                transform: skew(0.1deg);
+            }
+            10% {
+                clip: rect(42px, 9999px, 151px, 0);
+                transform: skew(0.4deg);
+            }
+            /* Add more keyframes */
+            95% {
+                clip: rect(8px, 9999px, 9px, 0);
+                transform: skew(0.2deg);
+            }
+            100% {
+                clip: rect(97px, 9999px, 85px, 0);
+                transform: skew(0.8deg);
+            }
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(1px, 1px) skew(2deg); }
+            10% { transform: translate(-1px, -1px) skew(-2deg); }
+            20% { transform: translate(1px, 0px) skew(3deg); }
+            30% { transform: translate(0px, 1px) skew(1deg); }
+            40% { transform: translate(1px, -1px) skew(-1deg); }
+            50% { transform: translate(-1px, 1px) skew(2deg); }
+            60% { transform: translate(-1px, -1px) skew(-3deg); }
+            70% { transform: translate(1px, 1px) skew(3deg); }
+            80% { transform: translate(-1px, -1px) skew(-1deg); }
+            90% { transform: translate(1px, 1px) skew(1deg); }
+            100% { transform: translate(1px, -1px) skew(-2deg); }
+        }
+
+        /* Glitch for Nav */
+        .main-nav.glitch-nav {
+            position: relative;
+        }
+
+        .main-nav.glitch-nav::before,
+        .main-nav.glitch-nav::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            opacity: 0.5;
+        }
+
+        .main-nav.glitch-nav::before {
+            transform: translate(2px, 2px);
+            animation: glitch-nav 2s infinite;
+        }
+
+        .main-nav.glitch-nav::after {
+            transform: translate(-2px, -2px);
+            animation: glitch-nav 2s infinite 0.5s;
+        }
+
+        @keyframes glitch-nav {
+            0% { clip: rect(0, auto, auto, 0); }
+            50% { clip: rect(50px, auto, auto, 0); }
+            100% { clip: rect(0, auto, auto, 0); }
+        }
+    </style>
 </head>
 <body class="fade-in-loading neon-body">
-    <!-- Navigation Bar -->
-    <nav class="main-nav">
+    <!-- Matrix Background Canvas -->
+    <canvas id="matrix-bg"></canvas>
+
+    <!-- Navigation Bar with Glitch -->
+    <nav class="main-nav glitch-nav">
         <div class="nav-container">
             <a href="/" class="nav-logo">
                 <svg viewBox="0 0 40 40" class="logo-icon"><circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="20" cy="20" r="8" fill="currentColor"/></svg>
                 <span>Atlantiplex</span>
             </a>
             <ul class="nav-links">
-                <li><a href="#brands" class="nav-link">Brands</a></li>
-                <li><a href="#products" class="nav-link">Products</a></li>
-                <li><a href="#mission" class="nav-link">Mission</a></li>
-                <li><a href="lore.html" class="nav-link">Lore</a></li>
-                <li><a href="store.html" class="nav-link">Store</a></li>
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#services" class="nav-link">Services</a></li>
+                <li><a href="#portfolio" class="nav-link">Portfolio</a></li>
+                <li><a href="#blog" class="nav-link">Blog</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
             <button class="nav-toggle" aria-label="Toggle menu">
                 <span></span><span></span><span></span>
@@ -73,127 +216,13 @@
         </defs>
     </svg>
 
-    <script>
-        window.addEventListener('load', () => {
-            document.body.classList.remove('fade-in-loading');
-        });
-        
-        // Navigation scroll effect
-        const mainNav = document.querySelector('.main-nav');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                mainNav.classList.add('scrolled');
-            } else {
-                mainNav.classList.remove('scrolled');
-            }
-        });
-        
-        // Enhanced particle animation
-        (function createParticles() {
-            const container = document.getElementById('particles');
-            if (!container) return;
-            const particleCount = 40;
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                const size = Math.random() * 4 + 2;
-                particle.style.width = size + 'px';
-                particle.style.height = size + 'px';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDuration = (Math.random() * 8 + 8) + 's';
-                particle.style.animationDelay = (Math.random() * 10) + 's';
-                particle.style.setProperty('--drift', (Math.random() * 100 - 50) + 'px');
-                container.appendChild(particle);
-            }
-        })();
-        
-        // Create bubbles
-        (function createBubbles() {
-            const container = document.querySelector('.bubbles');
-            if (!container) return;
-            const bubbleCount = 25;
-            for (let i = 0; i < bubbleCount; i++) {
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
-                const size = Math.random() * 20 + 8;
-                bubble.style.width = size + 'px';
-                bubble.style.height = size + 'px';
-                bubble.style.left = Math.random() * 100 + '%';
-                bubble.style.animationDuration = (Math.random() * 10 + 10) + 's';
-                bubble.style.animationDelay = (Math.random() * 15) + 's';
-                bubble.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
-                container.appendChild(bubble);
-            }
-        })();
-        
-        // Smooth scroll for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-    </script>
-
-    <script>
-        (function(){
-            const btn = document.getElementById('theme-toggle');
-            const root = document.documentElement;
-            function applyTheme(theme){
-                root.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
-            }
-            const saved = localStorage.getItem('theme') || 'default';
-            applyTheme(saved);
-            btn.addEventListener('click', () => {
-                const current = root.getAttribute('data-theme');
-                const next = current === 'neon' ? 'default' : 'neon';
-                applyTheme(next);
-            });
-        })();
-    </script>
-
-    <!-- Background Coral Elements -->
-    <div class="bg-elements">
-        <!-- SVG Coral -->
-        <svg class="coral left" viewBox="0 0 100 150" fill="#ff6b6b">
-            <path d="M50 150 Q20 100 30 70 Q40 40 50 20 Q60 40 70 70 Q80 100 50 150"/>
-            <path d="M35 150 Q15 120 25 100 Q35 80 40 60" fill="none" stroke="#ff8787" stroke-width="3"/>
-            <path d="M65 150 Q85 120 75 100 Q65 80 60 60" fill="none" stroke="#ff8787" stroke-width="3"/>
-        </svg>
-        <svg class="coral right" viewBox="0 0 100 150" fill="#39CCCC">
-            <path d="M50 150 Q20 100 30 70 Q40 40 50 20 Q60 40 70 70 Q80 100 50 150"/>
-            <path d="M35 150 Q15 120 25 100 Q35 80 40 60" fill="none" stroke="#5fd3d3" stroke-width="3"/>
-            <path d="M65 150 Q85 120 75 100 Q65 80 60 60" fill="none" stroke="#5fd3d3" stroke-width="3"/>
-        </svg>
-        <!-- SVG Seaweed -->
-        <svg class="seaweed" style="left: 8%;" viewBox="0 0 30 200" fill="#2d5a27">
-            <path d="M15 200 Q5 150 15 100 Q25 50 15 0 Q5 50 15 100 Q25 150 15 200" opacity="0.7"/>
-        </svg>
-        <svg class="seaweed" style="left: 20%;" viewBox="0 0 30 200" fill="#2d5a27">
-            <path d="M15 200 Q0 150 15 100 Q30 50 15 0 Q0 50 15 100 Q30 150 15 200" opacity="0.6"/>
-        </svg>
-        <svg class="seaweed" style="right: 12%;" viewBox="0 0 30 200" fill="#2d5a27">
-            <path d="M15 200 Q5 150 15 100 Q25 50 15 0 Q5 50 15 100 Q25 150 15 200" opacity="0.7"/>
-        </svg>
-        <svg class="seaweed" style="right: 25%;" viewBox="0 0 30 200" fill="#2d5a27">
-            <path d="M15 200 Q0 150 15 100 Q30 50 15 0 Q0 50 15 100 Q30 150 15 200" opacity="0.6"/>
-        </svg>
-    </div>
-
     <!-- Main Content -->
     <main class="main-container">
-        <!-- Hero Section -->
+        <!-- Hero Section Upgraded -->
         <section class="hero-section" id="hero">
             <div class="hero-content">
-                <h1 class="hero-title">Welcome to Atlantiplex</h1>
-                <p class="hero-subtitle">Three Brands. One Vision. Infinite Possibilities.</p>
+                <h1 class="hero-title glitch" data-text="AI Solutions for Your Business">AI Solutions for Your Business</h1>
+                <p class="hero-subtitle glitch" data-text="Transforming Ideas into Reality">Transforming Ideas into Reality</p>
                 <div class="hero-cta">
                     <a href="#brands" class="cta-primary">Explore Brands</a>
                     <a href="#mission" class="cta-secondary">Our Mission</a>
@@ -224,7 +253,7 @@
                 <!-- Seraphonix Studios (Golden Angel) -->
                 <div class="brand-card seraphonix-card">
                     <div class="brand-logo-container">
-                        <img src="./brand-site/assets/seraphonix-logo.svg" alt="Seraphonix Studios" class="brand-logo" />
+                        <img src="Copilot_20260215_023027.png" alt="Seraphonix Studios Logo" class="brand-logo" />
                     </div>
                     <h2>Seraphonix Studios</h2>
                     <p class="brand-tagline">Rising from Flames</p>
@@ -239,10 +268,13 @@
                 <!-- Verilysovereign (Dark Lion) -->
                 <div class="brand-card verilysovereign-card">
                     <div class="brand-logo-container">
-                        <img src="./brand-site/assets/verilysovereign-logo.svg" alt="Verilysovereign" class="brand-logo" />
+                        <img src="O5cCiqrn_400x400.jpg" alt="Manticore, head Dev of Seraphonix Studios" class="brand-logo" />
+                        <img src="HBZJSygbcAIJrHi.jpg" alt="Manticore, the lion that's head Dev of Seraphonix Studios" class="brand-logo" />
+                        <img src="Copilot_20260216_003035.png" alt="Verilysovereign Logo - Golden V" class="brand-logo secondary-logo" style="margin-top: 10px;" />
                     </div>
                     <h2>Verilysovereign</h2>
                     <p class="brand-tagline">Power & Authority</p>
+                    <p>Manticore is the lion that's head Dev of Seraphonix Studios</p>
                     <ul class="brand-traits">
                         <li>🦁 Strength</li>
                         <li>🛡️ Sovereignty</li>
@@ -254,7 +286,7 @@
                 <!-- Atlantiplex (All-Seeing Eye) -->
                 <div class="brand-card atlantiplex-card">
                     <div class="brand-logo-container">
-                        <img src="./brand-site/assets/atlantiplex-logo.svg" alt="Atlantiplex" class="brand-logo" />
+                        <img src="image (21).jpg" alt="Atlantiplex Logo" class="brand-logo" />
                     </div>
                     <h2>Atlantiplex AI</h2>
                     <p class="brand-tagline">Cosmic Consciousness</p>
@@ -406,6 +438,131 @@
             <svg class="ai-icon-animated" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
         </button>
     </div>
+
+    <script>
+        // Existing scripts...
+        window.addEventListener('load', () => {
+            document.body.classList.remove('fade-in-loading');
+        });
+        
+        // Navigation scroll effect
+        const mainNav = document.querySelector('.main-nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                mainNav.classList.add('scrolled');
+            } else {
+                mainNav.classList.remove('scrolled');
+            }
+        });
+        
+        // Enhanced particle animation
+        (function createParticles() {
+            const container = document.getElementById('particles');
+            if (!container) return;
+            const particleCount = 40;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * 4 + 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 8 + 8) + 's';
+                particle.style.animationDelay = (Math.random() * 10) + 's';
+                particle.style.setProperty('--drift', (Math.random() * 100 - 50) + 'px');
+                container.appendChild(particle);
+            }
+        })();
+        
+        // Create bubbles
+        (function createBubbles() {
+            const container = document.querySelector('.bubbles');
+            if (!container) return;
+            const bubbleCount = 25;
+            for (let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                const size = Math.random() * 20 + 8;
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                bubble.style.animationDelay = (Math.random() * 15) + 's';
+                bubble.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
+                container.appendChild(bubble);
+            }
+        })();
+        
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Theme toggle
+        (function(){
+            const btn = document.getElementById('theme-toggle');
+            const root = document.documentElement;
+            function applyTheme(theme){
+                root.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+            }
+            const saved = localStorage.getItem('theme') || 'default';
+            applyTheme(saved);
+            btn.addEventListener('click', () => {
+                const current = root.getAttribute('data-theme');
+                const next = current === 'neon' ? 'default' : 'neon';
+                applyTheme(next);
+            });
+        })();
+
+        // Matrix Rain Script
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+
+        canvas.height = window.innerHeight;
+        canvas.width = window.innerWidth;
+
+        const characters = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+
+        const drops = Array.from({ length: columns }, () => Math.floor(Math.random() * canvas.height / fontSize));
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0F0';
+            ctx.font = `${fontSize}px monospace`;
+
+            drops.forEach((y, x) => {
+                const text = characters[Math.floor(Math.random() * characters.length)];
+                ctx.fillText(text, x * fontSize, y * fontSize);
+
+                if (y * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[x] = 0;
+                }
+                drops[x]++;
+            });
+        }
+
+        setInterval(draw, 33);
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
 
     <script src="script.js"></script>
     <script src="chat.js"></script>

@@ -1,5 +1,5 @@
 # Static Website - Production Optimized (Multi-stage)
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 
 WORKDIR /app
 
@@ -30,7 +30,7 @@ RUN rm -rf \
     tests
 
 # Runtime stage - minimal nginx
-FROM nginx:1.25-alpine
+FROM nginx:1.25-bullseye-slim
 
 RUN apk add --no-cache dumb-init && \
     rm -rf /var/cache/apk/*
