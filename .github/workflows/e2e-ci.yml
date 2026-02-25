@@ -39,7 +39,7 @@ jobs:
 
       - name: Build and run stack
         run: |
-          docker-compose -f docker-compose.prod.yml -f docker-compose.override.yml up -d
+          docker compose -f docker-compose.prod.yml -f docker-compose.override.yml up -d
 
       - name: Run end-to-end test (Playwright Desktop)
         run: |
@@ -92,4 +92,4 @@ jobs:
       - name: Tear down stack
         if: always()
         run: |
-          docker-compose -f docker-compose.prod.yml -f docker-compose.override.yml down
+          docker compose -f docker-compose.prod.yml -f docker-compose.override.yml down
