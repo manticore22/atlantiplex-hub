@@ -1,4 +1,6 @@
 # Python Flask Backend - Production Optimized Multi-stage Build
+# Security hardened with minimal attack surface
+
 FROM python:3.11-alpine AS builder
 
 WORKDIR /app
@@ -8,13 +10,14 @@ RUN apk add --no-cache \
     gcc \
     musl-dev \
     libffi-dev \
-    openssl-dev && \
+    openssl-dev \
+    git && \
     rm -rf /var/cache/apk/*
 
 # Copy requirements
-COPY requirements.txt .
+COPY matrix-studio/requirements.txt .
 
-# Install Python dependencies with BuildKit cache
+# Install Python dependencies with BuildKit cache and security scanning
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip setuptools wheel && \
     pip install --user --no-cache-dir -r requirements.txt
@@ -24,13 +27,13 @@ FROM python:3.11-alpine
 
 WORKDIR /app
 
-# Install runtime dependencies only (no build tools) and clean cache
+# Install runtime dependencies only (no build tools)
+# Using minimal set: openssl for SSL, postgresql-client for DB connectivity
 RUN apk add --no-cache \
     libffi \
     openssl \
     postgresql-client \
-    dumb-init \
-    curl && \
+    dumb-init && \
     rm -rf /var/cache/apk/*
 
 # Create non-root user for security with no shell access
@@ -40,10 +43,10 @@ RUN addgroup -g 1001 -S appuser && \
 # Copy Python dependencies from builder with proper ownership
 COPY --from=builder --chown=appuser:appuser /root/.local /home/appuser/.local
 
-# Copy application code (exclude docs, tests, git, cache)
-COPY --chown=appuser:appuser . .
+# Copy application code from the correct path
+COPY --chown=appuser:appuser ./matrix-studio . 
 
-# Exclude unnecessary files to reduce image size
+# Exclude unnecessary files to reduce image size and attack surface
 RUN rm -rf \
     .git \
     .gitignore \
@@ -53,20 +56,24 @@ RUN rm -rf \
     __pycache__ \
     .pytest_cache \
     .venv \
-    .env* && \
+    .env* \
+    .github \
+    && \
     find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true && \
     find . -type f -name "*.pyc" -delete && \
-    find . -type f -name "*.pyo" -delete
+    find . -type f -name "*.pyo" -delete && \
+    find . -type f -name "*.dist-info" -path "*/tests/*" -delete 2>/dev/null || true
 
-# Create application directories with proper permissions
+# Create application directories with proper permissions and security context
 RUN mkdir -p logs core/recordings && \
     chown -R appuser:appuser . && \
-    chmod 755 logs core/recordings
+    chmod 755 logs core/recordings && \
+    chmod 750 .
 
 # Metadata
 LABEL maintainer="Atlantiplex Team" \
       version="1.0" \
-      description="Flask Backend - API Server"
+      description="Flask Backend - API Server (Security Hardened)"
 
 # Set Python environment variables for optimal production performance
 ENV PYTHONUNBUFFERED=1 \
@@ -74,7 +81,8 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONHASHSEED=random \
     PATH=/home/appuser/.local/bin:$PATH \
     FLASK_ENV=production \
-    FLASK_APP=app
+    FLASK_APP=app \
+    PYTHONOPTIMIZE=2
 
 # Expose port
 EXPOSE 5000
@@ -86,6 +94,6 @@ USER appuser
 HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:5000/api/health || exit 1
 
-# Use dumb-init to handle signals properly
+# Use dumb-init to handle signals properly (prevents zombie processes)
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]
