@@ -26,9 +26,26 @@ app.use(express.static(path.join(__dirname, '../verilysovereign')));
 const USERS_FILE = path.join(__dirname, 'data/users.json');
 const SUBSCRIPTIONS_FILE = path.join(__dirname, 'data/subscriptions.json');
 const PRODUCTS_FILE = path.join(__dirname, 'data/products.json');
+// Guests data store
+const GUESTS_FILE = path.join(__dirname, 'data/guests.json');
 
 // Ensure data directory exists
 fs.ensureDirSync(path.join(__dirname, 'data'));
+// Initialize guests.json if missing
+if (!fs.existsSync(GUESTS_FILE)) {
+  fs.writeFileSync(GUESTS_FILE, '[]');
+}
+async function getGuests() {
+  try {
+    const data = await fs.readFile(GUESTS_FILE, 'utf8')
+    return JSON.parse(data) || []
+  } catch {
+    return []
+  }
+}
+async function saveGuests(list) {
+  await fs.writeFile(GUESTS_FILE, JSON.stringify(list, null, 2))
+}
 
 // Initialize data files if they don't exist
 if (!fs.existsSync(USERS_FILE)) {
@@ -95,6 +112,15 @@ async function getProducts() {
     return JSON.parse(await fs.readFile(PRODUCTS_FILE, 'utf8'));
 }
 
+// Global tier limits (for usage/account checks)
+const TIER_LIMITS = {
+  free: 16,
+  ascendant: 70,
+  covenant: 999,
+  infinite: 999,
+  sovereign: 999
+};
+
 // Auth middleware
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
@@ -134,16 +160,38 @@ app.post('/api/auth/signup', async (req, res) => {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create user
+        // Create user with trial and usage fields
+        const trialEndsAt = Date.now() + 16*60*60*1000;
         const user = {
             id: Date.now().toString(),
             email,
             password: hashedPassword,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
+            trialEndsAt,
+            hoursUsed: 0,
+            guestsThisMonth: 0,
+            lastGuestReset: new Date().toISOString(),
+            plan: 'free',
+            subscriptionStatus: 'trial'
         };
 
         users.push(user);
         await saveUsers(users);
+
+        // Seed free trial subscription for new user
+        try {
+            const subsRaw = await fs.readFile(SUBSCRIPTIONS_FILE, 'utf8') || '{}';
+            const subs = JSON.parse(subsRaw) || {};
+            subs[email] = {
+                tier: 'free',
+                status: 'trial',
+                createdAt: new Date().toISOString(),
+                expiresAt: new Date(trialEndsAt).toISOString()
+            };
+            await fs.writeFile(SUBSCRIPTIONS_FILE, JSON.stringify(subs, null, 2));
+        } catch (e) {
+            console.error('Failed to seed free trial subscription for new user', e);
+        }
 
         // Generate token
         const role = (email === 'admin@verilysovereign.org') ? 'admin' : (user.role || 'user');
@@ -229,6 +277,28 @@ app.get('/api/auth/me', authenticateToken, async (req, res) => {
 app.get('/api/products', async (req, res) => {
     const products = await getProducts();
     res.json(products);
+});
+
+// Guests invite endpoint (monthly limit 2 invites per inviter)
+app.post('/api/guests/invite', authenticateToken, async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'guest email required' });
+  try {
+    const guests = await getGuests();
+    const now = new Date();
+    const monthKey = now.toISOString().slice(0, 7);
+    const count = guests.filter(g => g.inviter_email === req.user.email && g.month === monthKey).length;
+    if (count >= 2) {
+      return res.status(429).json({ error: 'Guest invite limit reached for this month' });
+    }
+    const invite = { id: Date.now().toString(), inviter_email: req.user.email, guest_email: email, invitedAt: now.toISOString(), month: monthKey, status: 'pending' };
+    guests.push(invite);
+    await saveGuests(guests);
+    res.json({ invited: true, invite });
+  } catch (e) {
+    console.error('Guest invite error', e);
+    res.status(500).json({ error: 'Failed to invite guest' });
+  }
 });
 
 // ============ SUBSCRIPTION ROUTES ============

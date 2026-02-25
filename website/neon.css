@@ -1,0 +1,82 @@
+/* Neon Theme Overrides - Atlantiplex */
+/* Additional neon enhancements layered on top of core styles */
+
+:root {
+    --neon-primary: #00fff2;
+    --neon-secondary: #00ffd8;
+    --neon-accent: #00ff41;
+}
+
+/* Glow utilities */
+.glow-hero {
+    text-shadow: 0 0 20px rgba(0, 255, 242, 0.9), 0 0 40px rgba(0, 255, 242, 0.5);
+    animation: glowPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0%, 100% { text-shadow: 0 0 20px rgba(0, 255, 242, 0.9), 0 0 40px rgba(0, 255, 242, 0.5); }
+    50% { text-shadow: 0 0 30px rgba(0, 255, 242, 1), 0 0 60px rgba(0, 255, 242, 0.7); }
+}
+
+/* Neon button enhancements */
+.cta-primary, .brand-link, .tentacle-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-primary::before, .brand-link::before, .tentacle-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.cta-primary:hover::before, .brand-link:hover::before, .tentacle-btn:hover::before {
+    left: 100%;
+}
+
+/* Card glow on hover */
+.brand-card {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.brand-card:hover {
+    border-color: var(--neon-primary);
+    box-shadow: 0 20px 60px rgba(0, 255, 242, 0.3), 0 0 30px rgba(0, 255, 242, 0.2);
+}
+
+/* Nav link glow */
+.nav-link::after {
+    background: linear-gradient(90deg, var(--neon-primary), var(--neon-secondary));
+    box-shadow: 0 0 10px var(--neon-primary);
+}
+
+/* [data-theme="neon"] - Enhanced neon mode */
+[data-theme="neon"] {
+    --blue: #00ffd8;
+    --aqua: #00fff2;
+    --glow-blue: #00ffd8;
+    --teal: #39ffd6;
+    --navy: #001515;
+    --deep-navy: #000a0a;
+}
+
+[data-theme="neon"] .brand-card {
+    border-color: rgba(0, 255, 242, 0.4);
+}
+
+[data-theme="neon"] .brand-card:hover {
+    border-color: #00ffff;
+    box-shadow: 0 25px 80px rgba(0, 255, 255, 0.4);
+}
+
+[data-theme="neon"] .hero-title {
+    text-shadow: 
+        0 0 40px rgba(0, 255, 242, 0.9),
+        0 0 80px rgba(0, 255, 242, 0.5),
+        0 0 120px rgba(0, 255, 242, 0.3);
+}
