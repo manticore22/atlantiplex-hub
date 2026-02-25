@@ -15,6 +15,23 @@
     --glass-border: rgba(127, 219, 255, 0.3);
 }
 
+/* Neon theme override (toggleable via data-theme="neon" on <html>) */
+[data-theme="neon"] {
+  --blue: #00ffd8;
+  --aqua: #00fff2;
+  --glow-blue: #00ffd8;
+  --teal: #39ffd6;
+  --navy: #001a1a;
+  --deep-navy: #000b0f;
+  --glass-border: rgba(0, 255, 255, 0.4);
+}
+
+/* Apply neon accent to key components for the neon theme */
+[data-theme="neon"] .brand-card:hover {
+  border-color: #00fff0;
+  box-shadow: 0 20px 60px rgba(0, 255, 240, 0.4);
+}
+
 * {
     margin: 0;
     padding: 0;
