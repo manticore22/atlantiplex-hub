@@ -21,7 +21,7 @@ jobs:
           node-version: '18'
 
       - name: Install Playwright and browsers
-        uses: microsoft/playwright-action@v1.39.0
+        uses: microsoft/playwright-action@v1
         with:
           install-deps: true
 
