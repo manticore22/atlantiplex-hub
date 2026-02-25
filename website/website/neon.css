@@ -1,0 +1,74 @@
+/* Neon cyberpunk overlay enhancements for Atlantiplex */
+
+/* Global neon accent overrides (used as an opt-in overlay) */
+:root {
+  --neon-glow: 0 0 18px rgba(0, 255, 240, 0.9);
+  --neon-accent: rgba(0, 255, 240, 0.8);
+}
+
+/* Subtle neon glow on interactive elements */
+.neon-glow-on-hover:hover,
+.button-neon:hover {
+  text-shadow: 0 0 8px var(--neon-accent);
+  box-shadow: 0 6px 24px rgba(0, 255, 240, 0.6);
+}
+
+/* Animated grid background for depth */
+.neon-grid {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(to right, rgba(0, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 28px 28px, 28px 28px;
+  animation: neonGridMove 60s linear infinite;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,.9), rgba(0,0,0,.0) 70%);
+}
+@keyframes neonGridMove {
+  0% { background-position: 0 0, 0 0; }
+  50% { background-position: 14px 14px, 14px -14px; }
+  100% { background-position: 0 0, 0 0; }
+}
+
+/* Subtle scrolling glow for hero text on load */
+.glow-hero {
+  text-shadow: 0 0 14px rgba(0, 255, 240, 0.9);
+  animation: glowPulse 2.5s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%,100% { text-shadow: 0 0 14px rgba(0,255,240,0.9); }
+  50% { text-shadow: 0 0 28px rgba(0,255,240,0.9); }
+}
+
+/* Neon borders for cards */
+.brand-card {
+  border: 2px solid rgba(0, 255, 255, 0.25);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.15);
+}
+.brand-card:hover {
+  border-color: #00ffff;
+  box-shadow: 0 10px 40px rgba(0, 255, 255, 0.35);
+}
+
+/* Neon link decorations */
+.nav-link::after {
+  background: linear-gradient(90deg, #00f5ff, #00ffd4);
+}
+.cta-primary {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.cta-primary:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 12px 40px rgba(0,255,240,0.5); }
+.brand-link {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.brand-link:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,255,240,0.45); }
+
+/* Small utility: enable neon theme when data-theme="neon" is present on root */
+[data-theme="neon"] {
+  --blue: #00ffd8;
+  --aqua: #00fff2;
+  --glow-blue: #00ffd8;
+  --teal: #39ffd6;
+}
