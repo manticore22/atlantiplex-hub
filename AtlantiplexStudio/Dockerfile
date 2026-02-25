@@ -1,7 +1,7 @@
 # Frontend nginx server - Production optimized
 # Multi-stage build for minimal, secure image
 
-FROM node:22-alpine AS builder
+FROM node:22-slim AS builder
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Production stage - use nginx alpine
-FROM nginx:1.27-alpine
+FROM nginx:1.27-bullseye-slim
 
 WORKDIR /etc/nginx
 
@@ -98,5 +98,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD wget --quiet --tries=1 --spider http://localhost/health || exit 1
 
 # Run nginx in foreground
-USER nginx
 CMD ["nginx", "-g", "daemon off;"]

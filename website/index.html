@@ -3,45 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atlantiplex - Seraphonix Studios</title>
+    <title>Atlantiplex - AI Innovation - Seraphonix Studios</title>
     <meta name="description" content="Dive into AI innovation with Seraphonix Studios in the underwater world of Atlantiplex. Explore our mission, lore, and AI tools store.">
     <meta name="keywords" content="Atlantiplex AI, underwater AI innovation, Seraphonix Studios coding, no-code AI tools, underwater technology, AI automation, digital transformation">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="neon.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+    <style>
+        /* Core Styles with Green Neon Essence */
+        :root {
+            --neon-primary: #00ff00;
+            --neon-secondary: #00ff99;
+            --bg-dark: #001a00;
+            --text-light: #ffffff;
+            --accent-glow: #00ff00;
+        }
+
+        body {
+            background: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Matrix Background with Green Tint */
+        canvas#matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -2;
+            width: 100%;
+            height: 100%;
+            opacity: 0.4;
+            filter: hue-rotate(120deg); /* Shift to green */
+        }
+
+        /* Enhanced Glitch Effect */
+        .glitch {
+            position: relative;
+            color: var(--neon-primary);
+            text-shadow: 0 0 5px var(--neon-primary), 0 0 10px var(--neon-primary);
+            animation: glitch 0.8s infinite linear alternate-reverse;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00ff;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 var(--neon-secondary), 2px 2px #ff00ff;
+            animation: glitch-anim2 1s infinite linear alternate-reverse;
+        }
+
+        /* Keyframes for Glitch (Expanded for more randomness) */
+        @keyframes glitch-anim {
+            $steps: 20;
+            @for $i from 0 through $steps {
+                #{percentage($i*(1/$steps))} {
+                    clip: rect(random(100)+px, 9999px, random(100)+px, 0);
+                    transform: skew((random(100)/100)+deg);
+                }
+            }
+        }
+
+        @keyframes glitch-anim2 {
+            $steps: 20;
+            @for $i from 0 through $steps {
+                #{percentage($i*(1/$steps))} {
+                    clip: rect(random(100)+px, 9999px, random(100)+px, 0);
+                    transform: skew((random(100)/100)+deg);
+                }
+            }
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(1px, 1px) skew(2deg); }
+            10% { transform: translate(-1px, -1px) skew(-2deg); }
+            20% { transform: translate(1px, 0px) skew(3deg); }
+            30% { transform: translate(0px, 1px) skew(1deg); }
+            40% { transform: translate(1px, -1px) skew(-1deg); }
+            50% { transform: translate(-1px, 1px) skew(2deg); }
+            60% { transform: translate(-1px, -1px) skew(-3deg); }
+            70% { transform: translate(1px, 1px) skew(3deg); }
+            80% { transform: translate(-1px, -1px) skew(-1deg); }
+            90% { transform: translate(1px, 1px) skew(1deg); }
+            100% { transform: translate(1px, -1px) skew(-2deg); }
+        }
+
+        /* Holographic UI Elements */
+        .holo-panel {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid var(--neon-primary);
+            box-shadow: 0 0 20px var(--neon-primary);
+            padding: 20px;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .holo-panel::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,255,0,0.2) 0%, transparent 70%);
+            animation: scan 5s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(100%); }
+            100% { transform: translateY(-100%); }
+        }
+
+        /* Circular Portal Architecture */
+        .portal-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .portal-ring {
+            position: absolute;
+            border: 2px dashed var(--neon-primary);
+            border-radius: 50%;
+            animation: rotate-portal 30s linear infinite;
+            box-shadow: 0 0 30px var(--neon-primary);
+        }
+
+        .portal-ring.outer { width: 100%; height: 100%; }
+        .portal-ring.middle { width: 80%; height: 80%; animation-direction: reverse; }
+        .portal-ring.inner { width: 60%; height: 60%; }
+
+        @keyframes rotate-portal {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .portal-core {
+            width: 40%;
+            height: 40%;
+            background: radial-gradient(circle, var(--neon-primary) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse-core 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-core {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* Underwater Tunnel Nav */
+        .tunnel-nav {
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .tunnel-nav ul {
+            display: flex;
+            justify-content: center;
+            transform: rotateX(20deg);
+            gap: 20px;
+        }
+
+        .tunnel-nav li {
+            transform: translateZ(-50px);
+            transition: transform 0.3s;
+        }
+
+        .tunnel-nav li:hover {
+            transform: translateZ(0px);
+        }
+
+        /* HUD Gauges and Dials */
+        .hud-container {
+            display: flex;
+            gap: 20px;
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 10;
+        }
+
+        .hud-gauge {
+            width: 100px;
+            height: 100px;
+            background: rgba(0,0,0,0.5);
+            border: 2px solid var(--neon-primary);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 0 15px var(--neon-primary);
+        }
+
+        .hud-gauge::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 70%;
+            height: 70%;
+            background: conic-gradient(var(--neon-primary), transparent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: rotate 4s linear infinite;
+        }
+
+        .hud-gauge::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: var(--neon-primary);
+        }
+
+        /* Ocean and Bubbles Enhanced */
+        .ocean-bg {
+            background: linear-gradient(to bottom, #001a00, #003300);
+            opacity: 0.8;
+        }
+
+        .bubbles {
+            filter: hue-rotate(120deg); /* Green tint */
+        }
+
+        /* Hero Section with Portal Architecture */
+        .hero-section {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: 2rem;
+        }
+    </style>
 </head>
 <body class="fade-in-loading neon-body">
-    <!-- Navigation Bar -->
-    <nav class="main-nav">
-        <div class="nav-container">
-            <a href="/" class="nav-logo">
-                <svg viewBox="0 0 40 40" class="logo-icon"><circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="20" cy="20" r="8" fill="currentColor"/></svg>
-                <span>Atlantiplex</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="#brands" class="nav-link">Brands</a></li>
-                <li><a href="#products" class="nav-link">Products</a></li>
-                <li><a href="#mission" class="nav-link">Mission</a></li>
-                <li><a href="lore.html" class="nav-link">Lore</a></li>
-                <li><a href="store.html" class="nav-link">Store</a></li>
-            </ul>
-            <button class="nav-toggle" aria-label="Toggle menu">
-                <span></span><span></span><span></span>
-            </button>
-        </div>
-    </nav>
-    
-    <!-- Neon Theme Toggle -->
-    <button id="theme-toggle" aria-label="Toggle Neon Theme">Neon Theme</button>
-    
+    <!-- Matrix Background Canvas -->
+    <canvas id="matrix-bg"></canvas>
+
     <!-- Animated Ocean Background -->
     <div class="ocean-bg"></div>
     <div class="light-rays"></div>
-    
+
     <!-- Neon Grid Matrix Background -->
     <div class="neon-grid" aria-hidden="true"></div>
-    
+
     <!-- Dome Canopy Overlay -->
     <div class="dome-overlay" aria-hidden="true">
         <div class="dome-canopy"></div>
@@ -49,14 +289,14 @@
         <div class="dome-ring"></div>
         <div class="dome-ring"></div>
     </div>
-    
+
     <!-- Particles Container -->
     <div class="particles" id="particles"></div>
-    
+
     <!-- Bubbles -->
     <div class="bubbles" aria-hidden="true"></div>
-    
-    <!-- SVG Filters for Wave Distortion -->
+
+    <!-- SVG Filters -->
     <svg class="filters">
         <defs>
             <filter id="wave" x="-20%" y="-20%" width="140%" height="140%">
@@ -73,265 +313,176 @@
         </defs>
     </svg>
 
-    <script>
-        window.addEventListener('load', () => {
-            document.body.classList.remove('fade-in-loading');
-        });
-        
-        const mainNav = document.querySelector('.main-nav');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                mainNav.classList.add('scrolled');
-            } else {
-                mainNav.classList.remove('scrolled');
-            }
-        });
-        
-        (function createParticles() {
-            const container = document.getElementById('particles');
-            if (!container) return;
-            const particleCount = 40;
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                const size = Math.random() * 4 + 2;
-                particle.style.width = size + 'px';
-                particle.style.height = size + 'px';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDuration = (Math.random() * 8 + 8) + 's';
-                particle.style.animationDelay = (Math.random() * 10) + 's';
-                particle.style.setProperty('--drift', (Math.random() * 100 - 50) + 'px');
-                container.appendChild(particle);
-            }
-        })();
-        
-        (function createBubbles() {
-            const container = document.querySelector('.bubbles');
-            if (!container) return;
-            const bubbleCount = 25;
-            for (let i = 0; i < bubbleCount; i++) {
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
-                const size = Math.random() * 20 + 8;
-                bubble.style.width = size + 'px';
-                bubble.style.height = size + 'px';
-                bubble.style.left = Math.random() * 100 + '%';
-                bubble.style.animationDuration = (Math.random() * 10 + 10) + 's';
-                bubble.style.animationDelay = (Math.random() * 15) + 's';
-                bubble.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
-                container.appendChild(bubble);
-            }
-        })();
-        
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-    </script>
+    <!-- Navigation Bar with Tunnel Effect -->
+    <nav class="main-nav glitch-nav tunnel-nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <svg viewBox="0 0 40 40" class="logo-icon"><circle cx="20" cy="20" r="18" fill="none" stroke="var(--neon-primary)" stroke-width="2"/><circle cx="20" cy="20" r="8" fill="var(--neon-primary)"/></svg>
+                <span class="glitch" data-text="Atlantiplex">Atlantiplex</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#home" class="nav-link glitch" data-text="Home">Home</a></li>
+                <li><a href="#about" class="nav-link glitch" data-text="About">About</a></li>
+                <li><a href="#services" class="nav-link glitch" data-text="Services">Services</a></li>
+                <li><a href="#portfolio" class="nav-link glitch" data-text="Portfolio">Portfolio</a></li>
+                <li><a href="#blog" class="nav-link glitch" data-text="Blog">Blog</a></li>
+                <li><a href="#contact" class="nav-link glitch" data-text="Contact">Contact</a></li>
+            </ul>
+            <button class="nav-toggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
 
-    <script>
-        (function(){
-            const btn = document.getElementById('theme-toggle');
-            const root = document.documentElement;
-            function applyTheme(theme){
-                root.setAttribute('data-theme', theme);
-                localStorage.setItem('theme', theme);
-            }
-            const saved = localStorage.getItem('theme') || 'default';
-            applyTheme(saved);
-            btn.addEventListener('click', () => {
-                const current = root.getAttribute('data-theme');
-                const next = current === 'neon' ? 'default' : 'neon';
-                applyTheme(next);
-            });
-        })();
-    </script>
-
-    <!-- Background Coral Elements -->
-    <div class="bg-elements">
-        <svg class="coral left" viewBox="0 0 100 150" fill="#ff6b6b">
-            <path d="M50 150 Q20 100 30 70 Q40 40 50 20 Q60 40 70 70 Q80 100 50 150"/>
-            <path d="M35 150 Q15 120 25 100 Q35 80 40 60" fill="none" stroke="#ff8787" stroke-width="3"/>
-            <path d="M65 150 Q85 120 75 100 Q65 80 60 60" fill="none" stroke="#ff8787" stroke-width="3"/>
-        </svg>
-        <svg class="coral right" viewBox="0 0 100 150" fill="#39CCCC">
-            <path d="M50 150 Q20 100 30 70 Q40 40 50 20 Q60 40 70 70 Q80 100 50 150"/>
-            <path d="M35 150 Q15 120 25 100 Q35 80 40 60" fill="none" stroke="#5fd3d3" stroke-width="3"/>
-            <path d="M65 150 Q85 120 75 100 Q65 80 60 60" fill="none" stroke="#5fd3d3" stroke-width="3"/>
-        </svg>
-        <svg class="seaweed" style="left: 8%;" viewBox="0 0 30 200" fill="#2d5a27">
-            <path d="M15 200 Q5 150 15 100 Q25 50 15 0 Q5 50 15 100 Q25 150 15 200" opacity="0.7"/>
-        </svg>
-        <svg class="seaweed" style="left: 20%;" viewBox="0 0 30 200" fill="#2d5a27">
-            <path d="M15 200 Q0 150 15 100 Q30 50 15 0 Q0 50 15 100 Q30 150 15 200" opacity="0.6"/>
-        </svg>
-        <svg class="seaweed" style="right: 12%;" viewBox="0 0 30 200" fill="#2d5a27">
-            <path d="M15 200 Q5 150 15 100 Q25 50 15 0 Q5 50 15 100 Q25 150 15 200" opacity="0.7"/>
-        </svg>
-        <svg class="seaweed" style="right: 25%;" viewBox="0 0 30 200" fill="#2d5a27">
-            <path d="M15 200 Q0 150 15 100 Q30 50 15 0 Q0 50 15 100 Q30 150 15 200" opacity="0.6"/>
-        </svg>
-    </div>
+    <!-- Neon Theme Toggle -->
+    <button id="theme-toggle" aria-label="Toggle Neon Theme">Neon Theme</button>
 
     <!-- Main Content -->
     <main class="main-container">
-        <!-- Hero Section -->
+        <!-- Hero Section with Circular Portal -->
         <section class="hero-section" id="hero">
-            <div class="hero-content">
-                <h1 class="hero-title">Welcome to Atlantiplex</h1>
-                <p class="hero-subtitle">Three Brands. One Vision. Infinite Possibilities.</p>
-                <div class="hero-cta">
-                    <a href="#brands" class="cta-primary">Explore Brands</a>
-                    <a href="#mission" class="cta-secondary">Our Mission</a>
-                </div>
+            <div class="portal-container">
+                <div class="portal-ring outer"></div>
+                <div class="portal-ring middle"></div>
+                <div class="portal-ring inner"></div>
+                <div class="portal-core"></div>
             </div>
-            <div class="hero-visual">
-                <div class="hero-orb"></div>
-                <div class="hero-ring ring-1"></div>
-                <div class="hero-ring ring-2"></div>
-                <div class="hero-ring ring-3"></div>
+            <div class="hero-content">
+                <h1 class="hero-title glitch" data-text="AI Solutions for Your Business">AI Solutions for Your Business</h1>
+                <p class="hero-subtitle glitch" data-text="Transforming Ideas into Reality">Transforming Ideas into Reality</p>
+                <div class="hero-cta">
+                    <a href="#brands" class="cta-primary glitch" data-text="Explore Brands">Explore Brands</a>
+                    <a href="#mission" class="cta-secondary glitch" data-text="Our Mission">Our Mission</a>
+                </div>
             </div>
             <div class="scroll-indicator">
                 <span>Scroll</span>
                 <div class="scroll-arrow"></div>
             </div>
         </section>
-        
-        <!-- Studio Center Hub (3x3 around portal) -->
-        <section class="studio-center" aria-label="Studio Center Hub" style="padding: 40px 0 20px;">
-            <div class="studio-grid" role="navigation" aria-label="Studio Center Grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: min(1100px, 92vw); justify-items: center; align-items: center; margin: 0 auto;">
-                <a href="studio-signups.html" class="neon-tile" aria-label="Studio Signups">Studio Signups</a>
-                <a href="about.html" class="neon-tile" aria-label="About Us">About Us</a>
-                <a href="lore.html" class="neon-tile" aria-label="Lore">Lore</a>
-                <a href="store.html" class="neon-tile" aria-label="Product Page">Product Page</a>
-                <div class="portal-tile" aria-label="Portal Visual" style="width:180px; height:180px; display:flex; align-items:center; justify-content:center; border-radius:50%; border:10px solid #0ff; box-shadow:0 0 80px #0ff, inset 0 0 40px rgba(0,255,242,0.3); background: radial-gradient(circle at center, rgba(0,255,242,0.15), transparent 70%);"></div>
-                <a href="verilysovereign/index.html" class="neon-tile" aria-label="Archivist Intro">Archivist Intro</a>
-                <a href="contact.html" class="neon-tile" aria-label="Contact">Contact</a>
-                <a href="portfolio.html" class="neon-tile" aria-label="Portfolio">Portfolio</a>
-                <a href="blog.html" class="neon-tile" aria-label="Blog">Blog</a>
-            </div>
-            <div class="portal-caption" style="text-align:center; margin-top:16px; font-family:monospace; color:#0ff; font-size:1.1rem; text-shadow:0 0 10px #0ff;">Sayeths Ocean Moon</div>
-        </section>
-        
-        <!-- Brand Universe Showcase -->
+
+        <!-- Brand Universe with Holographic Panels -->
         <div class="brand-universe" id="brands">
-            <!-- Header -->
-            <div class="universe-header">
-                <h1>Three Brands. One Vision.</h1>
+            <div class="universe-header holo-panel">
+                <h1 class="glitch" data-text="Three Brands. One Vision.">Three Brands. One Vision.</h1>
                 <p>Unified by innovation, distinguished by purpose</p>
             </div>
-            
-            <!-- Brand Triptych -->
+
             <div class="brand-triptych">
                 <!-- Seraphonix Studios -->
-                <div class="brand-card seraphonix-card">
+                <div class="brand-card seraphonix-card holo-panel">
                     <div class="brand-logo-container">
-                        <img src="./brand-site/assets/seraphonix-logo.svg" alt="Seraphonix Studios" class="brand-logo" />
+                        <img src="Copilot_20260215_023027.png" alt="Seraphonix Studios Logo" class="brand-logo" />
                     </div>
-                    <h2>Seraphonix Studios</h2>
+                    <h2 class="glitch" data-text="Seraphonix Studios">Seraphonix Studios</h2>
                     <p class="brand-tagline">Rising from Flames</p>
                     <ul class="brand-traits">
-                        <li>Design Excellence</li>
-                        <li>AI Innovation</li>
-                        <li>Rapid Iteration</li>
+                        <li>🎨 Design Excellence</li>
+                        <li>🚀 AI Innovation</li>
+                        <li>⚡ Rapid Iteration</li>
                     </ul>
-                    <a href="#" class="brand-link">Explore Seraphonix</a>
+                    <a href="#" class="brand-link glitch" data-text="Explore Seraphonix →">Explore Seraphonix →</a>
                 </div>
-                
+
                 <!-- Verilysovereign -->
-                <div class="brand-card verilysovereign-card">
+                <div class="brand-card verilysovereign-card holo-panel">
                     <div class="brand-logo-container">
-                        <img src="./brand-site/assets/verilysovereign-logo.svg" alt="Verilysovereign" class="brand-logo" />
+                        <img src="O5cCiqrn_400x400.jpg" alt="Manticore, head Dev of Seraphonix Studios" class="brand-logo" />
+                        <img src="HBZJSygbcAIJrHi.jpg" alt="Manticore, the lion that's head Dev of Seraphonix Studios" class="brand-logo" />
+                        <img src="Copilot_20260216_003035.png" alt="Verilysovereign Logo - Golden V" class="brand-logo secondary-logo" style="margin-top: 10px;" />
                     </div>
-                    <h2>Verilysovereign</h2>
+                    <h2 class="glitch" data-text="Verilysovereign">Verilysovereign</h2>
                     <p class="brand-tagline">Power & Authority</p>
+                    <p>Manticore is the lion that's head Dev of Seraphonix Studios</p>
                     <ul class="brand-traits">
-                        <li>Strength</li>
-                        <li>Sovereignty</li>
-                        <li>Resilience</li>
+                        <li>🦁 Strength</li>
+                        <li>🛡️ Sovereignty</li>
+                        <li>⚔️ Resilience</li>
                     </ul>
-                    <a href="verilysovereign/index.html" class="brand-link">Explore Verilysovereign</a>
+                    <a href="#" class="brand-link glitch" data-text="Explore Verilysovereign →">Explore Verilysovereign →</a>
                 </div>
-                
+
                 <!-- Atlantiplex -->
-                <div class="brand-card atlantiplex-card">
+                <div class="brand-card atlantiplex-card holo-panel">
                     <div class="brand-logo-container">
-                        <img src="./brand-site/assets/atlantiplex-logo.svg" alt="Atlantiplex" class="brand-logo" />
+                        <img src="image (21).jpg" alt="Atlantiplex Logo" class="brand-logo" />
                     </div>
-                    <h2>Atlantiplex AI</h2>
+                    <h2 class="glitch" data-text="Atlantiplex AI">Atlantiplex AI</h2>
                     <p class="brand-tagline">Cosmic Consciousness</p>
                     <ul class="brand-traits">
-                        <li>Intelligence</li>
-                        <li>Insight</li>
-                        <li>Vision</li>
+                        <li>🧠 Intelligence</li>
+                        <li>👁️ Insight</li>
+                        <li>🌌 Vision</li>
                     </ul>
-                    <a href="#" class="brand-link">Explore Atlantiplex</a>
+                    <a href="#" class="brand-link glitch" data-text="Explore Atlantiplex →">Explore Atlantiplex →</a>
                 </div>
 
                 <!-- Product Download -->
-                <div class="brand-card" style="min-height:450px;">
+                <div class="brand-card holo-panel" style="min-height:450px;">
                     <h2 style="margin-bottom:12px; color:var(--neon-primary);">Product Download</h2>
-                    <p class="brand-tagline">Sample app package</p>
+                    <p class="brand-tagline">Sample app package for download</p>
                     <a class="brand-link download" href="/downloads/sample-app-v1.txt" download>Download Sample App</a>
                 </div>
             </div>
-            
+
             <!-- Mission Statement -->
-            <div class="mission-unified" id="mission">
+            <div class="mission-unified holo-panel" id="mission">
                 <div class="mission-glow"></div>
                 <strong>Born from the flames of transformation,</strong> 
                 our unified vision dives into AI innovation to build the future from the depths of creativity—powered by three distinct identities working in harmony.
             </div>
-            
+
             <!-- Products Section -->
             <section class="products-section" id="products">
-                <h2 class="section-title">Featured Products</h2>
+                <h2 class="section-title glitch" data-text="Featured Products">Featured Products</h2>
                 <div class="product-preview-grid">
-                    <div class="product-preview-card">
-                        <div class="preview-icon">AI</div>
+                    <div class="product-preview-card holo-panel">
+                        <div class="preview-icon">🧠</div>
                         <h3>AI Suite Pro</h3>
                         <p>Advanced AI tools for automation</p>
                         <span class="preview-price">$99/mo</span>
                     </div>
-                    <div class="product-preview-card">
-                        <div class="preview-icon">ML</div>
+                    <div class="product-preview-card holo-panel">
+                        <div class="preview-icon">⚡</div>
                         <h3>Neural Engine</h3>
                         <p>High-performance ML pipeline</p>
                         <span class="preview-price">$149/mo</span>
                     </div>
-                    <div class="product-preview-card">
-                        <div class="preview-icon">DL</div>
+                    <div class="product-preview-card holo-panel">
+                        <div class="preview-icon">🌊</div>
                         <h3>Deep Learning Kit</h3>
                         <p>Complete AI development suite</p>
                         <span class="preview-price">$199/mo</span>
                     </div>
                 </div>
             </section>
-            
+
             <!-- Navigation Tentacles -->
             <div class="nav-tentacles">
                 <a href="store.html" class="tentacle-btn store" aria-label="Visit Web Store Catalog">
-                    Web Store Catalog
+                    🛒 Web Store Catalog
                 </a>
                 <a href="lore.html" class="tentacle-btn lore" aria-label="Read Background Lore">
-                    Background Lore
+                    📜 Background Lore
                 </a>
             </div>
         </div>
     </main>
 
+    <!-- HUD Elements -->
+    <div class="hud-container">
+        <div class="hud-gauge" data-label="Power"></div>
+        <div class="hud-gauge" data-label="Signal"></div>
+        <div class="hud-gauge" data-label="Depth"></div>
+    </div>
+
     <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <a href="contact.html" class="contact-link" aria-label="Contact Us">
+            <a href="#" class="contact-link" onclick="openModal(); return false;" aria-label="Contact Us">
                 Contact: support@seraphonix.com
             </a>
-            
+
             <div class="social-orbs">
                 <a href="https://twitter.com/r1914514" class="social-orb" aria-label="Twitter" target="_blank" rel="noopener noreferrer">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -349,7 +500,7 @@
                     </svg>
                 </a>
             </div>
-            
+
             <div class="legal-links">
                 <a href="/privacy.html">Privacy Policy</a>
                 <a href="/terms.html">Terms of Service</a>
@@ -359,9 +510,9 @@
 
     <!-- Contact Modal -->
     <div class="modal-overlay" id="contact-modal" onclick="closeModal(event)">
-        <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal holo-panel" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
-            <h2>Send Us a Message</h2>
+            <h2>🌊 Send Us a Message</h2>
             <form id="contact-form" onsubmit="handleSubmit(event)">
                 <input type="text" name="name" placeholder="Your Name" required aria-label="Your Name">
                 <input type="email" name="email" placeholder="Your Email" required aria-label="Your Email">
@@ -375,7 +526,7 @@
     <div class="ai-chat-widget">
         <div class="ai-chat-container" id="ai-chat">
             <div class="ai-chat-header">
-                <h3>Atlantiplex AI</h3>
+                <h3><span>🧠</span> Atlantiplex AI</h3>
                 <div class="ai-chat-status">
                     <span class="ai-status-dot" id="ai-status-dot"></span>
                     <span id="ai-status-text">Connecting...</span>
@@ -384,7 +535,7 @@
             </div>
             <div class="ai-chat-messages" id="ai-messages">
                 <div class="ai-message ai">
-                    <span class="ai-message-avatar"></span>
+                    <span class="ai-message-avatar">🌊</span>
                     Greetings, traveler! I'm the Atlantiplex AI assistant. How may I help you dive deeper into our world of AI innovation?
                 </div>
             </div>
@@ -395,7 +546,13 @@
             </div>
             <div class="ai-chat-input-container">
                 <div class="ai-chat-input-wrapper">
-                    <textarea class="ai-chat-input" id="ai-input" placeholder="Type your message..." rows="1" onkeydown="handleAIKeydown(event)"></textarea>
+                    <textarea 
+                        class="ai-chat-input" 
+                        id="ai-input" 
+                        placeholder="Type your message..."
+                        rows="1"
+                        onkeydown="handleAIKeydown(event)"
+                    ></textarea>
                     <button class="ai-send-button" id="ai-send-btn" onclick="sendAIMessage()" aria-label="Send message">
                         <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
                     </button>
@@ -404,10 +561,134 @@
         </div>
         <button class="ai-chat-toggle" id="ai-chat-toggle" onclick="toggleAIChat()" aria-label="Open AI chat">
             <svg class="ai-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            <svg class="ai-icon-animated" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
         </button>
     </div>
 
+    <script>
+        // Matrix Rain Script with Green Characters
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+
+        canvas.height = window.innerHeight;
+        canvas.width = window.innerWidth;
+
+        const characters = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+
+        const drops = Array.from({ length: columns }, () => Math.floor(Math.random() * canvas.height / fontSize));
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ff00';
+            ctx.font = `${fontSize}px monospace`;
+
+            drops.forEach((y, x) => {
+                const text = characters[Math.floor(Math.random() * characters.length)];
+                ctx.fillText(text, x * fontSize, y * fontSize);
+
+                if (y * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[x] = 0;
+                }
+                drops[x]++;
+            });
+        }
+
+        setInterval(draw, 33);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Other scripts...
+        window.addEventListener('load', () => {
+            document.body.classList.remove('fade-in-loading');
+        });
+
+        const mainNav = document.querySelector('.main-nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                mainNav.classList.add('scrolled');
+            } else {
+                mainNav.classList.remove('scrolled');
+            }
+        });
+
+        (function createParticles() {
+            const container = document.getElementById('particles');
+            if (!container) return;
+            const particleCount = 40;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * 4 + 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 8 + 8) + 's';
+                particle.style.animationDelay = (Math.random() * 10) + 's';
+                particle.style.setProperty('--drift', (Math.random() * 100 - 50) + 'px');
+                container.appendChild(particle);
+            }
+        })();
+
+        (function createBubbles() {
+            const container = document.querySelector('.bubbles');
+            if (!container) return;
+            const bubbleCount = 25;
+            for (let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                const size = Math.random() * 20 + 8;
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                bubble.style.animationDelay = (Math.random() * 15) + 's';
+                bubble.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
+                container.appendChild(bubble);
+            }
+        })();
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        (function(){
+            const btn = document.getElementById('theme-toggle');
+            const root = document.documentElement;
+            function applyTheme(theme){
+                root.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+            }
+            const saved = localStorage.getItem('theme') || 'default';
+            applyTheme(saved);
+            btn.addEventListener('click', () => {
+                const current = root.getAttribute('data-theme');
+                const next = current === 'neon' ? 'default' : 'neon';
+                applyTheme(next);
+            });
+        })();
+    </script>
+
     <script src="script.js"></script>
     <script src="chat.js"></script>
+  <!-- Portal quick access -->
+  <div style="position:fixed; bottom:20px; left:20px; z-index:9999;">
+    <a href="portal.html" style="padding:12px 16px; background:#0ff; color:#000; font-weight:700; border-radius:8px; text-decoration:none;">Portal</a>
+  </div>
 </body>
 </html>

@@ -1,0 +1,43 @@
+{
+  "webrtc": {
+    "stun_servers": [
+      "stun:stun.l.google.com:19302",
+      "stun:stun1.l.google.com:19302"
+    ],
+    "turn_servers": [],
+    "codecs": {
+      "video": ["VP9", "VP8", "H264"],
+      "audio": ["opus", "G711"]
+    },
+    "bitrate": {
+      "min": 500,
+      "max": 5000,
+      "start": 2500
+    },
+    "resolution": {
+      "width": 1280,
+      "height": 720,
+      "fps": 30
+    }
+  },
+  "rtmp": {
+    "ingest_endpoints": [
+      "rtmp://live.twitch.tv/app",
+      "rtmp://a.rtmp.youtube.com/live2",
+      "rtmp://ingest.dlive.tv/live"
+    ],
+    "backup_endpoints": [],
+    "fallback_enabled": true
+  },
+  "recording": {
+    "enabled": true,
+    "format": "mp4",
+    "quality": "high",
+    "local_storage": "./uploads/recordings"
+  },
+  "monitoring": {
+    "health_check_interval": 30,
+    "metrics_enabled": true,
+    "alert_on_failure": true
+  }
+}

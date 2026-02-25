@@ -73,15 +73,6 @@ services:
       - "9001"
     networks:
       - atlantiplex-network
-    environment:
-      - STRIPE_SECRET=${STRIPE_SECRET}
-      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
-      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
-      - STRIPE_PRICE_ASCENDANT=${STRIPE_PRICE_ASCENDANT}
-      - STRIPE_PRICE_COVENANT=${STRIPE_PRICE_COVENANT}
-      - STRIPE_PRICE_INFINITE=${STRIPE_PRICE_INFINITE}
-      - STRIPE_PRICE_SOVEREIGN=${STRIPE_PRICE_SOVEREIGN}
-      - FRONTEND_URL=${FRONTEND_URL}
     depends_on:
       - postgres
       - redis
@@ -103,15 +94,6 @@ services:
     depends_on:
       - postgres
       - redis
-    environment:
-      - STRIPE_SECRET=${STRIPE_SECRET}
-      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
-      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
-      - STRIPE_PRICE_ASCENDANT=${STRIPE_PRICE_ASCENDANT}
-      - STRIPE_PRICE_COVENANT=${STRIPE_PRICE_COVENANT}
-      - STRIPE_PRICE_INFINITE=${STRIPE_PRICE_INFINITE}
-      - STRIPE_PRICE_SOVEREIGN=${STRIPE_PRICE_SOVEREIGN}
-      - FRONTEND_URL=${FRONTEND_URL}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
       interval: 30s
@@ -127,15 +109,6 @@ services:
       - "80"
     networks:
       - atlantiplex-network
-    environment:
-      - STRIPE_SECRET=${STRIPE_SECRET}
-      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
-      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
-      - STRIPE_PRICE_ASCENDANT=${STRIPE_PRICE_ASCENDANT}
-      - STRIPE_PRICE_COVENANT=${STRIPE_PRICE_COVENANT}
-      - STRIPE_PRICE_INFINITE=${STRIPE_PRICE_INFINITE}
-      - STRIPE_PRICE_SOVEREIGN=${STRIPE_PRICE_SOVEREIGN}
-      - FRONTEND_URL=${FRONTEND_URL}
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
       interval: 30s
@@ -150,15 +123,6 @@ services:
       - "80"
     networks:
       - atlantiplex-network
-    environment:
-      - STRIPE_SECRET=${STRIPE_SECRET}
-      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
-      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
-      - STRIPE_PRICE_ASCENDANT=${STRIPE_PRICE_ASCENDANT}
-      - STRIPE_PRICE_COVENANT=${STRIPE_PRICE_COVENANT}
-      - STRIPE_PRICE_INFINITE=${STRIPE_PRICE_INFINITE}
-      - STRIPE_PRICE_SOVEREIGN=${STRIPE_PRICE_SOVEREIGN}
-      - FRONTEND_URL=${FRONTEND_URL}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health"]
       interval: 30s
