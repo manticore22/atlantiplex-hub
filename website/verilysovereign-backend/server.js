@@ -339,12 +339,12 @@ app.post('/api/stripe/create-checkout-session', authenticateToken, async (req, r
     const { tier } = req.body;
     const email = req.user.email;
 
-    // Price IDs - replace with your actual Stripe price IDs
+    // Price IDs - read from environment (Stripe) with safe fallbacks
     const PRICES = {
-        'ascendant': 'price_ascendant_monthly',    // $9.99/month
-        'covenant': 'price_covenant_monthly',     // $29/month
-        'infinite': 'price_infinite_monthly',    // $70/month
-        'sovereign': 'price_sovereign_monthly'   // $99/month (legacy)
+        'ascendant': process.env.STRIPE_PRICE_ASCENDANT || 'price_ascendant_monthly',    // $9.99/month
+        'covenant': process.env.STRIPE_PRICE_COVENANT || 'price_covenant_monthly',     // $29/month
+        'infinite': process.env.STRIPE_PRICE_INFINITE || 'price_infinite_monthly',    // $70/month
+        'sovereign': process.env.STRIPE_PRICE_SOVEREIGN || 'price_sovereign_monthly'   // $99/month (legacy)
     };
 
     // Hours limits per tier
@@ -443,6 +443,22 @@ app.post('/api/stripe/webhook', async (req, res) => {
     }
 
     res.json({ received: true });
+});
+
+// Stripe public key (for frontend)
+app.get('/api/stripe/public-key', (req, res) => {
+  res.json({ publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || '' });
+});
+
+// Plans endpoint (front-end can fetch plan catalog)
+app.get('/api/plans', (req, res) => {
+  const plans = [
+    { id: 'free', name: 'Free Trial', price: 0, cadence: 'monthly', features: ['16 hours', '2 guests/month', 'Basic access'] },
+    { id: 'ascendant', name: 'Ascendant', price: 9.99, cadence: 'month', features: ['70 hours', 'Priority support'] },
+    { id: 'covenant', name: 'Covenant', price: 29, cadence: 'month', features: ['Unlimited hours', 'Premium support'] },
+    { id: 'infinite', name: 'Infinite', price: 70, cadence: 'month', features: ['Unlimited hours', 'Enterprise support'] }
+  ];
+  res.json(plans);
 });
 
 // ============ ADMIN ROUTES ============

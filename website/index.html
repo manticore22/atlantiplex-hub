@@ -78,7 +78,6 @@
             document.body.classList.remove('fade-in-loading');
         });
         
-        // Navigation scroll effect
         const mainNav = document.querySelector('.main-nav');
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
@@ -88,7 +87,6 @@
             }
         });
         
-        // Enhanced particle animation
         (function createParticles() {
             const container = document.getElementById('particles');
             if (!container) return;
@@ -107,7 +105,6 @@
             }
         })();
         
-        // Create bubbles
         (function createBubbles() {
             const container = document.querySelector('.bubbles');
             if (!container) return;
@@ -126,16 +123,12 @@
             }
         })();
         
-        // Smooth scroll for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
         });
@@ -161,7 +154,6 @@
 
     <!-- Background Coral Elements -->
     <div class="bg-elements">
-        <!-- SVG Coral -->
         <svg class="coral left" viewBox="0 0 100 150" fill="#ff6b6b">
             <path d="M50 150 Q20 100 30 70 Q40 40 50 20 Q60 40 70 70 Q80 100 50 150"/>
             <path d="M35 150 Q15 120 25 100 Q35 80 40 60" fill="none" stroke="#ff8787" stroke-width="3"/>
@@ -172,7 +164,6 @@
             <path d="M35 150 Q15 120 25 100 Q35 80 40 60" fill="none" stroke="#5fd3d3" stroke-width="3"/>
             <path d="M65 150 Q85 120 75 100 Q65 80 60 60" fill="none" stroke="#5fd3d3" stroke-width="3"/>
         </svg>
-        <!-- SVG Seaweed -->
         <svg class="seaweed" style="left: 8%;" viewBox="0 0 30 200" fill="#2d5a27">
             <path d="M15 200 Q5 150 15 100 Q25 50 15 0 Q5 50 15 100 Q25 150 15 200" opacity="0.7"/>
         </svg>
@@ -211,6 +202,22 @@
             </div>
         </section>
         
+        <!-- Studio Center Hub (3x3 around portal) -->
+        <section class="studio-center" aria-label="Studio Center Hub" style="padding: 40px 0 20px;">
+            <div class="studio-grid" role="navigation" aria-label="Studio Center Grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: min(1100px, 92vw); justify-items: center; align-items: center; margin: 0 auto;">
+                <a href="studio-signups.html" class="neon-tile" aria-label="Studio Signups">Studio Signups</a>
+                <a href="about.html" class="neon-tile" aria-label="About Us">About Us</a>
+                <a href="lore.html" class="neon-tile" aria-label="Lore">Lore</a>
+                <a href="store.html" class="neon-tile" aria-label="Product Page">Product Page</a>
+                <div class="portal-tile" aria-label="Portal Visual" style="width:180px; height:180px; display:flex; align-items:center; justify-content:center; border-radius:50%; border:10px solid #0ff; box-shadow:0 0 80px #0ff, inset 0 0 40px rgba(0,255,242,0.3); background: radial-gradient(circle at center, rgba(0,255,242,0.15), transparent 70%);"></div>
+                <a href="verilysovereign/index.html" class="neon-tile" aria-label="Archivist Intro">Archivist Intro</a>
+                <a href="contact.html" class="neon-tile" aria-label="Contact">Contact</a>
+                <a href="portfolio.html" class="neon-tile" aria-label="Portfolio">Portfolio</a>
+                <a href="blog.html" class="neon-tile" aria-label="Blog">Blog</a>
+            </div>
+            <div class="portal-caption" style="text-align:center; margin-top:16px; font-family:monospace; color:#0ff; font-size:1.1rem; text-shadow:0 0 10px #0ff;">Sayeths Ocean Moon</div>
+        </section>
+        
         <!-- Brand Universe Showcase -->
         <div class="brand-universe" id="brands">
             <!-- Header -->
@@ -221,7 +228,7 @@
             
             <!-- Brand Triptych -->
             <div class="brand-triptych">
-                <!-- Seraphonix Studios (Golden Angel) -->
+                <!-- Seraphonix Studios -->
                 <div class="brand-card seraphonix-card">
                     <div class="brand-logo-container">
                         <img src="./brand-site/assets/seraphonix-logo.svg" alt="Seraphonix Studios" class="brand-logo" />
@@ -229,14 +236,14 @@
                     <h2>Seraphonix Studios</h2>
                     <p class="brand-tagline">Rising from Flames</p>
                     <ul class="brand-traits">
-                        <li>🎨 Design Excellence</li>
-                        <li>🚀 AI Innovation</li>
-                        <li>⚡ Rapid Iteration</li>
+                        <li>Design Excellence</li>
+                        <li>AI Innovation</li>
+                        <li>Rapid Iteration</li>
                     </ul>
-                    <a href="#" class="brand-link">Explore Seraphonix →</a>
+                    <a href="#" class="brand-link">Explore Seraphonix</a>
                 </div>
                 
-                <!-- Verilysovereign (Dark Lion) -->
+                <!-- Verilysovereign -->
                 <div class="brand-card verilysovereign-card">
                     <div class="brand-logo-container">
                         <img src="./brand-site/assets/verilysovereign-logo.svg" alt="Verilysovereign" class="brand-logo" />
@@ -244,14 +251,14 @@
                     <h2>Verilysovereign</h2>
                     <p class="brand-tagline">Power & Authority</p>
                     <ul class="brand-traits">
-                        <li>🦁 Strength</li>
-                        <li>🛡️ Sovereignty</li>
-                        <li>⚔️ Resilience</li>
+                        <li>Strength</li>
+                        <li>Sovereignty</li>
+                        <li>Resilience</li>
                     </ul>
-                    <a href="#" class="brand-link">Explore Verilysovereign →</a>
+                    <a href="verilysovereign/index.html" class="brand-link">Explore Verilysovereign</a>
                 </div>
                 
-                <!-- Atlantiplex (All-Seeing Eye) -->
+                <!-- Atlantiplex -->
                 <div class="brand-card atlantiplex-card">
                     <div class="brand-logo-container">
                         <img src="./brand-site/assets/atlantiplex-logo.svg" alt="Atlantiplex" class="brand-logo" />
@@ -259,17 +266,17 @@
                     <h2>Atlantiplex AI</h2>
                     <p class="brand-tagline">Cosmic Consciousness</p>
                     <ul class="brand-traits">
-                        <li>🧠 Intelligence</li>
-                        <li>👁️ Insight</li>
-                        <li>🌌 Vision</li>
+                        <li>Intelligence</li>
+                        <li>Insight</li>
+                        <li>Vision</li>
                     </ul>
-                    <a href="#" class="brand-link">Explore Atlantiplex →</a>
+                    <a href="#" class="brand-link">Explore Atlantiplex</a>
                 </div>
 
-                <!-- Download product sample -->
+                <!-- Product Download -->
                 <div class="brand-card" style="min-height:450px;">
                     <h2 style="margin-bottom:12px; color:var(--neon-primary);">Product Download</h2>
-                    <p class="brand-tagline">Sample app package for download</p>
+                    <p class="brand-tagline">Sample app package</p>
                     <a class="brand-link download" href="/downloads/sample-app-v1.txt" download>Download Sample App</a>
                 </div>
             </div>
@@ -286,19 +293,19 @@
                 <h2 class="section-title">Featured Products</h2>
                 <div class="product-preview-grid">
                     <div class="product-preview-card">
-                        <div class="preview-icon">🧠</div>
+                        <div class="preview-icon">AI</div>
                         <h3>AI Suite Pro</h3>
                         <p>Advanced AI tools for automation</p>
                         <span class="preview-price">$99/mo</span>
                     </div>
                     <div class="product-preview-card">
-                        <div class="preview-icon">⚡</div>
+                        <div class="preview-icon">ML</div>
                         <h3>Neural Engine</h3>
                         <p>High-performance ML pipeline</p>
                         <span class="preview-price">$149/mo</span>
                     </div>
                     <div class="product-preview-card">
-                        <div class="preview-icon">🌊</div>
+                        <div class="preview-icon">DL</div>
                         <h3>Deep Learning Kit</h3>
                         <p>Complete AI development suite</p>
                         <span class="preview-price">$199/mo</span>
@@ -309,10 +316,10 @@
             <!-- Navigation Tentacles -->
             <div class="nav-tentacles">
                 <a href="store.html" class="tentacle-btn store" aria-label="Visit Web Store Catalog">
-                    🛒 Web Store Catalog
+                    Web Store Catalog
                 </a>
                 <a href="lore.html" class="tentacle-btn lore" aria-label="Read Background Lore">
-                    📜 Background Lore
+                    Background Lore
                 </a>
             </div>
         </div>
@@ -321,7 +328,7 @@
     <!-- Footer -->
     <footer>
         <div class="footer-content">
-            <a href="#" class="contact-link" onclick="openModal(); return false;" aria-label="Contact Us">
+            <a href="contact.html" class="contact-link" aria-label="Contact Us">
                 Contact: support@seraphonix.com
             </a>
             
@@ -354,7 +361,7 @@
     <div class="modal-overlay" id="contact-modal" onclick="closeModal(event)">
         <div class="modal" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
-            <h2>🌊 Send Us a Message</h2>
+            <h2>Send Us a Message</h2>
             <form id="contact-form" onsubmit="handleSubmit(event)">
                 <input type="text" name="name" placeholder="Your Name" required aria-label="Your Name">
                 <input type="email" name="email" placeholder="Your Email" required aria-label="Your Email">
@@ -368,7 +375,7 @@
     <div class="ai-chat-widget">
         <div class="ai-chat-container" id="ai-chat">
             <div class="ai-chat-header">
-                <h3><span>🧠</span> Atlantiplex AI</h3>
+                <h3>Atlantiplex AI</h3>
                 <div class="ai-chat-status">
                     <span class="ai-status-dot" id="ai-status-dot"></span>
                     <span id="ai-status-text">Connecting...</span>
@@ -377,7 +384,7 @@
             </div>
             <div class="ai-chat-messages" id="ai-messages">
                 <div class="ai-message ai">
-                    <span class="ai-message-avatar">🌊</span>
+                    <span class="ai-message-avatar"></span>
                     Greetings, traveler! I'm the Atlantiplex AI assistant. How may I help you dive deeper into our world of AI innovation?
                 </div>
             </div>
@@ -388,13 +395,7 @@
             </div>
             <div class="ai-chat-input-container">
                 <div class="ai-chat-input-wrapper">
-                    <textarea 
-                        class="ai-chat-input" 
-                        id="ai-input" 
-                        placeholder="Type your message..."
-                        rows="1"
-                        onkeydown="handleAIKeydown(event)"
-                    ></textarea>
+                    <textarea class="ai-chat-input" id="ai-input" placeholder="Type your message..." rows="1" onkeydown="handleAIKeydown(event)"></textarea>
                     <button class="ai-send-button" id="ai-send-btn" onclick="sendAIMessage()" aria-label="Send message">
                         <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
                     </button>
@@ -403,7 +404,6 @@
         </div>
         <button class="ai-chat-toggle" id="ai-chat-toggle" onclick="toggleAIChat()" aria-label="Open AI chat">
             <svg class="ai-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-            <svg class="ai-icon-animated" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
         </button>
     </div>
 
