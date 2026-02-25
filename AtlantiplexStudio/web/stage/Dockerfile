@@ -1,40 +1,58 @@
-# Multi-stage Dockerfile for Node.js Stage Server
-# Stage 1: Dependencies
-FROM node:20-alpine AS dependencies
+# Node.js Stage Server - Production optimized
+# Multi-stage build for minimal image
+
+FROM node:20-alpine AS builder
+
 WORKDIR /app
 
+# Copy dependency files
 COPY package*.json ./
 
-# Install dependencies excluding optional packages (heapdump is optional)
-# Use --no-optional and --legacy-peer-deps for compatibility
-RUN npm ci --no-optional --legacy-peer-deps && npm cache clean --force
+# Install dependencies with cache mount, exclude dev
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --omit=dev --legacy-peer-deps && \
+    npm cache clean --force
 
 # Stage 2: Runtime
 FROM node:20-alpine
+
 WORKDIR /app
 
-# Install dumb-init for proper signal handling
+# Install only essential runtime dependencies
 RUN apk add --no-cache dumb-init
 
-# Copy dependencies from builder stage (node:20-alpine already has node user)
-COPY --from=dependencies --chown=node:node /app/node_modules ./node_modules
+# Create unprivileged user with restricted shell
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 -h /nonexistent -s /sbin/nologin
+
+# Copy dependencies from builder
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 
 # Copy application code
-COPY --chown=node:node . .
+COPY --chown=nodejs:nodejs . .
 
-# Create log and upload directories
+# Create log and upload directories with correct permissions
 RUN mkdir -p /app/logs /app/uploads && \
-    chown -R node:node /app
+    chown -R nodejs:nodejs /app
+
+# Metadata
+LABEL maintainer="Atlantiplex Team" \
+      version="1.0" \
+      description="Stage Server - WebSocket & API"
+
+# Environment
+ENV NODE_ENV=production \
+    NODE_OPTIONS="--max-old-space-size=512"
 
 # Switch to non-root user
-USER node
+USER nodejs
 
 # Expose port
 EXPOSE 9001
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD wget --quiet --tries=1 --spider http://localhost:9001/health || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:9001/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" || exit 1
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]

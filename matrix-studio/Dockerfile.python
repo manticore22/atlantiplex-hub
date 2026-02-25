@@ -1,9 +1,11 @@
-# Builder stage - compile dependencies
+# Python Flask Backend - Production optimized
+# Multi-stage build for minimal image
+
 FROM python:3.11-alpine AS builder
 
 WORKDIR /app
 
-# Install build dependencies
+# Install build dependencies only (will be removed in final image)
 RUN apk add --no-cache \
     gcc \
     musl-dev \
@@ -23,7 +25,7 @@ FROM python:3.11-alpine
 
 WORKDIR /app
 
-# Install runtime dependencies only
+# Install runtime dependencies only (no build tools)
 RUN apk add --no-cache \
     libffi \
     openssl \
@@ -33,7 +35,7 @@ RUN apk add --no-cache \
 
 # Create non-root user for security
 RUN addgroup -g 1001 -S appuser && \
-    adduser -S appuser -u 1001
+    adduser -S appuser -u 1001 -h /nonexistent -s /sbin/nologin
 
 # Copy Python dependencies from builder with proper ownership
 COPY --from=builder --chown=appuser:appuser /root/.local /home/appuser/.local
@@ -41,7 +43,7 @@ COPY --from=builder --chown=appuser:appuser /root/.local /home/appuser/.local
 # Copy application code
 COPY --chown=appuser:appuser . .
 
-# Exclude unnecessary files
+# Exclude unnecessary files to reduce image size
 RUN rm -rf \
     .git \
     .gitignore \
@@ -52,7 +54,7 @@ RUN rm -rf \
     .pytest_cache \
     .venv
 
-# Clean Python cache
+# Clean Python bytecode to reduce image size
 RUN find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true && \
     find . -type f -name "*.pyc" -delete && \
     find . -type f -name "*.pyo" -delete
@@ -61,6 +63,11 @@ RUN find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true && \
 RUN mkdir -p logs core/recordings && \
     chown -R appuser:appuser logs core/recordings . && \
     chmod 755 logs core/recordings
+
+# Metadata
+LABEL maintainer="Atlantiplex Team" \
+      version="1.0" \
+      description="Flask Backend - API Server"
 
 # Set Python environment variables
 ENV PYTHONUNBUFFERED=1 \
@@ -76,7 +83,7 @@ EXPOSE 5000
 USER appuser
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:5000/api/health || exit 1
 
 # Use dumb-init to handle signals properly

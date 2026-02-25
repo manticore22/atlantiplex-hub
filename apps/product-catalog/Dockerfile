@@ -1,57 +1,58 @@
 # Product Catalog - E-Commerce/Shop
-# Multi-stage build for minimal production image
-# Monorepo structure: root package.json + workspace apps
+# Production-optimized multi-stage build
 
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy root lockfiles for dependency caching
+# Copy dependency files
 COPY package*.json ./
 
-# Use BuildKit cache mount for npm dependencies
+# Install dependencies with cache mount
 RUN --mount=type=cache,target=/root/.npm \
-    npm install --omit=dev && \
+    npm ci --omit=dev && \
     npm cache clean --force
 
-# Copy workspace and source
-COPY apps/product-catalog ./apps/product-catalog
+# Copy source
+COPY . .
 
-RUN npm run build --workspace=apps/product-catalog
+# Build application
+RUN npm run build
 
-# Production stage
+# Production runtime stage
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Install only dumb-init for proper signal handling
+# Install only essential runtime dependencies
 RUN apk add --no-cache dumb-init
 
 # Create unprivileged user
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
+    adduser -S nodejs -u 1001 -h /nonexistent -s /sbin/nologin
 
-# Copy built application and dependencies
+# Copy production dependencies and built app
 COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nodejs:nodejs /app/apps/product-catalog ./apps/product-catalog
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
 
-# Metadata labels for production tracking
+# Metadata
 LABEL maintainer="Atlantiplex Team" \
       version="1.0" \
       description="Product Catalog - E-Commerce/Shop"
 
-# Production environment
+# Environment
 ENV NODE_ENV=production \
-    NODE_OPTIONS="--max-old-space-size=512" \
-    PORT=5174
+    PORT=5174 \
+    NODE_OPTIONS="--max-old-space-size=512"
 
 EXPOSE 5174
 
 USER nodejs
 
-# Health check with improved timeout
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD wget --quiet --tries=1 --spider http://localhost:5174 || exit 1
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:5174', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" || exit 1
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["npm", "run", "preview", "--workspace=apps/product-catalog"]
+CMD ["npm", "run", "preview"]

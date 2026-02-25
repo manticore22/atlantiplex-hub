@@ -9,12 +9,12 @@ WORKDIR /app
 COPY package*.json ./
 
 RUN --mount=type=cache,target=/root/.npm \
-    npm install --production && \
+    npm ci --omit=dev && \
     npm cache clean --force
 
 # Copy source and build
 COPY . .
-RUN npm run build 2>/dev/null || true
+RUN npm run build
 
 # Production stage - use nginx alpine
 FROM nginx:stable-alpine
@@ -46,17 +46,19 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
 
-    # Cache static assets
+    # Cache static assets (long-lived)
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
         expires 30d;
         add_header Cache-Control "public, immutable";
+        access_log off;
     }
 
     # SPA fallback - serve index.html for all routes
     location / {
         try_files $uri $uri/ /index.html;
-        add_header Cache-Control "no-cache, must-revalidate";
+        add_header Cache-Control "no-cache, must-revalidate, max-age=0";
     }
 
     # Health check endpoint
@@ -72,11 +74,17 @@ server {
         access_log off;
         log_not_found off;
     }
+    
+    location ~ \.env {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
 }
 NGINXEOF
 
 # Copy built application
-COPY --from=builder --chown=nginx:nginx /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Metadata labels for production tracking
 LABEL maintainer="Atlantiplex Team" \
@@ -85,8 +93,8 @@ LABEL maintainer="Atlantiplex Team" \
 
 EXPOSE 80
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+# Health check with native curl
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD wget --quiet --tries=1 --spider http://localhost/health || exit 1
 
 # Run nginx in foreground
