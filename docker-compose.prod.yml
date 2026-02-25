@@ -1,0 +1,208 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: atlantiplex-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-atlantiplex}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-}
+      POSTGRES_DB: ${DB_NAME:-atlantiplex}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - atlantiplex-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-atlantiplex} -d ${DB_NAME:-atlantiplex}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    security_opt:
+      - no-new-privileges:true
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    read_only: false
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    container_name: atlantiplex-redis
+    restart: always
+    expose:
+      - "6379"
+    networks:
+      - atlantiplex-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "PING"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      - redis_data:/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  stage-server:
+    image: docker.io/manticore313/website_and_studio:stage
+    container_name: atlantiplex-stage
+    restart: always
+    expose:
+      - "9001"
+    networks:
+      - atlantiplex-network
+    environment:
+      - STRIPE_SECRET=${STRIPE_SECRET}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - STRIPE_PRICE_ASCENDANT=${STRIPE_PRICE_ASCENDANT}
+      - STRIPE_PRICE_COVENANT=${STRIPE_PRICE_COVENANT}
+      - STRIPE_PRICE_INFINITE=${STRIPE_PRICE_INFINITE}
+      - STRIPE_PRICE_SOVEREIGN=${STRIPE_PRICE_SOVEREIGN}
+      - FRONTEND_URL=${FRONTEND_URL}
+    depends_on:
+      - postgres
+      - redis
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  flask-backend:
+    image: docker.io/manticore313/website_and_studio:flask
+    container_name: atlantiplex-flask
+    restart: always
+    expose:
+      - "5000"
+    networks:
+      - atlantiplex-network
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - STRIPE_SECRET=${STRIPE_SECRET}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - STRIPE_PRICE_ASCENDANT=${STRIPE_PRICE_ASCENDANT}
+      - STRIPE_PRICE_COVENANT=${STRIPE_PRICE_COVENANT}
+      - STRIPE_PRICE_INFINITE=${STRIPE_PRICE_INFINITE}
+      - STRIPE_PRICE_SOVEREIGN=${STRIPE_PRICE_SOVEREIGN}
+      - FRONTEND_URL=${FRONTEND_URL}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  website:
+    image: docker.io/manticore313/website_and_studio:website
+    container_name: atlantiplex-website
+    restart: always
+    expose:
+      - "80"
+    networks:
+      - atlantiplex-network
+    environment:
+      - STRIPE_SECRET=${STRIPE_SECRET}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - STRIPE_PRICE_ASCENDANT=${STRIPE_PRICE_ASCENDANT}
+      - STRIPE_PRICE_COVENANT=${STRIPE_PRICE_COVENANT}
+      - STRIPE_PRICE_INFINITE=${STRIPE_PRICE_INFINITE}
+      - STRIPE_PRICE_SOVEREIGN=${STRIPE_PRICE_SOVEREIGN}
+      - FRONTEND_URL=${FRONTEND_URL}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  studio:
+    image: docker.io/manticore313/website_and_studio:studio
+    container_name: atlantiplex-studio
+    restart: always
+    expose:
+      - "80"
+    networks:
+      - atlantiplex-network
+    environment:
+      - STRIPE_SECRET=${STRIPE_SECRET}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - STRIPE_PRICE_ASCENDANT=${STRIPE_PRICE_ASCENDANT}
+      - STRIPE_PRICE_COVENANT=${STRIPE_PRICE_COVENANT}
+      - STRIPE_PRICE_INFINITE=${STRIPE_PRICE_INFINITE}
+      - STRIPE_PRICE_SOVEREIGN=${STRIPE_PRICE_SOVEREIGN}
+      - FRONTEND_URL=${FRONTEND_URL}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: atlantiplex-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/sites-enabled:/etc/nginx/sites-enabled:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    networks:
+      - atlantiplex-network
+    depends_on:
+      stage-server:
+        condition: service_healthy
+      flask-backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  stage_logs:
+    driver: local
+  stage_uploads:
+    driver: local
+  flask_logs:
+    driver: local
+  flask_recordings:
+    driver: local
+
+networks:
+  atlantiplex-network:
+    driver: bridge

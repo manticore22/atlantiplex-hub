@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: atlantiplex
+  labels:
+    name: atlantiplex
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: atlantiplex-config
+  namespace: atlantiplex
+data:
+  NODE_ENV: "production"
+  FLASK_ENV: "production"
+  LOG_LEVEL: "info"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: atlantiplex-secrets
+  namespace: atlantiplex
+type: Opaque
+stringData:
+  # IMPORTANT: Replace these with your actual secrets before deployment
+  DB_USER: "atlantiplex"
+  DB_PASSWORD: "REPLACE_WITH_STRONG_PASSWORD"
+  DB_NAME: "atlantiplex"
+  REDIS_PASSWORD: "REPLACE_WITH_STRONG_PASSWORD"
+  JWT_SECRET: "REPLACE_WITH_JWT_SECRET"
+  JWT_REFRESH_SECRET: "REPLACE_WITH_JWT_REFRESH_SECRET"
+  STRIPE_SECRET_KEY: "REPLACE_WITH_STRIPE_SECRET"
+  STRIPE_PUBLISHABLE_KEY: "REPLACE_WITH_STRIPE_PUBLIC"
+  STRIPE_WEBHOOK_SECRET: "REPLACE_WITH_WEBHOOK_SECRET"
+  CORS_ORIGIN: "https://atlantiplex.example.com"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: atlantiplex-storage
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp3
+  iops: "3000"
+  throughput: "125"
+allowVolumeExpansion: true

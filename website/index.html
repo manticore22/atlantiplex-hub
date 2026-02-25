@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atlantiplex - Seraphonix Studios</title>
+    <meta name="description" content="Dive into AI innovation with Seraphonix Studios in the underwater world of Atlantiplex. Explore our mission, lore, and AI tools store.">
+    <meta name="keywords" content="Atlantiplex AI, underwater AI innovation, Seraphonix Studios coding, no-code AI tools, underwater technology, AI automation, digital transformation">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="neon.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+</head>
+<body class="fade-in-loading neon-body">
+    <!-- Navigation Bar -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <svg viewBox="0 0 40 40" class="logo-icon"><circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="20" cy="20" r="8" fill="currentColor"/></svg>
+                <span>Atlantiplex</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#brands" class="nav-link">Brands</a></li>
+                <li><a href="#products" class="nav-link">Products</a></li>
+                <li><a href="#mission" class="nav-link">Mission</a></li>
+                <li><a href="lore.html" class="nav-link">Lore</a></li>
+                <li><a href="store.html" class="nav-link">Store</a></li>
+            </ul>
+            <button class="nav-toggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Neon Theme Toggle -->
+    <button id="theme-toggle" aria-label="Toggle Neon Theme">Neon Theme</button>
+    
+    <!-- Animated Ocean Background -->
+    <div class="ocean-bg"></div>
+    <div class="light-rays"></div>
+    
+    <!-- Neon Grid Matrix Background -->
+    <div class="neon-grid" aria-hidden="true"></div>
+    
+    <!-- Dome Canopy Overlay -->
+    <div class="dome-overlay" aria-hidden="true">
+        <div class="dome-canopy"></div>
+        <div class="dome-ring"></div>
+        <div class="dome-ring"></div>
+        <div class="dome-ring"></div>
+    </div>
+    
+    <!-- Particles Container -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Bubbles -->
+    <div class="bubbles" aria-hidden="true"></div>
+    
+    <!-- SVG Filters for Wave Distortion -->
+    <svg class="filters">
+        <defs>
+            <filter id="wave" x="-20%" y="-20%" width="140%" height="140%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="3" result="noise" seed="5"/>
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </defs>
+    </svg>
+
+    <script>
+        window.addEventListener('load', () => {
+            document.body.classList.remove('fade-in-loading');
+        });
+        
+        const mainNav = document.querySelector('.main-nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                mainNav.classList.add('scrolled');
+            } else {
+                mainNav.classList.remove('scrolled');
+            }
+        });
+        
+        (function createParticles() {
+            const container = document.getElementById('particles');
+            if (!container) return;
+            const particleCount = 40;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * 4 + 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 8 + 8) + 's';
+                particle.style.animationDelay = (Math.random() * 10) + 's';
+                particle.style.setProperty('--drift', (Math.random() * 100 - 50) + 'px');
+                container.appendChild(particle);
+            }
+        })();
+        
+        (function createBubbles() {
+            const container = document.querySelector('.bubbles');
+            if (!container) return;
+            const bubbleCount = 25;
+            for (let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                const size = Math.random() * 20 + 8;
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
+                bubble.style.left = Math.random() * 100 + '%';
+                bubble.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                bubble.style.animationDelay = (Math.random() * 15) + 's';
+                bubble.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
+                container.appendChild(bubble);
+            }
+        })();
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+
+    <script>
+        (function(){
+            const btn = document.getElementById('theme-toggle');
+            const root = document.documentElement;
+            function applyTheme(theme){
+                root.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+            }
+            const saved = localStorage.getItem('theme') || 'default';
+            applyTheme(saved);
+            btn.addEventListener('click', () => {
+                const current = root.getAttribute('data-theme');
+                const next = current === 'neon' ? 'default' : 'neon';
+                applyTheme(next);
+            });
+        })();
+    </script>
+
+    <!-- Background Coral Elements -->
+    <div class="bg-elements">
+        <svg class="coral left" viewBox="0 0 100 150" fill="#ff6b6b">
+            <path d="M50 150 Q20 100 30 70 Q40 40 50 20 Q60 40 70 70 Q80 100 50 150"/>
+            <path d="M35 150 Q15 120 25 100 Q35 80 40 60" fill="none" stroke="#ff8787" stroke-width="3"/>
+            <path d="M65 150 Q85 120 75 100 Q65 80 60 60" fill="none" stroke="#ff8787" stroke-width="3"/>
+        </svg>
+        <svg class="coral right" viewBox="0 0 100 150" fill="#39CCCC">
+            <path d="M50 150 Q20 100 30 70 Q40 40 50 20 Q60 40 70 70 Q80 100 50 150"/>
+            <path d="M35 150 Q15 120 25 100 Q35 80 40 60" fill="none" stroke="#5fd3d3" stroke-width="3"/>
+            <path d="M65 150 Q85 120 75 100 Q65 80 60 60" fill="none" stroke="#5fd3d3" stroke-width="3"/>
+        </svg>
+        <svg class="seaweed" style="left: 8%;" viewBox="0 0 30 200" fill="#2d5a27">
+            <path d="M15 200 Q5 150 15 100 Q25 50 15 0 Q5 50 15 100 Q25 150 15 200" opacity="0.7"/>
+        </svg>
+        <svg class="seaweed" style="left: 20%;" viewBox="0 0 30 200" fill="#2d5a27">
+            <path d="M15 200 Q0 150 15 100 Q30 50 15 0 Q0 50 15 100 Q30 150 15 200" opacity="0.6"/>
+        </svg>
+        <svg class="seaweed" style="right: 12%;" viewBox="0 0 30 200" fill="#2d5a27">
+            <path d="M15 200 Q5 150 15 100 Q25 50 15 0 Q5 50 15 100 Q25 150 15 200" opacity="0.7"/>
+        </svg>
+        <svg class="seaweed" style="right: 25%;" viewBox="0 0 30 200" fill="#2d5a27">
+            <path d="M15 200 Q0 150 15 100 Q30 50 15 0 Q0 50 15 100 Q30 150 15 200" opacity="0.6"/>
+        </svg>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Hero Section -->
+        <section class="hero-section" id="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Welcome to Atlantiplex</h1>
+                <p class="hero-subtitle">Three Brands. One Vision. Infinite Possibilities.</p>
+                <div class="hero-cta">
+                    <a href="#brands" class="cta-primary">Explore Brands</a>
+                    <a href="#mission" class="cta-secondary">Our Mission</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-orb"></div>
+                <div class="hero-ring ring-1"></div>
+                <div class="hero-ring ring-2"></div>
+                <div class="hero-ring ring-3"></div>
+            </div>
+            <div class="scroll-indicator">
+                <span>Scroll</span>
+                <div class="scroll-arrow"></div>
+            </div>
+        </section>
+        
+        <!-- Studio Center Hub (3x3 around portal) -->
+        <section class="studio-center" aria-label="Studio Center Hub" style="padding: 40px 0 20px;">
+            <div class="studio-grid" role="navigation" aria-label="Studio Center Grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: min(1100px, 92vw); justify-items: center; align-items: center; margin: 0 auto;">
+                <a href="studio-signups.html" class="neon-tile" aria-label="Studio Signups">Studio Signups</a>
+                <a href="about.html" class="neon-tile" aria-label="About Us">About Us</a>
+                <a href="lore.html" class="neon-tile" aria-label="Lore">Lore</a>
+                <a href="store.html" class="neon-tile" aria-label="Product Page">Product Page</a>
+                <div class="portal-tile" aria-label="Portal Visual" style="width:180px; height:180px; display:flex; align-items:center; justify-content:center; border-radius:50%; border:10px solid #0ff; box-shadow:0 0 80px #0ff, inset 0 0 40px rgba(0,255,242,0.3); background: radial-gradient(circle at center, rgba(0,255,242,0.15), transparent 70%);"></div>
+                <a href="verilysovereign/index.html" class="neon-tile" aria-label="Archivist Intro">Archivist Intro</a>
+                <a href="contact.html" class="neon-tile" aria-label="Contact">Contact</a>
+                <a href="portfolio.html" class="neon-tile" aria-label="Portfolio">Portfolio</a>
+                <a href="blog.html" class="neon-tile" aria-label="Blog">Blog</a>
+            </div>
+            <div class="portal-caption" style="text-align:center; margin-top:16px; font-family:monospace; color:#0ff; font-size:1.1rem; text-shadow:0 0 10px #0ff;">Sayeths Ocean Moon</div>
+        </section>
+        
+        <!-- Brand Universe Showcase -->
+        <div class="brand-universe" id="brands">
+            <!-- Header -->
+            <div class="universe-header">
+                <h1>Three Brands. One Vision.</h1>
+                <p>Unified by innovation, distinguished by purpose</p>
+            </div>
+            
+            <!-- Brand Triptych -->
+            <div class="brand-triptych">
+                <!-- Seraphonix Studios -->
+                <div class="brand-card seraphonix-card">
+                    <div class="brand-logo-container">
+                        <img src="./brand-site/assets/seraphonix-logo.svg" alt="Seraphonix Studios" class="brand-logo" />
+                    </div>
+                    <h2>Seraphonix Studios</h2>
+                    <p class="brand-tagline">Rising from Flames</p>
+                    <ul class="brand-traits">
+                        <li>Design Excellence</li>
+                        <li>AI Innovation</li>
+                        <li>Rapid Iteration</li>
+                    </ul>
+                    <a href="#" class="brand-link">Explore Seraphonix</a>
+                </div>
+                
+                <!-- Verilysovereign -->
+                <div class="brand-card verilysovereign-card">
+                    <div class="brand-logo-container">
+                        <img src="./brand-site/assets/verilysovereign-logo.svg" alt="Verilysovereign" class="brand-logo" />
+                    </div>
+                    <h2>Verilysovereign</h2>
+                    <p class="brand-tagline">Power & Authority</p>
+                    <ul class="brand-traits">
+                        <li>Strength</li>
+                        <li>Sovereignty</li>
+                        <li>Resilience</li>
+                    </ul>
+                    <a href="verilysovereign/index.html" class="brand-link">Explore Verilysovereign</a>
+                </div>
+                
+                <!-- Atlantiplex -->
+                <div class="brand-card atlantiplex-card">
+                    <div class="brand-logo-container">
+                        <img src="./brand-site/assets/atlantiplex-logo.svg" alt="Atlantiplex" class="brand-logo" />
+                    </div>
+                    <h2>Atlantiplex AI</h2>
+                    <p class="brand-tagline">Cosmic Consciousness</p>
+                    <ul class="brand-traits">
+                        <li>Intelligence</li>
+                        <li>Insight</li>
+                        <li>Vision</li>
+                    </ul>
+                    <a href="#" class="brand-link">Explore Atlantiplex</a>
+                </div>
+
+                <!-- Product Download -->
+                <div class="brand-card" style="min-height:450px;">
+                    <h2 style="margin-bottom:12px; color:var(--neon-primary);">Product Download</h2>
+                    <p class="brand-tagline">Sample app package</p>
+                    <a class="brand-link download" href="/downloads/sample-app-v1.txt" download>Download Sample App</a>
+                </div>
+            </div>
+            
+            <!-- Mission Statement -->
+            <div class="mission-unified" id="mission">
+                <div class="mission-glow"></div>
+                <strong>Born from the flames of transformation,</strong> 
+                our unified vision dives into AI innovation to build the future from the depths of creativity—powered by three distinct identities working in harmony.
+            </div>
+            
+            <!-- Products Section -->
+            <section class="products-section" id="products">
+                <h2 class="section-title">Featured Products</h2>
+                <div class="product-preview-grid">
+                    <div class="product-preview-card">
+                        <div class="preview-icon">AI</div>
+                        <h3>AI Suite Pro</h3>
+                        <p>Advanced AI tools for automation</p>
+                        <span class="preview-price">$99/mo</span>
+                    </div>
+                    <div class="product-preview-card">
+                        <div class="preview-icon">ML</div>
+                        <h3>Neural Engine</h3>
+                        <p>High-performance ML pipeline</p>
+                        <span class="preview-price">$149/mo</span>
+                    </div>
+                    <div class="product-preview-card">
+                        <div class="preview-icon">DL</div>
+                        <h3>Deep Learning Kit</h3>
+                        <p>Complete AI development suite</p>
+                        <span class="preview-price">$199/mo</span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Navigation Tentacles -->
+            <div class="nav-tentacles">
+                <a href="store.html" class="tentacle-btn store" aria-label="Visit Web Store Catalog">
+                    Web Store Catalog
+                </a>
+                <a href="lore.html" class="tentacle-btn lore" aria-label="Read Background Lore">
+                    Background Lore
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <a href="contact.html" class="contact-link" aria-label="Contact Us">
+                Contact: support@seraphonix.com
+            </a>
+            
+            <div class="social-orbs">
+                <a href="https://twitter.com/r1914514" class="social-orb" aria-label="Twitter" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </a>
+                <a href="https://instagram.com" class="social-orb" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                </a>
+                <a href="https://discord.com" class="social-orb" aria-label="Discord" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                    </svg>
+                </a>
+            </div>
+            
+            <div class="legal-links">
+                <a href="/privacy.html">Privacy Policy</a>
+                <a href="/terms.html">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Contact Modal -->
+    <div class="modal-overlay" id="contact-modal" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()" aria-label="Close">&times;</button>
+            <h2>Send Us a Message</h2>
+            <form id="contact-form" onsubmit="handleSubmit(event)">
+                <input type="text" name="name" placeholder="Your Name" required aria-label="Your Name">
+                <input type="email" name="email" placeholder="Your Email" required aria-label="Your Email">
+                <textarea name="message" placeholder="Your Message" required aria-label="Your Message"></textarea>
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- AI Chat Widget -->
+    <div class="ai-chat-widget">
+        <div class="ai-chat-container" id="ai-chat">
+            <div class="ai-chat-header">
+                <h3>Atlantiplex AI</h3>
+                <div class="ai-chat-status">
+                    <span class="ai-status-dot" id="ai-status-dot"></span>
+                    <span id="ai-status-text">Connecting...</span>
+                </div>
+                <button class="ai-chat-close" onclick="toggleAIChat()" aria-label="Close chat">&times;</button>
+            </div>
+            <div class="ai-chat-messages" id="ai-messages">
+                <div class="ai-message ai">
+                    <span class="ai-message-avatar"></span>
+                    Greetings, traveler! I'm the Atlantiplex AI assistant. How may I help you dive deeper into our world of AI innovation?
+                </div>
+            </div>
+            <div class="ai-quick-prompts">
+                <button class="ai-quick-prompt" onclick="sendQuickPrompt('Tell me about your AI tools')">AI Tools</button>
+                <button class="ai-quick-prompt" onclick="sendQuickPrompt('What is Seraphonix Studios?')">About</button>
+                <button class="ai-quick-prompt" onclick="sendQuickPrompt('How do I get started?')">Get Started</button>
+            </div>
+            <div class="ai-chat-input-container">
+                <div class="ai-chat-input-wrapper">
+                    <textarea class="ai-chat-input" id="ai-input" placeholder="Type your message..." rows="1" onkeydown="handleAIKeydown(event)"></textarea>
+                    <button class="ai-send-button" id="ai-send-btn" onclick="sendAIMessage()" aria-label="Send message">
+                        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <button class="ai-chat-toggle" id="ai-chat-toggle" onclick="toggleAIChat()" aria-label="Open AI chat">
+            <svg class="ai-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="chat.js"></script>
+</body>
+</html>

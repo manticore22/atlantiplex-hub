@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <defs>
+    <radialGradient id="fire-core" cx="50%" cy="40%">
+      <stop offset="0%" style="stop-color:#FFFF00;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FFA500;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF4500;stop-opacity:0.8" />
+    </radialGradient>
+    <radialGradient id="flame-glow" cx="30%" cy="30%">
+      <stop offset="0%" style="stop-color:#FFD700;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#FF6347;stop-opacity:0.3" />
+    </radialGradient>
+    <filter id="fire-shadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-opacity:0.6" flood-color="#8B0000"/>
+    </filter>
+    <filter id="flame-blur">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background glow -->
+  <ellipse cx="150" cy="150" rx="140" ry="140" fill="url(#flame-glow)" opacity="0.4"/>
+  
+  <!-- FLAMING ORB (bottom right) -->
+  <g filter="url(#fire-shadow)">
+    <!-- Outer flame aura -->
+    <circle cx="220" cy="220" r="45" fill="#FF4500" opacity="0.3" filter="url(#flame-blur)"/>
+    <circle cx="220" cy="220" r="38" fill="#FF6347" opacity="0.4" filter="url(#flame-blur)"/>
+    
+    <!-- Main orb -->
+    <circle cx="220" cy="220" r="32" fill="url(#fire-core)"/>
+    
+    <!-- Orb highlight -->
+    <circle cx="215" cy="210" r="12" fill="#FFFF00" opacity="0.7"/>
+    <circle cx="212" cy="208" r="6" fill="white" opacity="0.6"/>
+    
+    <!-- Flame wisps around orb -->
+    <path d="M 220 188 Q 225 170 220 155" stroke="#FF6347" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.8"/>
+    <path d="M 235 200 Q 250 185 260 170" stroke="#FF4500" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+    <path d="M 205 200 Q 190 185 180 170" stroke="#FF4500" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+    <path d="M 240 230 Q 260 240 275 250" stroke="#FF6347" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>
+    <path d="M 200 240 Q 180 250 165 265" stroke="#FF6347" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.6"/>
+  </g>
+  
+  <!-- LION HEAD (main focus) -->
+  <g filter="url(#fire-shadow)">
+    <!-- Head base -->
+    <circle cx="110" cy="120" r="55" fill="#CC4400" stroke="#8B0000" stroke-width="2"/>
+    
+    <!-- MANE - Flowing flames -->
+    <g fill="none" stroke-linecap="round" filter="url(#flame-blur)">
+      <!-- Top left mane strands -->
+      <path d="M 65 85 Q 45 60 40 40" stroke="#FF6347" stroke-width="4" opacity="0.9"/>
+      <path d="M 70 75 Q 50 50 45 25" stroke="#FF4500" stroke-width="3.5" opacity="0.85"/>
+      <path d="M 80 70 Q 65 45 60 20" stroke="#FF6347" stroke-width="3" opacity="0.8"/>
+      
+      <!-- Top center mane -->
+      <path d="M 100 65 Q 100 40 105 15" stroke="#FFD700" stroke-width="4" opacity="0.9"/>
+      <path d="M 110 65 Q 115 40 120 15" stroke="#FF6347" stroke-width="3.5" opacity="0.85"/>
+      
+      <!-- Top right mane strands -->
+      <path d="M 155 75 Q 175 50 185 25" stroke="#FF4500" stroke-width="3.5" opacity="0.85"/>
+      <path d="M 150 85 Q 170 60 180 40" stroke="#FF6347" stroke-width="4" opacity="0.9"/>
+      <path d="M 140 70 Q 160 45 170 20" stroke="#FF6347" stroke-width="3" opacity="0.8"/>
+      
+      <!-- Left side mane -->
+      <path d="M 60 110 Q 35 105 20 110" stroke="#FF4500" stroke-width="3.5" opacity="0.85"/>
+      <path d="M 58 125 Q 30 130 15 145" stroke="#FF6347" stroke-width="3" opacity="0.8"/>
+      <path d="M 65 140 Q 40 155 30 175" stroke="#FF4500" stroke-width="2.5" opacity="0.75"/>
+      
+      <!-- Right side mane -->
+      <path d="M 160 110 Q 185 105 200 110" stroke="#FF4500" stroke-width="3.5" opacity="0.85"/>
+      <path d="M 162 125 Q 190 130 205 145" stroke="#FF6347" stroke-width="3" opacity="0.8"/>
+      <path d="M 155 140 Q 180 155 190 175" stroke="#FF4500" stroke-width="2.5" opacity="0.75"/>
+    </g>
+    
+    <!-- Mane detail layer (darker inner strokes) -->
+    <g fill="none" stroke-linecap="round" opacity="0.5">
+      <path d="M 68 80 Q 52 58 46 38" stroke="#8B0000" stroke-width="2"/>
+      <path d="M 105 68 Q 108 45 110 20" stroke="#8B0000" stroke-width="2"/>
+      <path d="M 152 80 Q 168 58 182 38" stroke="#8B0000" stroke-width="2"/>
+    </g>
+    
+    <!-- Eyes -->
+    <circle cx="95" cy="110" r="8" fill="#FFD700" stroke="#FF4500" stroke-width="1.5"/>
+    <circle cx="125" cy="110" r="8" fill="#FFD700" stroke="#FF4500" stroke-width="1.5"/>
+    <circle cx="95" cy="110" r="4" fill="#000" opacity="0.8"/>
+    <circle cx="125" cy="110" r="4" fill="#000" opacity="0.8"/>
+    <circle cx="93" cy="108" r="2" fill="#FFFF00" opacity="0.7"/>
+    <circle cx="123" cy="108" r="2" fill="#FFFF00" opacity="0.7"/>
+    
+    <!-- Snout -->
+    <ellipse cx="110" cy="135" rx="18" ry="20" fill="#8B3300" stroke="#8B0000" stroke-width="1"/>
+    
+    <!-- Nose -->
+    <ellipse cx="110" cy="140" rx="6" ry="7" fill="#4A0E0E"/>
+    
+    <!-- Mouth -->
+    <path d="M 110 140 Q 105 148 100 150" stroke="#4A0E0E" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M 110 140 Q 115 148 120 150" stroke="#4A0E0E" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Additional flame wisps (background) -->
+  <g fill="none" stroke="#FF6347" stroke-width="1.5" opacity="0.4" stroke-linecap="round">
+    <path d="M 40 90 Q 30 85 25 75"/>
+    <path d="M 190 90 Q 200 85 205 75"/>
+    <path d="M 50 170 Q 35 175 25 185"/>
+    <path d="M 170 170 Q 185 175 195 185"/>
+  </g>
+</svg>

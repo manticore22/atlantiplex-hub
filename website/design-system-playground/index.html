@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Design System Playground</title>
+  <link rel="stylesheet" href="../design-system/styles.css" />
+  <style>
+    body { margin:0; font-family: Inter, system-ui, -apple-system, Roboto, Arial, sans-serif; background:#04101a; color:#eaf7ff; }
+    .layout { display:flex; min-height:100vh; }
+    .sidebar { width:320px; border-right:1px solid rgba(128,210,255,.15); padding:16px; }
+    .sidebar h2 { font-size:1rem; margin:0 0 12px; }
+    .sidebar button { display:block; width:100%; text-align:left; padding:8px 10px; margin:6px 0; border-radius:8px; border:1px solid rgba(128,210,255,.25); background: rgba(6,20,40,.8); color:#eaffff; cursor:pointer; }
+    .sidebar button.active { outline:2px solid #5ef1ff; }
+    .preview { flex:1; padding:16px; }
+    .panel { background: rgba(6,20,40,.8); border:1px solid rgba(128,210,255,.25); border-radius:12px; padding:16px; margin-bottom:12px; }
+    .panel + .panel { margin-top:6px; }
+    .title { font-weight:600; }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar" aria-label="Component navigation">
+      <h2>Components</h2>
+      <button data-route="panel" class="active">Panel</button>
+      <button data-route="glyph-divider">GlyphDivider</button>
+      <button data-route="status">StatusBadge</button>
+      <button data-route="list-row">ListRow</button>
+      <button data-route="telemetry">Telemetry</button>
+      <button data-route="dark-mode-toggle">DarkModeToggle</button>
+    </aside>
+    <main class="preview" id="preview" aria-label="Live preview area">
+      <div class="panel" id="panel-preview">
+        <div class="title">Panel</div>
+        <p>Sample panel content.</p>
+      </div>
+      <div class="panel" id="glyph-divider-preview">
+        <div class="title">Glyph Divider</div>
+        <div class="glyph-divider" style="height:18px; display:flex; justify-content: center; align-items: center; gap:6px;">
+          <span>✦</span><span>✧</span><span>✦</span>
+        </div>
+      </div>
+      <div class="panel" id="status-preview">
+        <div class="title">Status Badges</div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span class="ds-status-badge ds-ok">LIVE</span>
+          <span class="ds-status-badge ds-info">INFO</span>
+          <span class="ds-status-badge ds-warn">WARN</span>
+        </div>
+      </div>
+      <div class="panel" id="listrow-preview">
+        <div class="title">List Row</div>
+        <div class="ds-list-row" role="listitem" style="display:flex; justify-content: space-between; align-items:center;">
+          <div class="ds-list-row-left" style="display:flex; align-items:center; gap:8px;">
+            <span class="ds-icon" aria-hidden>🔷</span>
+            <span class="ds-primary">Telemetry Window</span>
+            <span class="ds-secondary">Real-time data</span>
+          </div>
+          <span>▶</span>
+        </div>
+      </div>
+      <div class="panel" id="telemetry-preview">
+        <div class="title">Telemetry Chart</div>
+        <svg width="100%" height="140" viewBox="0 0 600 140" aria-label="Demo telemetry chart">
+          <polyline fill="none" stroke="var(--accent)" stroke-width="3" points="0,110 60,90 120,100 180,60 240,80 300,40 360,50 420,20 480,60 540,20 600,40"></polyline>
+        </svg>
+      </div>
+      <div class="panel" id="darkmode-preview" style="margin-bottom:0;">
+        <div class="title">DarkMode Toggle</div>
+        <button class="ds-darkmode-toggle ds-sonar-btn" aria-label="Toggle glow mode">🌊</button>
+      </div>
+    </main>
+  </div>
+  <script src="./design-system-demo-playground.js"></script>
+</body>
+</html>

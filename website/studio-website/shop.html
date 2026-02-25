@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shop - Aqua-Studio</title>
+  <link rel="stylesheet" href="../design-system/styles.css" />
+  <style>
+    .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:16px; }
+    .card { padding:12px; border-radius:12px; border:1px solid rgba(128,210,255,.25); background: rgba(6,20,40,.8); }
+    .card h3 { margin:0 0 6px; font-size:1rem; }
+    .buy { margin-top:8px; padding:8px 12px; border-radius:8px; background:#00ffd8; border:none; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div class="container" style="padding:20px;">
+    <h1>Shop</h1>
+    <p>A concise catalog of starter offerings and services.</p>
+    <div class="grid" id="shop-grid"></div>
+  </div>
+  <script src="../design-system/src/tokens.ts" type="module"></script>
+  <script src="shop-init.js"></script>
+</body>
+</html>

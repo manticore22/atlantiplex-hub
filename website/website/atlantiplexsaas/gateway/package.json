@@ -1,0 +1,12 @@
+{
+  "name": "gateway",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "build": "echo 'no build'"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}

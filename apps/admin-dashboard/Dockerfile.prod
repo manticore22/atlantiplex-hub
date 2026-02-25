@@ -1,0 +1,58 @@
+# Admin Dashboard - Production-Optimized Multi-Stage Build
+# Stage 1: Builder
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy dependency files
+COPY package*.json ./
+
+# Install dependencies (use npm install instead of ci for compatibility)
+RUN npm install && npm cache clean --force
+
+# Copy source
+COPY . .
+
+# Build application
+RUN npm run build
+
+# Stage 2: Production Runtime
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install only essential runtime dependencies and clean up apk cache
+RUN apk add --no-cache dumb-init && \
+    rm -rf /var/cache/apk/*
+
+# Create non-root user with no shell access (security)
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 -h /nonexistent -s /sbin/nologin
+
+# Copy built application and dependencies from builder (production only)
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
+
+# Metadata
+LABEL maintainer="Atlantiplex Team" \
+      version="1.0" \
+      description="Admin Dashboard - Production"
+
+# Environment variables
+ENV NODE_ENV=production \
+    PORT=5175 \
+    NODE_OPTIONS="--max-old-space-size=512"
+
+EXPOSE 5175
+
+# Switch to unprivileged user
+USER nodejs
+
+# Health check with node native HTTP
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+    CMD node -e "require('http').get('http://localhost:5175', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" || exit 1
+
+# Use dumb-init as PID 1 to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["npm", "run", "preview"]

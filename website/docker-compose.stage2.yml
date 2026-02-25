@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  # Atlantiplex Studio (Stage 2)
+  atlantiplex:
+    build:
+      context: ./READY-TO-SHIP-PROJECTS/atlantiplex-hub/AtlantiplexStudio
+      dockerfile: Dockerfile
+    container_name: atlantiplex-studio-stage2
+    restart: unless-stopped
+    environment:
+      - SECRET_KEY=${ATLANTIPLEX_SECRET:-atlantiplex-secret-2026}
+      - SERAPHONIX_API_URL=http://seraphonix-api:3000
+    volumes:
+      - atlantiplex-uploads:/app/uploads
+    ports:
+      - "5000:5000"
+    networks:
+      - seraphonix-network
+    depends_on:
+      - seraphonix-api
+
+  # Nginx stage 2 proxy
+  nginx:
+    image: nginx:alpine
+    container_name: seraphonix-nginx-stage2
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      - ./nginx-stage2.conf:/etc/nginx/nginx.conf:ro
+      - ./verilysovereign:/var/www/verilysovereign:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - atlantiplex
+    networks:
+      - seraphonix-network
+
+volumes:
+  atlantiplex-uploads:
+
+networks:
+  seraphonix-network:
+    external: true

@@ -1,0 +1,95 @@
+# Python Flask Backend - Production optimized
+# Multi-stage build for minimal image
+
+FROM python:3.12-alpine AS builder
+
+WORKDIR /app
+
+# Install build dependencies only (will be removed in final image)
+RUN apk add --no-cache \
+    gcc \
+    musl-dev \
+    libffi-dev \
+    openssl-dev
+
+# Copy requirements
+COPY requirements.txt .
+COPY requirements_enhanced.txt .
+
+# Install Python dependencies with BuildKit cache
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade pip setuptools wheel && \
+    if [ -f requirements_enhanced.txt ]; then \
+      pip install --no-cache-dir -r requirements_enhanced.txt; \
+    fi && \
+    pip install --user --no-cache-dir -r requirements.txt
+
+# Runtime stage - minimal image with only runtime dependencies
+FROM python:3.12-alpine
+
+WORKDIR /app
+
+# Install runtime dependencies only (no build tools)
+RUN apk add --no-cache \
+    libffi \
+    openssl \
+    postgresql-client \
+    dumb-init \
+    curl
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S appuser && \
+    adduser -S appuser -u 1001 -h /nonexistent -s /sbin/nologin
+
+# Copy Python dependencies from builder with proper ownership
+COPY --from=builder --chown=appuser:appuser /root/.local /home/appuser/.local
+
+# Copy application code
+COPY --chown=appuser:appuser . .
+
+# Exclude unnecessary files to reduce image size
+RUN rm -rf \
+    .git \
+    .gitignore \
+    *.md \
+    tests \
+    docs \
+    __pycache__ \
+    .pytest_cache \
+    .venv
+
+# Clean Python bytecode to reduce image size
+RUN find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true && \
+    find . -type f -name "*.pyc" -delete && \
+    find . -type f -name "*.pyo" -delete
+
+# Create application directories with proper permissions
+RUN mkdir -p logs core/recordings && \
+    chown -R appuser:appuser logs core/recordings . && \
+    chmod 755 logs core/recordings
+
+# Metadata
+LABEL maintainer="Atlantiplex Team" \
+      version="1.0" \
+      description="Flask Backend - API Server"
+
+# Set Python environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH=/home/appuser/.local/bin:$PATH \
+    FLASK_ENV=production \
+    FLASK_APP=app
+
+# Expose port
+EXPOSE 5000
+
+# Switch to non-root user
+USER appuser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:5000/api/health || exit 1
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]

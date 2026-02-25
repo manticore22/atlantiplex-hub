@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 120" width="320" height="120" role="img" aria-label="Atlantiplex Studio logo variant 3">
+  <defs>
+    <linearGradient id="g3" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#00e8ff" />
+      <stop offset="50%" stop-color="#16e06e" />
+      <stop offset="100%" stop-color="#ffd400" />
+    </linearGradient>
+  </defs>
+  <polygon points="160,8 310,68 160,112 10,68" fill="none" stroke="url(#g3)" stroke-width="6"/>
+  <circle cx="160" cy="68" r="18" fill="url(#g3)"/>
+  <text x="160" y="102" text-anchor="middle" fill="#eaffff" font-family="Arial Black, Arial" font-size="18">ATLANTIPLEX</text>
+</svg>

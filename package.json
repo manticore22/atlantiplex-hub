@@ -1,0 +1,31 @@
+{
+  "name": "atlantiplex-studio",
+  "version": "1.0.0",
+  "description": "Atlantiplex Studio - Matrix Broadcasting Platform",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run frontend:dev\"",
+    "server:dev": "cd matrix-studio/web/stage && npm start",
+    "frontend:dev": "cd matrix-studio/web/frontend && npm run dev",
+    "build": "cd matrix-studio/web/frontend && npm run build",
+    "test": "python pre_flight_test.py",
+    "test:full": "npm run test && npm run test:e2e",
+    "test:e2e": "echo 'Run E2E tests with: npx playwright test'",
+    "deploy:railway": "railway up",
+    "deploy:vercel": "cd matrix-studio/web/frontend && vercel --prod",
+    "deploy:render": "echo 'Deploy via Render dashboard'",
+    "deploy:fly": "fly deploy",
+    "docker:build": "docker build -t atlantiplex-studio .",
+    "docker:run": "docker run -p 9001:9001 -p 5173:5173 atlantiplex-studio",
+    "setup": "npm run setup:backend && npm run setup:frontend",
+    "setup:backend": "cd matrix-studio/web/stage && npm install",
+    "setup:frontend": "cd matrix-studio/web/frontend && npm install",
+    "batch-test": "./scripts/batch_clean_and_run.sh",
+    "build-and-push": "./scripts/build_and_push.sh"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

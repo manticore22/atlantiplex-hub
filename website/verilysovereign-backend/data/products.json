@@ -1,0 +1,91 @@
+[
+  {
+    "id": "atlantiplex-studio-initiates",
+    "name": "TIER I — INITIATE ACCESS",
+    "description": "Free streaming tier",
+    "longDescription": "2 panelists, 16 hours/month, 720p, stream to YouTube/Twitch, basic overlays, chat, limited scene switching.",
+    "status": "active",
+    "priceId": null,
+    "monthly": 0,
+    "monthly_id": null,
+    "yearly": 0,
+    "yearly_id": null,
+    "features": [
+      "2 Panelists",
+      "16 Hours/Month",
+      "720p Resolution",
+      "Stream to YouTube/Twitch",
+      "Basic overlays",
+      "Basic chat tools",
+      "Limited scene switching"
+    ]
+  },
+  {
+    "id": "atlantiplex-studio-ascendant",
+    "name": "TIER II — STUDIO ASCENDANT",
+    "description": "$4.99/month",
+    "longDescription": "Up to 6 guests, 1080p, 70+ hours/month, director-grade scene switching, multi-layout control, AI tools, multistream to YouTube + Twitch.",
+    "status": "active",
+    "priceId": null,
+    "monthly": 499,
+    "monthly_id": "price_atlantiplex_ascendant_monthly",
+    "yearly": 11000,
+    "yearly_id": "price_atlantiplex_ascendant_yearly",
+    "features": [
+      "Up to 6 Guests/Panelists",
+      "1080p streaming",
+      "70+ Hours/Month",
+      "Director-grade scene switching",
+      "Multi-layout control",
+      "Custom overlays + transitions",
+      "Multistream to YouTube + Twitch",
+      "Automata AI tools"
+    ]
+  },
+  {
+    "id": "atlantiplex-studio-sovereign",
+    "name": "TIER III — SOVEREIGN BROADCAST",
+    "description": "$40/month",
+    "longDescription": "Up to 8 guests, 1080p, 200 hours/month, director-grade scene switching, multi-layout control, AI tools, multistream.",
+    "status": "active",
+    "priceId": null,
+    "monthly": 4000,
+    "monthly_id": "price_atlantiplex_sovereign_monthly",
+    "yearly": 15000,
+    "yearly_id": "price_atlantiplex_sovereign_yearly",
+    "features": [
+      "Up to 8 Guests",
+      "1080p",
+      "200 Hours/Month",
+      "Director-grade scene switching",
+      "Multi-layout control",
+      "Custom overlays + transitions",
+      "Multistream to YouTube + Twitch",
+      "Automata AI tools"
+    ]
+  },
+  {
+    "id": "atlantiplex-studio-infinite",
+    "name": "TIER IV — INFINITE RELAY",
+    "description": "$70/month",
+    "longDescription": "Up to 8 guests, 4K, unlimited hours, white-label studio, multistream, AI suite, priority routing.",
+    "status": "active",
+    "priceId": null,
+    "monthly": 7000,
+    "monthly_id": "price_atlantiplex_infinite_monthly",
+    "yearly": 21000,
+    "yearly_id": "price_atlantiplex_infinite_yearly",
+    "features": [
+      "Up to 8 Guests",
+      "4K",
+      "Unlimited Hours",
+      "White-label Studio",
+      "Multistream to YouTube + Twitch",
+      "Director-grade scene switching",
+      "Multi-layout control",
+      "Custom overlays + branding",
+      "Automata AI suite",
+      "Priority routing"
+    ]
+  }
+]

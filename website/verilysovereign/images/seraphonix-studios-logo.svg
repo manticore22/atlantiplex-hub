@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <!-- Flame gradient -->
+    <linearGradient id="flameGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff6600;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ffaa00;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffcc00;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Eye gradient -->
+    <radialGradient id="eyeGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffdd00;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#ff8800;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#cc0000;stop-opacity:1" />
+    </radialGradient>
+    
+    <!-- Diamond gradient -->
+    <linearGradient id="diamondGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f0ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#d4a017;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ff00aa;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Glow filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background circle (optional) -->
+  <circle cx="100" cy="85" r="70" fill="none" stroke="url(#diamondGrad)" stroke-width="1" opacity="0.3"/>
+  
+  <!-- Diamond / Occult Symbol -->
+  <polygon 
+    points="100,20 170,85 100,150 30,85" 
+    fill="none" 
+    stroke="url(#diamondGrad)" 
+    stroke-width="2"
+    filter="url(#glow)"
+  />
+  
+  <!-- Inner diamond -->
+  <polygon 
+    points="100,35 150,85 100,135 50,85" 
+    fill="none" 
+    stroke="url(#diamondGrad)" 
+    stroke-width="1"
+    opacity="0.7"
+  />
+  
+  <!-- Eye shape -->
+  <ellipse cx="100" cy="85" rx="35" ry="20" fill="none" stroke="#00f0ff" stroke-width="2" filter="url(#glow)"/>
+  
+  <!-- Eye pupil -->
+  <circle cx="100" cy="85" r="12" fill="url(#eyeGrad)" filter="url(#glow)"/>
+  
+  <!-- Flames inside eye -->
+  <path d="M95,88 Q90,80 93,72 Q88,78 90,68" fill="url(#flameGrad)" opacity="0.9">
+    <animate attributeName="d" dur="0.5s" repeatCount="indefinite"
+      values="M95,88 Q90,80 93,72 Q88,78 90,68;M95,88 Q92,79 94,70 Q89,77 91,66;M95,88 Q90,80 93,72 Q88,78 90,68"/>
+  </path>
+  <path d="M105,88 Q110,80 107,72 Q112,78 110,68" fill="url(#flameGrad)" opacity="0.9">
+    <animate attributeName="d" dur="0.5s" repeatCount="indefinite"
+      values="M105,88 Q110,80 107,72 Q112,78 110,68;M105,88 Q108,79 106,70 Q111,77 109,66;M105,88 Q110,80 107,72 Q112,78 110,68"/>
+  </path>
+  <path d="M100,90 L97,75 L100,70 L103,75 Z" fill="url(#flameGrad)" opacity="0.8">
+    <animate attributeName="d" dur="0.3s" repeatCount="indefinite"
+      values="M100,90 L97,75 L100,70 L103,75 Z;M100,90 L96,73 L100,67 L104,73 Z;M100,90 L97,75 L100,70 L103,75 Z"/>
+  </path>
+  
+  <!-- Text beneath -->
+  <text x="100" y="175" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="14" font-weight="900" letter-spacing="3" fill="#00f0ff">SERAPHONIX</text>
+  <text x="100" y="188" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" letter-spacing="4" fill="#d4a017">STUDIOS</text>
+</svg>

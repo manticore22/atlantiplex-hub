@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RE-ENTER — Seraphonix</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="icon" type="image/svg+xml" href="images/seraphonix-icon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <img src="images/seraphonix-studios-logo.svg" alt="Seraphonix" class="auth-logo" style="max-width: 200px; margin-bottom: 20px;">
+                <h1 class="auth-title">RE-ENTER</h1>
+                <p class="auth-subtitle">Re-establish your clearance</p>
+            </div>
+
+            <form id="login-form" class="auth-form">
+                <div class="form-group">
+                    <label for="email">TRANSMISSION ID</label>
+                    <input type="email" id="email" name="email" placeholder="your@transmission.id" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">ACCESS KEY</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                </div>
+
+                <div class="form-error" id="login-error"></div>
+
+                <button type="submit" class="auth-btn">
+                    <span class="btn-text">AUTHENTICATE</span>
+                    <span class="btn-glyph">◇</span>
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>No clearance? <a href="/signup.html">INITIATE NEW IDENTITY</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts/auth.js"></script>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('login-error');
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    localStorage.setItem('seraphonix_token', data.token);
+                    localStorage.setItem('seraphonix_user', JSON.stringify(data.user));
+                    window.location.href = '/';
+                } else {
+                    errorEl.textContent = data.error || 'Authentication failed';
+                }
+            } catch (err) {
+                errorEl.textContent = 'Connection error. Try again.';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  # Ollama AI Service
+  ollama:
+    image: ollama/ollama:latest
+    container_name: atlantiplex-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - atlantiplex-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Atlantiplex Web Server
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: atlantiplex-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-dolphin-llama3:30b}
+    volumes:
+      # Development: enable hot reload with bind mounts
+      - ./index.html:/app/index.html
+      - ./chat.js:/app/chat.js
+      - ./script.js:/app/script.js
+      - ./styles.css:/app/styles.css
+      - ./server.js:/app/server.js
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      - atlantiplex-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/status', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Nginx Reverse Proxy (optional)
+  nginx:
+    image: nginx:alpine
+    container_name: atlantiplex-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - atlantiplex-network
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Seraphonix API Server (existing backend)
+  seraphonix-api:
+    build:
+      context: ./verilysovereign-backend
+      dockerfile: Dockerfile
+    container_name: seraphonix-api
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - JWT_SECRET=${JWT_SECRET:-seraphonix-secret-change-in-production}
+      - STRIPE_SECRET=${STRIPE_SECRET:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+      - FRONTEND_URL=${FRONTEND_URL:-https://verilysovereign.org}
+    volumes:
+      - seraphonix-data:/app/data
+    networks:
+      - atlantiplex-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  ollama-data:
+  seraphonix-data:
+
+networks:
+  atlantiplex-network:
+    driver: bridge

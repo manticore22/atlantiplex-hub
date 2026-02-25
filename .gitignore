@@ -97,3 +97,7 @@ Thumbs.db
 
 # Archives (keep docs only)
 archived/
+*.pem
+*.key
+secrets/
+credentials/

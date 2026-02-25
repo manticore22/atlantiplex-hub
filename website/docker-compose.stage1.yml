@@ -1,0 +1,53 @@
+version: '3.8'
+services:
+  frontend:
+    image: nginx:alpine
+    container_name: seraphonix-frontend-stage1
+    restart: unless-stopped
+    volumes:
+      - ./verilysovereign:/usr/share/nginx/html:ro
+    networks:
+      - seraphonix-network
+  seraphonix-api:
+    build:
+      context: ./verilysovereign-backend
+      dockerfile: Dockerfile
+    container_name: seraphonix-api-stage1
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - FRONTEND_URL=https://verilysovereign.org
+    volumes:
+      - seraphonix-data:/app/data
+    networks:
+      - seraphonix-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+  nginx:
+    image: nginx:alpine
+    container_name: seraphonix-nginx-stage1
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-stage1.conf:/etc/nginx/nginx.conf:ro
+      - ./verilysovereign:/var/www/verilysovereign:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - seraphonix-api
+    networks:
+      - seraphonix-network
+
+volumes:
+  seraphonix-data:
+
+networks:
+  seraphonix-network:
+    driver: bridge

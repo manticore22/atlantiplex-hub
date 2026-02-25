@@ -1,0 +1,192 @@
+/* Neon Theme Overrides - Atlantiplex */
+/* Additional neon enhancements layered on top of core styles */
+
+:root {
+    --neon-primary: #00fff2;
+    --neon-secondary: #00ffd8;
+    --neon-accent: #00ff41;
+}
+
+/* Studio Center Hub */
+.studio-center {
+    padding: 40px 0 20px;
+    position: relative;
+    z-index: 4;
+}
+
+.studio-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: min(1100px, 92vw);
+    justify-items: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+/* Neon Tiles */
+.neon-tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 24px;
+    min-width: 140px;
+    border-radius: 10px;
+    border: 2px solid rgba(0, 255, 242, 0.6);
+    color: #eaffff;
+    text-decoration: none;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 15px rgba(0, 255, 242, 0.5), inset 0 0 15px rgba(0, 255, 242, 0.05);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.neon-tile:hover {
+    transform: translateY(-3px);
+    border-color: #00ffea;
+    box-shadow: 0 8px 40px rgba(0, 255, 242, 0.8), inset 0 0 20px rgba(0, 255, 242, 0.1);
+    text-shadow: 0 0 10px #00fff2;
+}
+
+.neon-tile:focus-visible {
+    outline: 3px solid #00fff2;
+    outline-offset: 3px;
+}
+
+/* Portal Tile */
+.portal-tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 10px solid #0ff;
+    box-shadow: 0 0 80px #0ff, inset 0 0 40px rgba(0, 255, 242, 0.3);
+    background: radial-gradient(circle at center, rgba(0, 255, 242, 0.15), transparent 70%);
+    animation: portalPulse 6s ease-in-out infinite;
+    position: relative;
+}
+
+@keyframes portalPulse {
+    0%, 100% { 
+        transform: scale(1); 
+        box-shadow: 0 0 80px #0ff, inset 0 0 40px rgba(0, 255, 242, 0.3);
+    }
+    50% { 
+        transform: scale(1.03); 
+        box-shadow: 0 0 100px #0ff, inset 0 0 50px rgba(0, 255, 242, 0.4);
+    }
+}
+
+/* Portal Caption */
+.portal-caption {
+    text-align: center;
+    margin-top: 16px;
+    font-family: monospace;
+    color: #0ff;
+    font-size: 1.1rem;
+    text-shadow: 0 0 10px #0ff;
+    letter-spacing: 2px;
+}
+
+/* Glow utilities */
+.glow-hero {
+    text-shadow: 0 0 20px rgba(0, 255, 242, 0.9), 0 0 40px rgba(0, 255, 242, 0.5);
+    animation: glowPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0%, 100% { text-shadow: 0 0 20px rgba(0, 255, 242, 0.9), 0 0 40px rgba(0, 255, 242, 0.5); }
+    50% { text-shadow: 0 0 30px rgba(0, 255, 242, 1), 0 0 60px rgba(0, 255, 242, 0.7); }
+}
+
+/* Neon button enhancements */
+.cta-primary, .brand-link, .tentacle-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-primary::before, .brand-link::before, .tentacle-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.cta-primary:hover::before, .brand-link:hover::before, .tentacle-btn:hover::before {
+    left: 100%;
+}
+
+/* Card glow on hover */
+.brand-card {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.brand-card:hover {
+    border-color: var(--neon-primary);
+    box-shadow: 0 20px 60px rgba(0, 255, 242, 0.3), 0 0 30px rgba(0, 255, 242, 0.2);
+}
+
+/* Nav link glow */
+.nav-link::after {
+    background: linear-gradient(90deg, var(--neon-primary), var(--neon-secondary));
+    box-shadow: 0 0 10px var(--neon-primary);
+}
+
+/* [data-theme="neon"] - Enhanced neon mode */
+[data-theme="neon"] {
+    --blue: #00ffd8;
+    --aqua: #00fff2;
+    --glow-blue: #00ffd8;
+    --teal: #39ffd6;
+    --navy: #001515;
+    --deep-navy: #000a0a;
+}
+
+[data-theme="neon"] .brand-card {
+    border-color: rgba(0, 255, 242, 0.4);
+}
+
+[data-theme="neon"] .brand-card:hover {
+    border-color: #00ffff;
+    box-shadow: 0 25px 80px rgba(0, 255, 255, 0.4);
+}
+
+[data-theme="neon"] .hero-title {
+    text-shadow: 
+        0 0 40px rgba(0, 255, 242, 0.9),
+        0 0 80px rgba(0, 255, 242, 0.5),
+        0 0 120px rgba(0, 255, 242, 0.3);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .portal-tile {
+        animation: none;
+    }
+    .neon-tile {
+        transition: none;
+    }
+}
+
+/* Mobile responsive */
+@media (max-width: 700px) {
+    .studio-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .portal-tile {
+        grid-column: span 2;
+        justify-self: center;
+    }
+    .neon-tile {
+        min-width: 120px;
+        padding: 12px 16px;
+        font-size: 0.9rem;
+    }
+}

@@ -1,0 +1,160 @@
+# .dockerignore - Excludes files from Docker build context to reduce layer size and build time
+
+# Version control
+.git
+.gitignore
+.gitattributes
+.github
+
+# Documentation and guides
+*.md
+*.MD
+docs
+docs/**
+DEPLOYMENT_*.md
+DOCKERFILE_*.md
+DOCKER_*.md
+*_SUMMARY.md
+QUICK_*.md
+LAUNCH_*.md
+K8S_*.md
+KUBERNETES_*.md
+SECURITY_*.md
+COMPLETE_*.md
+PRE_*.md
+MASTER_*.md
+TEST_RESULTS_*.md
+PRODUCTION_*.md
+BARE_METAL_*.md
+HOSTINGER_*.md
+ATLANTIPLEX_*.md
+BEFORE_AFTER_*.md
+BRAND_*.md
+CI_CD_*.md
+CONTAINERIZATION_*.md
+DEPLOYMENT_*.md
+E2E_TEST_*.md
+ENHANCED_*.md
+ENHANCEMENT_*.md
+GITHUB_*.md
+LIVESTREAM_*.md
+MATRIX_*.md
+OPTIMIZATION_*.md
+QUICK_*.md
+API_DOCUMENTATION.md
+ARCHITECTURE_MULTI_APP.md
+BUILD_AND_RUN.md
+README.md
+LICENSE
+
+# Environment files (use Docker secrets/env_file)
+.env
+.env.*
+!.env.example
+.env.local
+.env.production.template
+
+# Node.js
+node_modules
+npm-debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+.npm
+dist
+build
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+env
+venv
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis
+.pytest_cache
+*.egg-info
+dist
+build
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+*.sublime-project
+*.sublime-workspace
+.editorconfig
+
+# Testing
+tests
+test
+specs
+.mocha
+.nyc_output
+coverage
+cypress/screenshots
+cypress/videos
+
+# CI/CD
+.travis.yml
+.gitlab-ci.yml
+Jenkinsfile
+.circleci
+
+# Archives and backups
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.backup
+*.bak
+
+# Temporary files
+tmp
+temp
+.tmp
+*.log
+*.swp
+*.swo
+
+# Docker files (don't need originals in final image)
+Dockerfile
+Dockerfile.*
+docker-compose*.yml
+.dockerignore
+
+# Build scripts
+*.sh
+*.bat
+*.ps1
+Makefile
+
+# Archive and package directories
+archive
+archive/**
+
+# Data directories (often large)
+data
+data/**
+
+# Cache
+.cache
+.next
