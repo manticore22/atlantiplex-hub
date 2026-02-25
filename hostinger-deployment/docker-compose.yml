@@ -1,0 +1,220 @@
+version: '3.9'
+
+# Hostinger VPS Deployment - Production Configuration
+# Minimal, optimized setup for Hostinger shared/VPS hosting
+# Domains: 
+#   - Website: www.atlantiplex.com (or your domain)
+#   - Studio: studio.atlantiplex.com
+#   - API: api.atlantiplex.com
+
+services:
+  # Nginx Reverse Proxy & Load Balancer
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: atlantiplex-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./hostinger-deployment/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./hostinger-deployment/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./hostinger-deployment/ssl:/etc/nginx/ssl:ro
+      - website_build:/usr/share/nginx/html/website:ro
+      - studio_build:/usr/share/nginx/html/studio:ro
+    depends_on:
+      - website
+      - studio
+      - api
+    networks:
+      - atlantiplex-net
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - TZ=UTC
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: atlantiplex-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-atlantiplex}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?error: DB_PASSWORD required}
+      POSTGRES_DB: ${DB_NAME:-atlantiplex}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - atlantiplex-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-atlantiplex}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    security_opt:
+      - no-new-privileges:true
+    read_only: false
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: atlantiplex-redis
+    restart: always
+    command: >
+      redis-server
+      --appendonly yes
+      --appendfsync everysec
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --requirepass ${REDIS_PASSWORD:?error: REDIS_PASSWORD required}
+    volumes:
+      - redis_data:/data
+    networks:
+      - atlantiplex-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+
+  # Static Website (Build + Serve)
+  website:
+    build:
+      context: ./website
+      dockerfile: Dockerfile
+    image: atlantiplex-website:${IMAGE_TAG:-latest}
+    container_name: atlantiplex-website
+    restart: always
+    expose:
+      - "3000"
+    networks:
+      - atlantiplex-net
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - website_build:/app/dist
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  # Atlantiplex Studio (Build + Serve)
+  studio:
+    build:
+      context: ./AtlantiplexStudio
+      dockerfile: Dockerfile
+    image: atlantiplex-studio:${IMAGE_TAG:-latest}
+    container_name: atlantiplex-studio
+    restart: always
+    expose:
+      - "80"
+    networks:
+      - atlantiplex-net
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - studio_build:/usr/share/nginx/html
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  # Flask API Backend
+  api:
+    build:
+      context: ./matrix-studio
+      dockerfile: Dockerfile.python
+    image: atlantiplex-api:${IMAGE_TAG:-latest}
+    container_name: atlantiplex-api
+    restart: always
+    expose:
+      - "5000"
+    networks:
+      - atlantiplex-net
+    environment:
+      FLASK_ENV: production
+      FLASK_PORT: 5000
+      PYTHONUNBUFFERED: 1
+      PYTHONDONTWRITEBYTECODE: 1
+      DATABASE_URL: postgresql://${DB_USER:-atlantiplex}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-atlantiplex}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      JWT_SECRET_KEY: ${JWT_SECRET:?error: JWT_SECRET required}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:?error: STRIPE_SECRET_KEY required}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:?error: STRIPE_WEBHOOK_SECRET required}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    volumes:
+      - api_logs:/app/logs
+      - api_recordings:/app/core/recordings
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  website_build:
+    driver: local
+  studio_build:
+    driver: local
+  api_logs:
+    driver: local
+  api_recordings:
+    driver: local
+
+networks:
+  atlantiplex-net:
+    driver: bridge

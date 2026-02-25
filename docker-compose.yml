@@ -1,5 +1,6 @@
+version: '3.9'
+
 services:
-  # PostgreSQL Database with security hardening
   postgres:
     image: postgres:15-alpine
     container_name: atlantiplex-postgres
@@ -29,8 +30,7 @@ services:
       - CHOWN
       - SETGID
       - SETUID
-
-  # Redis Cache & Session Store
+  
   redis:
     image: redis:7-alpine
     container_name: atlantiplex-redis
@@ -55,100 +55,77 @@ services:
     cap_drop:
       - ALL
     cap_add:
-      - SETUID
-      - SETGID
+      - NET_ADMIN
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
-  # Node.js Stage Server (WebSocket + API)
   stage-server:
-    build:
-      context: ./matrix-studio/web/stage
-      dockerfile: Dockerfile
-    image: atlantiplex-stage:latest
+    image: docker.io/manticore313/website_and_studio:stage
     container_name: atlantiplex-stage
     restart: unless-stopped
-    environment:
-      NODE_ENV: production
-      PORT: 9001
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-change-me-in-production}
-      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
-      STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY}
-      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
-      DATABASE_URL: postgresql://${DB_USER:-atlantiplex}:${DB_PASSWORD:-change-me-in-production}@postgres:5432/${DB_NAME:-atlantiplex}
-      REDIS_URL: redis://:${REDIS_PASSWORD:-change-me-in-production}@redis:6379/0
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
-      LOG_LEVEL: info
-      NODE_OPTIONS: --max-old-space-size=512
-    ports:
-      - "9001:9001"
-    volumes:
-      - stage_logs:/app/logs
-      - stage_uploads:/app/uploads
+    expose:
+      - "9001"
     networks:
       - atlantiplex-network
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - postgres
+      - redis
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9001/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add:
-      - NET_BIND_SERVICE
 
-  # Python Flask Backend
   flask-backend:
-    build:
-      context: ./matrix-studio
-      dockerfile: Dockerfile.python
-    image: atlantiplex-flask:latest
+    image: docker.io/manticore313/website_and_studio:flask
     container_name: atlantiplex-flask
     restart: unless-stopped
-    environment:
-      FLASK_ENV: production
-      FLASK_PORT: 5000
-      DATABASE_URL: postgresql://${DB_USER:-atlantiplex}:${DB_PASSWORD:-change-me-in-production}@postgres:5432/${DB_NAME:-atlantiplex}
-      JWT_SECRET_KEY: ${JWT_SECRET}
-      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
-      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
-      REDIS_URL: redis://:${REDIS_PASSWORD:-change-me-in-production}@redis:6379/1
-      LOG_LEVEL: INFO
-      PYTHONUNBUFFERED: 1
-      PYTHONDONTWRITEBYTECODE: 1
-    ports:
-      - "5000:5000"
-    volumes:
-      - flask_logs:/app/logs
-      - flask_recordings:/app/core/recordings
+    expose:
+      - "5000"
     networks:
       - atlantiplex-network
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - postgres
+      - redis
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5000/api/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add:
-      - NET_BIND_SERVICE
 
-  # Nginx Reverse Proxy & Load Balancer
+  website:
+    image: docker.io/manticore313/website_and_studio:website
+    container_name: atlantiplex-website
+    restart: unless-stopped
+    expose:
+      - "80"
+    networks:
+      - atlantiplex-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  studio:
+    image: docker.io/manticore313/website_and_studio:studio
+    container_name: atlantiplex-studio
+    restart: unless-stopped
+    expose:
+      - "80"
+    networks:
+      - atlantiplex-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   nginx:
     image: nginx:1.25-alpine
     container_name: atlantiplex-nginx
@@ -160,7 +137,6 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/sites-enabled:/etc/nginx/sites-enabled:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
-      - frontend_build:/usr/share/nginx/html:ro
     networks:
       - atlantiplex-network
     depends_on:
@@ -173,43 +149,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - SETGID
-      - SETUID
-      - NET_BIND_SERVICE
-    tmpfs:
-      - /var/run
-      - /var/cache/nginx
-      - /var/log/nginx
-
-  # Frontend Builder (builds static files once at startup)
-  frontend-builder:
-    build:
-      context: ./matrix-studio/web/frontend
-      dockerfile: Dockerfile
-    image: atlantiplex-frontend:latest
-    container_name: atlantiplex-frontend-builder
-    volumes:
-      - frontend_build:/usr/share/nginx/html
-    environment:
-      VITE_API_URL: ${API_URL:-http://localhost}
-      VITE_STRIPE_KEY: ${STRIPE_PUBLISHABLE_KEY}
-      NODE_ENV: production
-      NODE_OPTIONS: --max-old-space-size=256
-    command: npm run build
-    networks:
-      - atlantiplex-network
-    profiles:
-      - build
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
 
 volumes:
   postgres_data:
@@ -223,10 +162,6 @@ volumes:
   flask_logs:
     driver: local
   flask_recordings:
-    driver: local
-  frontend_build:
-    driver: local
-  nginx_logs:
     driver: local
 
 networks:

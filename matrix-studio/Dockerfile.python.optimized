@@ -1,53 +1,49 @@
-# Python Flask Backend - Production Optimized
+# Python Flask Backend - Production Optimized Multi-stage Build
 FROM python:3.11-alpine AS builder
 
 WORKDIR /app
 
-# Install build dependencies only (minimal layer)
+# Install build dependencies only (will be removed in final image)
 RUN apk add --no-cache \
     gcc \
     musl-dev \
     libffi-dev \
-    openssl-dev
+    openssl-dev && \
+    rm -rf /var/cache/apk/*
 
-# Copy requirements first for better caching
+# Copy requirements
 COPY requirements.txt .
 
-# Install Python dependencies with BuildKit cache mount
+# Install Python dependencies with BuildKit cache
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip setuptools wheel && \
     pip install --user --no-cache-dir -r requirements.txt
 
-# Cleanup build artifacts in builder stage
-RUN find /root/.local -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true && \
-    find /root/.local -type f -name "*.pyc" -delete
-
-# Runtime stage - minimal with only dependencies
+# Runtime stage - minimal image with only runtime dependencies
 FROM python:3.11-alpine
 
 WORKDIR /app
 
-# Install only runtime dependencies (no dev tools, no curl since we use curl from Alpine for health check)
+# Install runtime dependencies only (no build tools) and clean cache
 RUN apk add --no-cache \
     libffi \
     openssl \
     postgresql-client \
-    dumb-init
+    dumb-init \
+    curl && \
+    rm -rf /var/cache/apk/*
 
-# Clean apk cache
-RUN rm -rf /var/cache/apk/*
-
-# Create non-root user with no shell access for security
+# Create non-root user for security with no shell access
 RUN addgroup -g 1001 -S appuser && \
     adduser -S appuser -u 1001 -h /nonexistent -s /sbin/nologin
 
-# Copy compiled Python dependencies from builder
+# Copy Python dependencies from builder with proper ownership
 COPY --from=builder --chown=appuser:appuser /root/.local /home/appuser/.local
 
-# Copy application code
+# Copy application code (exclude docs, tests, git, cache)
 COPY --chown=appuser:appuser . .
 
-# Remove unnecessary files from app code (keep only runtime essentials)
+# Exclude unnecessary files to reduce image size
 RUN rm -rf \
     .git \
     .gitignore \
@@ -56,31 +52,40 @@ RUN rm -rf \
     docs \
     __pycache__ \
     .pytest_cache \
-    .venv
+    .venv \
+    .env* && \
+    find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true && \
+    find . -type f -name "*.pyc" -delete && \
+    find . -type f -name "*.pyo" -delete
 
-# Ensure application directories exist with proper permissions
+# Create application directories with proper permissions
 RUN mkdir -p logs core/recordings && \
-    chown -R appuser:appuser logs core/recordings . && \
+    chown -R appuser:appuser . && \
     chmod 755 logs core/recordings
 
-# Set Python environment variables for production
+# Metadata
+LABEL maintainer="Atlantiplex Team" \
+      version="1.0" \
+      description="Flask Backend - API Server"
+
+# Set Python environment variables for optimal production performance
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONHASHSEED=random \
     PATH=/home/appuser/.local/bin:$PATH \
     FLASK_ENV=production \
-    FLASK_APP=app \
-    PYTHONHASHSEED=random
+    FLASK_APP=app
 
-# Expose application port
+# Expose port
 EXPOSE 5000
 
-# Switch to non-root user before running
+# Switch to non-root user
 USER appuser
 
-# Health check using Python HTTP client (no external tool dependency)
+# Health check with short timeout (curl is already available)
 HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
-    CMD python -c "import http.client; conn = http.client.HTTPConnection('localhost', 5000, timeout=5); conn.request('GET', '/api/health'); r = conn.getresponse(); exit(0 if r.status == 200 else 1)" || exit 1
+    CMD curl -f http://localhost:5000/api/health || exit 1
 
-# Use dumb-init to properly handle signals (SIGTERM, SIGINT)
+# Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["python", "-m", "flask", "run", "--host=0.0.0.0"]
