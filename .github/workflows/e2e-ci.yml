@@ -36,6 +36,17 @@ jobs:
           npm audit --json > npm-audit.json || true
           npm audit fix || true
 
+      - name: Python security checks
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade pip-audit
+          if [ -f requirements.txt ]; then
+            python -m pip install -r requirements.txt || true
+            pip-audit -r requirements.txt > python-audit.txt || true
+          else
+            pip-audit > python-audit.txt || true
+          fi
+
       - name: Prepare docker-compose override
         run: |
           mkdir -p .
@@ -66,6 +77,22 @@ jobs:
         with:
           name: e2e-endpoints-summary
           path: test_endpoints_summary.json
+
+      - name: Upload npm audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit
+          path: npm-audit.json
+          if-no-files-found: ignore
+
+      - name: Upload Python audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-audit
+          path: python-audit.txt
+          if-no-files-found: ignore
 
       - name: Upload Playwright desktop failure artifact
         if: always()
