@@ -1,5 +1,5 @@
 /* Atlantiplex - Seraphonix Studios */
-/* Underwater Theme Styles */
+/* Enhanced Underwater Theme Styles with Advanced Animations */
 
 :root {
     --navy: #001F3F;
@@ -13,6 +13,7 @@
     --glow-blue: #00d4ff;
     --glass-bg: rgba(0, 116, 217, 0.15);
     --glass-border: rgba(127, 219, 255, 0.3);
+    --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-theme="neon"] {
@@ -72,6 +73,7 @@
 
 html {
     scroll-behavior: smooth;
+    scroll-padding-top: 80px;
 }
 
 body {
@@ -81,6 +83,374 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
+}
+
+/* ===== MAIN NAVIGATION ===== */
+.main-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: linear-gradient(180deg, rgba(0, 15, 30, 0.95), rgba(0, 15, 30, 0.8));
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(127, 219, 255, 0.15);
+    transition: all 0.4s var(--transition-smooth);
+}
+
+.main-nav.scrolled {
+    background: rgba(0, 15, 30, 0.98);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 70px;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--aqua);
+    font-weight: 700;
+    font-size: 1.3rem;
+    transition: all 0.3s ease;
+}
+
+.nav-logo:hover {
+    text-shadow: 0 0 20px var(--glow-blue);
+    transform: scale(1.02);
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    animation: logoRotate 20s linear infinite;
+}
+
+@keyframes logoRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 35px;
+    align-items: center;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    position: relative;
+    padding: 8px 0;
+    transition: all 0.3s ease;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--teal), var(--aqua));
+    transition: width 0.3s var(--transition-smooth);
+}
+
+.nav-link:hover {
+    color: var(--aqua);
+    text-shadow: 0 0 15px var(--glow-blue);
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.nav-toggle span {
+    width: 25px;
+    height: 2px;
+    background: var(--aqua);
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+    }
+    .nav-toggle {
+        display: flex;
+    }
+}
+
+/* ===== HERO SECTION ===== */
+.hero-section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 20px 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content {
+    text-align: center;
+    z-index: 2;
+    animation: heroFadeIn 1s ease-out;
+}
+
+@keyframes heroFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-title {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--aqua);
+    text-shadow: 0 0 40px var(--glow-blue), 0 0 80px rgba(0, 212, 255, 0.4);
+    margin-bottom: 20px;
+    animation: titlePulse 3s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+    0%, 100% { 
+        text-shadow: 0 0 40px var(--glow-blue), 0 0 80px rgba(0, 212, 255, 0.4);
+        transform: scale(1);
+    }
+    50% { 
+        text-shadow: 0 0 60px var(--glow-blue), 0 0 100px rgba(0, 212, 255, 0.6);
+        transform: scale(1.02);
+    }
+}
+
+.hero-subtitle {
+    font-size: 1.4rem;
+    color: var(--teal);
+    margin-bottom: 40px;
+    opacity: 0.9;
+    animation: subtitleFadeIn 1s ease-out 0.3s both;
+}
+
+@keyframes subtitleFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 0.9; transform: translateY(0); }
+}
+
+.hero-cta {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: ctaFadeIn 1s ease-out 0.6s both;
+}
+
+@keyframes ctaFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.cta-primary, .cta-secondary {
+    padding: 15px 40px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.4s var(--transition-smooth);
+}
+
+.cta-primary {
+    background: linear-gradient(135deg, var(--teal), var(--blue));
+    color: white;
+    box-shadow: 0 5px 30px rgba(0, 212, 255, 0.4);
+}
+
+.cta-primary:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 40px rgba(0, 212, 255, 0.6);
+}
+
+.cta-secondary {
+    background: transparent;
+    color: var(--aqua);
+    border: 2px solid var(--aqua);
+}
+
+.cta-secondary:hover {
+    background: rgba(127, 219, 255, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 25px rgba(127, 219, 255, 0.3);
+}
+
+.hero-visual {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.hero-orb {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 150px;
+    height: 150px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, var(--aqua), var(--blue), transparent);
+    border-radius: 50%;
+    animation: orbPulse 4s ease-in-out infinite;
+    box-shadow: 0 0 60px var(--glow-blue), 0 0 100px rgba(0, 212, 255, 0.5);
+}
+
+@keyframes orbPulse {
+    0%, 100% { 
+        transform: translate(-50%, -50%) scale(1);
+        box-shadow: 0 0 60px var(--glow-blue), 0 0 100px rgba(0, 212, 255, 0.5);
+    }
+    50% { 
+        transform: translate(-50%, -50%) scale(1.1);
+        box-shadow: 0 0 80px var(--glow-blue), 0 0 120px rgba(0, 212, 255, 0.7);
+    }
+}
+
+.hero-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border: 2px solid rgba(127, 219, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ring-1 {
+    width: 200px;
+    height: 200px;
+    animation: ringExpand 4s ease-in-out infinite;
+}
+
+.ring-2 {
+    width: 300px;
+    height: 300px;
+    animation: ringExpand 4s ease-in-out 0.5s infinite;
+    border-color: rgba(57, 204, 204, 0.2);
+}
+
+.ring-3 {
+    width: 400px;
+    height: 400px;
+    animation: ringExpand 4s ease-in-out 1s infinite;
+    border-color: rgba(0, 116, 217, 0.15);
+}
+
+@keyframes ringExpand {
+    0%, 100% { 
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+    }
+    50% { 
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 0.3;
+    }
+}
+
+.scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: var(--teal);
+    font-size: 0.85rem;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(10px); }
+}
+
+.scroll-arrow {
+    width: 20px;
+    height: 20px;
+    border-right: 2px solid var(--aqua);
+    border-bottom: 2px solid var(--aqua);
+    transform: rotate(45deg);
+    animation: arrowBounce 2s infinite;
+}
+
+@keyframes arrowBounce {
+    0%, 100% { opacity: 1; transform: rotate(45deg) translateY(0); }
+    50% { opacity: 0.5; transform: rotate(45deg) translateY(5px); }
+}
+
+/* ===== PARTICLES ===== */
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--aqua);
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: particleFloat linear infinite;
+}
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0;
+    }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.4; }
+    100% {
+        transform: translateY(-100vh) translateX(100px);
+        opacity: 0;
+    }
 }
 
 /* Animated Ocean Background */
@@ -425,18 +795,123 @@ svg.filters {
     text-align: center;
     font-size: 1.2rem;
     font-weight: 400;
-    padding: 30px 40px;
-    max-width: 600px;
+    padding: 40px 50px;
+    max-width: 800px;
     background: linear-gradient(135deg, rgba(0, 116, 217, 0.15), rgba(57, 204, 204, 0.1));
-    border-radius: 15px;
+    border-radius: 20px;
     border: 1px solid var(--glass-border);
     text-shadow: 0 0 20px rgba(127, 219, 255, 0.3);
     line-height: 1.8;
+    position: relative;
+    overflow: hidden;
+}
+
+.mission-glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(127, 219, 255, 0.1), transparent 50%);
+    animation: missionGlow 5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes missionGlow {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(10%, 10%); }
 }
 
 .mission-unified strong {
     color: var(--aqua);
     font-weight: 700;
+}
+
+/* ===== PRODUCTS SECTION ===== */
+.products-section {
+    padding: 60px 20px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    color: var(--aqua);
+    text-shadow: 0 0 30px var(--glow-blue);
+    margin-bottom: 50px;
+}
+
+.product-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.product-preview-card {
+    background: linear-gradient(135deg, rgba(0, 31, 63, 0.7), rgba(0, 60, 100, 0.5));
+    border-radius: 20px;
+    padding: 35px 25px;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: all 0.4s var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.product-preview-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(127, 219, 255, 0.1), transparent);
+    transition: left 0.6s ease;
+}
+
+.product-preview-card:hover::before {
+    left: 100%;
+}
+
+.product-preview-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    border-color: var(--aqua);
+    box-shadow: 0 20px 50px rgba(0, 212, 255, 0.3);
+}
+
+.preview-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.product-preview-card h3 {
+    color: var(--aqua);
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+}
+
+.product-preview-card p {
+    color: var(--teal);
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+    opacity: 0.9;
+}
+
+.preview-price {
+    display: inline-block;
+    padding: 8px 20px;
+    background: linear-gradient(135deg, var(--teal), var(--blue));
+    border-radius: 20px;
+    font-weight: 600;
+    color: white;
+    font-size: 1.1rem;
 }
 
 /* 3D Octagon Interface */

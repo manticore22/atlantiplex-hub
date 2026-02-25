@@ -11,11 +11,31 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
 </head>
 <body class="fade-in-loading neon-body">
+    <!-- Navigation Bar -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <svg viewBox="0 0 40 40" class="logo-icon"><circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="20" cy="20" r="8" fill="currentColor"/></svg>
+                <span>Atlantiplex</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#brands" class="nav-link">Brands</a></li>
+                <li><a href="#products" class="nav-link">Products</a></li>
+                <li><a href="#mission" class="nav-link">Mission</a></li>
+                <li><a href="lore.html" class="nav-link">Lore</a></li>
+                <li><a href="store.html" class="nav-link">Store</a></li>
+            </ul>
+            <button class="nav-toggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
     <!-- Neon Theme Toggle (experimental) -->
     <button id="theme-toggle" aria-label="Toggle Neon Theme" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; padding: 10px 14px; border-radius: 6px; border: 1px solid #0ff; background: #001021; color: #0ff; cursor: pointer;">Neon Theme</button>
     <!-- Animated Ocean Background -->
     <div class="ocean-bg"></div>
     <div class="light-rays"></div>
+    <div class="particles" id="particles"></div>
     
     <!-- SVG Filters for Wave Distortion -->
     <svg class="filters">
@@ -37,6 +57,46 @@
   <script>
     window.addEventListener('load', () => {
       document.body.classList.remove('fade-in-loading');
+    });
+    
+    // Navigation scroll effect
+    const mainNav = document.querySelector('.main-nav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 50) {
+        mainNav.classList.add('scrolled');
+      } else {
+        mainNav.classList.remove('scrolled');
+      }
+    });
+    
+    // Particle animation
+    (function createParticles() {
+      const container = document.getElementById('particles');
+      const particleCount = 30;
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        particle.style.animationDelay = (Math.random() * 's';
+        10) + particle.style.width = (Math.random() * 4 + 2) + 'px';
+        particle.style.height = particle.style.width;
+        container.appendChild(particle);
+      }
+    })();
+    
+    // Smooth scroll for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
     });
   </script>
 
@@ -91,8 +151,30 @@
 
     <!-- Main Content -->
     <main class="main-container">
+        <!-- Hero Section -->
+        <section class="hero-section" id="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Welcome to Atlantiplex</h1>
+                <p class="hero-subtitle">Three Brands. One Vision. Infinite Possibilities.</p>
+                <div class="hero-cta">
+                    <a href="#brands" class="cta-primary">Explore Brands</a>
+                    <a href="#mission" class="cta-secondary">Our Mission</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-orb"></div>
+                <div class="hero-ring ring-1"></div>
+                <div class="hero-ring ring-2"></div>
+                <div class="hero-ring ring-3"></div>
+            </div>
+            <div class="scroll-indicator">
+                <span>Scroll</span>
+                <div class="scroll-arrow"></div>
+            </div>
+        </section>
+        
         <!-- Brand Universe Showcase -->
-        <div class="brand-universe">
+        <div class="brand-universe" id="brands">
             <!-- Header -->
             <div class="universe-header">
                 <h1>Three Brands. One Vision.</h1>
@@ -155,10 +237,36 @@
             </div>
             
             <!-- Mission Statement -->
-            <div class="mission-unified">
+            <div class="mission-unified" id="mission">
+                <div class="mission-glow"></div>
                 <strong>Born from the flames of transformation,</strong> 
                 our unified vision dives into AI innovation to build the future from the depths of creativity—powered by three distinct identities working in harmony.
             </div>
+            
+            <!-- Products Section -->
+            <section class="products-section" id="products">
+                <h2 class="section-title">Featured Products</h2>
+                <div class="product-preview-grid">
+                    <div class="product-preview-card">
+                        <div class="preview-icon">🧠</div>
+                        <h3>AI Suite Pro</h3>
+                        <p>Advanced AI tools for automation</p>
+                        <span class="preview-price">$99/mo</span>
+                    </div>
+                    <div class="product-preview-card">
+                        <div class="preview-icon">⚡</div>
+                        <h3>Neural Engine</h3>
+                        <p>High-performance ML pipeline</p>
+                        <span class="preview-price">$149/mo</span>
+                    </div>
+                    <div class="product-preview-card">
+                        <div class="preview-icon">🌊</div>
+                        <h3>Deep Learning Kit</h3>
+                        <p>Complete AI development suite</p>
+                        <span class="preview-price">$199/mo</span>
+                    </div>
+                </div>
+            </section>
             
             <!-- Navigation Tentacles -->
             <div class="nav-tentacles">
