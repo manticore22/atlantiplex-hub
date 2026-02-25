@@ -10,7 +10,9 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
 </head>
-<body>
+    <body>
+    <!-- Neon Theme Toggle (experimental) -->
+    <button id="theme-toggle" aria-label="Toggle Neon Theme" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; padding: 10px 14px; border-radius: 6px; border: 1px solid #0ff; background: #001021; color: #0ff; cursor: pointer;">Neon Theme</button>
     <!-- Animated Ocean Background -->
     <div class="ocean-bg"></div>
     <div class="light-rays"></div>
@@ -31,6 +33,24 @@
             </filter>
         </defs>
     </svg>
+
+    <script>
+      (function(){
+        const btn = document.getElementById('theme-toggle');
+        const root = document.documentElement;
+        function applyTheme(theme){
+          root.setAttribute('data-theme', theme);
+          localStorage.setItem('theme', theme);
+        }
+        const saved = localStorage.getItem('theme') || 'default';
+        applyTheme(saved);
+        btn.addEventListener('click', () => {
+          const current = root.getAttribute('data-theme');
+          const next = current === 'neon' ? 'default' : 'neon';
+          applyTheme(next);
+        });
+      })();
+    </script>
 
     <!-- Background Coral Elements -->
     <div class="bg-elements">
