@@ -1,0 +1,87 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: flask-backend-pdb
+  namespace: atlantiplex
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: flask-backend
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: stage-server-pdb
+  namespace: atlantiplex
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: stage-server
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: frontend-pdb
+  namespace: atlantiplex
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: frontend
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: atlantiplex-quota
+  namespace: atlantiplex
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: "8Gi"
+    limits.cpu: "8"
+    limits.memory: "16Gi"
+    pods: "20"
+    services: "10"
+    persistentvolumeclaims: "5"
+  scopeSelector:
+    matchExpressions:
+    - operator: In
+      scopeName: PriorityClass
+      values:
+      - default
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: atlantiplex-limits
+  namespace: atlantiplex
+spec:
+  limits:
+  - type: Pod
+    max:
+      cpu: "2"
+      memory: "2Gi"
+    min:
+      cpu: "50m"
+      memory: "64Mi"
+    default:
+      cpu: "500m"
+      memory: "512Mi"
+    defaultRequest:
+      cpu: "250m"
+      memory: "256Mi"
+  - type: Container
+    max:
+      cpu: "1"
+      memory: "1Gi"
+    min:
+      cpu: "50m"
+      memory: "64Mi"
+    default:
+      cpu: "500m"
+      memory: "512Mi"
+    defaultRequest:
+      cpu: "250m"
+      memory: "256Mi"
