@@ -14,10 +14,14 @@ RUN apk add --no-cache \
 
 # Copy requirements
 COPY requirements.txt .
+COPY requirements_enhanced.txt .
 
 # Install Python dependencies with BuildKit cache
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip setuptools wheel && \
+    if [ -f requirements_enhanced.txt ]; then \
+      pip install --no-cache-dir -r requirements_enhanced.txt; \
+    fi && \
     pip install --user --no-cache-dir -r requirements.txt
 
 # Runtime stage - minimal image with only runtime dependencies

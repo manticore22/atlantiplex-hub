@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Studio Signups - Atlantiplex</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="neon.css">
+  <style>
+    body { background: #000a12; color: #e6f7ff; }
+    .container { max-width: 800px; margin: 40px auto; padding: 0 16px; }
+    h1 { color: #0ff; font-family: monospace; text-align: center; }
+    form { display: grid; gap: 12px; }
+    input, select, textarea { padding: 12px; border-radius: 8px; border: 1px solid #0ff; background: rgba(0,0,0,.5); color: #fff; }
+    button { padding: 12px 20px; border-radius: 8px; border: none; background: #00fff2; color: #00131a; font-weight: 700; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Studio Signups</h1>
+    <form>
+      <input type="text" placeholder="Your Name" aria-label="Your Name" />
+      <input type="email" placeholder="Email" aria-label="Email" />
+      <select aria-label="Role">
+        <option>Engineer</option>
+        <option>Designer</option>
+        <option>Researcher</option>
+        <option>Other</option>
+      </select>
+      <button type="submit">Get Notified</button>
+    </form>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
