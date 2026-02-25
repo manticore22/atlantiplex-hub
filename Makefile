@@ -196,3 +196,7 @@ docs:
 	@echo ""
 
 .DEFAULT_GOAL := help
+
+# Quick debugging: run end-to-end checks for signup and payments
+test-debug:
+	@bash ./test-debug.sh

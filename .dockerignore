@@ -1,101 +1,70 @@
-# Version Control
+# .dockerignore - Excludes files from Docker build context to reduce layer size and build time
+
+# Version control
 .git
 .gitignore
 .gitattributes
 .github
 
-# CI/CD
-.gitlab-ci.yml
-.circleci
-.travis.yml
-azure-pipelines.yml
+# Documentation and guides
+*.md
+*.MD
+docs
+docs/**
+DEPLOYMENT_*.md
+DOCKERFILE_*.md
+DOCKER_*.md
+*_SUMMARY.md
+QUICK_*.md
+LAUNCH_*.md
+K8S_*.md
+KUBERNETES_*.md
+SECURITY_*.md
+COMPLETE_*.md
+PRE_*.md
+MASTER_*.md
+TEST_RESULTS_*.md
+PRODUCTION_*.md
+BARE_METAL_*.md
+HOSTINGER_*.md
+ATLANTIPLEX_*.md
+BEFORE_AFTER_*.md
+BRAND_*.md
+CI_CD_*.md
+CONTAINERIZATION_*.md
+DEPLOYMENT_*.md
+E2E_TEST_*.md
+ENHANCED_*.md
+ENHANCEMENT_*.md
+GITHUB_*.md
+LIVESTREAM_*.md
+MATRIX_*.md
+OPTIMIZATION_*.md
+QUICK_*.md
+API_DOCUMENTATION.md
+ARCHITECTURE_MULTI_APP.md
+BUILD_AND_RUN.md
+README.md
+LICENSE
 
-# Package Managers & Lock Files
+# Environment files (use Docker secrets/env_file)
+.env
+.env.*
+!.env.example
+.env.local
+.env.production.template
+
+# Node.js
 node_modules
+npm-debug.log
 npm-debug.log*
-npm-error.log*
 yarn-debug.log*
 yarn-error.log*
-.npm
-.pnpm-debug.log*
-lerna-debug.log*
-pnpm-lock.yaml
+package-lock.json
 yarn.lock
-
-# IDE & Editor
-.vscode
-.vscode-server
-.idea
-*.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
-*.sublime-project
-*.sublime-workspace
-.prettierrc*
-.eslintrc*
-.editorconfig
-
-# Build Outputs
+.npm
 dist
 build
-coverage
-.nyc_output
-htmlcov
-*.tsbuildinfo
-.next
-out
-
-# Logs
-logs
-*.log
-lerna-debug.log*
-
-# Environment Files
-.env
-.env.local
-.env.*.local
-.env.development
-.env.test
-.env.production
-.env.example
-
-# Temporary & Cache Files
-tmp
-temp
-*.tmp
-*.bak
-.cache
-.eslintcache
-.parcel-cache
-.next
-out
-
-# Testing
-tests
-test
-cypress
-.mocha
-.jest
-playwright
-.coverage
-
-# Docker
-Dockerfile*
-docker-compose*.yml
-docker-compose*.yaml
-.dockerignore
-
-# Documentation & Assets
-*.md
-README*
-CHANGELOG*
-LICENSE*
-CONTRIBUTING*
-docs
-.docs
-*.pdf
 
 # Python
 __pycache__
@@ -103,104 +72,89 @@ __pycache__
 *$py.class
 *.so
 .Python
-egg-info/
-dist/
-*.egg
+env
+venv
 .venv
-env/
-venv/
-ENV/
-build/
-develop-eggs/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
 pip-log.txt
 pip-delete-this-directory.txt
-.tox/
+.tox
 .coverage
 .coverage.*
 .cache
 nosetests.xml
 coverage.xml
 *.cover
-.hypothesis/
-.pytest_cache/
-.mypy_cache/
-.dmypy.json
-dmypy.json
+.hypothesis
+.pytest_cache
+*.egg-info
+dist
+build
 
-# System & OS
-.vscode-server
-.AppleDouble
-.LSOverride
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Desktop.ini
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+*.sublime-project
+*.sublime-workspace
+.editorconfig
 
-# Project Specific
-launchers
+# Testing
+tests
+test
+specs
+.mocha
+.nyc_output
+coverage
+cypress/screenshots
+cypress/videos
+
+# CI/CD
+.travis.yml
+.gitlab-ci.yml
+Jenkinsfile
+.circleci
+
+# Archives and backups
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.backup
+*.bak
+
+# Temporary files
+tmp
+temp
+.tmp
+*.log
+*.swp
+*.swo
+
+# Docker files (don't need originals in final image)
+Dockerfile
+Dockerfile.*
+docker-compose*.yml
+.dockerignore
+
+# Build scripts
+*.sh
 *.bat
-tools
-branding
-init-scripts
+*.ps1
+Makefile
 
-# Documentation Files (keep build-related only)
-ATLANTIPLEX*.md
-DEPLOYMENT*.md
-ENHANCEMENT*.md
-LAUNCH*.bat
-LAUNCH*.md
-QUICK_DEPLOY.md
-BARE_METAL*.md
-GITHUB_SETUP.md
-COMMAND_CENTRE*.md
-$20_BUDGET_HOSTING_GUIDE.md
-AUSTRALIAN_HOSTING_OPTIONS.md
-ORACLE_CLOUD_SETUP_GUIDE.md
-GOOGLE_CLOUD_MELBOURNE_DEPLOYMENT.md
-PAYMENT_INTEGRATION_GUIDE.md
-PROFESSIONAL_EDITION.md
-UPGRADE_CHECKLIST.md
-BEFORE_AFTER_METRICS.md
-E2E_TEST_*.md
-HOSTINGER_DEPLOYMENT_GUIDE.md
-LIVESTREAM_*.md
-MATRIX_CURTAIN_SUMMARY.md
-PRE_LAUNCH_CHECKLIST.md
-PRODUCTION_*.md
-VULNERABILITY_*.md
-WEB_HOSTING_STRATEGY.md
-API_DOCUMENTATION.md
+# Archive and package directories
+archive
+archive/**
 
-# Development & Debug
-FINAL_COMPLETE.py
-DEBUG_*.py
-WORKING_*.py
-MATRIX_STUDIO_PRO.py
-PRODUCTION_READY.py
-pre_flight_test.py
-test-studio.html
-setup.py
-setup.cfg
-pyproject.toml
-tox.ini
-pytest.ini
-conftest.py
+# Data directories (often large)
+data
+data/**
 
-# Cleanup Directories
-final/
-clean_project/
-plugins/
-scripts/
+# Cache
+.cache
+.next
