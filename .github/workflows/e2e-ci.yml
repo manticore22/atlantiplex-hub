@@ -1,0 +1,89 @@
+name: End-to-End Neon Theme
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Playwright and browsers
+        uses: microsoft/playwright-action@v1.39.0
+        with:
+          install-deps: true
+
+      - name: Prepare docker-compose override
+        run: |
+          mkdir -p .
+          printf "version: '3.9'\nservices:\n  nginx:\n    ports:\n      - \"8080:80\"\n      - \"8443:443\"\n" > docker-compose.override.yml
+          cat docker-compose.override.yml
+
+      - name: Build and run stack
+        run: |
+          docker-compose -f docker-compose.prod.yml -f docker-compose.override.yml up -d
+
+      - name: Run end-to-end test (Playwright Desktop)
+        run: |
+          node tests/e2e-theme-playwright.js
+      - name: Run end-to-end test (Playwright Mobile)
+        run: |
+          node tests/e2e-theme-playwright-mobile.js
+      - name: Run end-to-end test (Download)
+        run: |
+          node tests/e2e-download.js
+
+      - name: Run health checks (Python)
+        run: |
+          python3 tests/test_endpoints.py || true
+
+      - name: Upload endpoints health summary
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-endpoints-summary
+          path: test_endpoints_summary.json
+
+      - name: Upload Playwright desktop failure artifact
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-desktop-fail
+          path: neon-theme-desktop-fail.png
+
+      - name: Upload Playwright mobile failure artifact
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-mobile-fail
+          path: neon-theme-mobile-fail.png
+
+      - name: Collect Playwright traces
+        if: always()
+        run: |
+          mkdir -p traces
+          sh -c 'for f in trace-*.zip; do [ -f "$f" ] && mv "$f" traces/; done'
+
+      - name: Upload Playwright traces
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: e2e-playwright-traces
+          path: traces
+
+      - name: Tear down stack
+        if: always()
+        run: |
+          docker-compose -f docker-compose.prod.yml -f docker-compose.override.yml down

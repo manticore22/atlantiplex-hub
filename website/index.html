@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
 </head>
-    <body>
+<body class="fade-in-loading neon-body">
     <!-- Neon Theme Toggle (experimental) -->
     <button id="theme-toggle" aria-label="Toggle Neon Theme" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; padding: 10px 14px; border-radius: 6px; border: 1px solid #0ff; background: #001021; color: #0ff; cursor: pointer;">Neon Theme</button>
     <!-- Animated Ocean Background -->
@@ -32,7 +32,13 @@
                 </feMerge>
             </filter>
         </defs>
-    </svg>
+</svg>
+
+  <script>
+    window.addEventListener('load', () => {
+      document.body.classList.remove('fade-in-loading');
+    });
+  </script>
 
     <script>
       (function(){
@@ -138,6 +144,13 @@
                         <li>🌌 Vision</li>
                     </ul>
                     <a href="#" class="brand-link">Explore Atlantiplex →</a>
+                </div>
+
+                <!-- Download product sample -->
+                <div class="brand-card" style="min-height:420px;">
+                    <h2 style="margin-bottom:12px; color:var(--aqua);">Product Download</h2>
+                    <p class="brand-tagline">Sample app package for download</p>
+                    <a class="brand-link download" href="/downloads/sample-app-v1.txt" download>Download Sample App</a>
                 </div>
             </div>
             
