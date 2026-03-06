@@ -46,9 +46,9 @@
 NODE_ENV=production
 PORT=3000
 
-# Stripe Live Keys
-STRIPE_SECRET_KEY=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
-STRIPE_PUBLISHABLE_KEY=pk_live_51StL0tEfu4UzsT8NLxPdKLoxXwYcZyBzZxYZaXwYcZyBzZxYZaXwYcZyBzZxYZaXwYcZyBzZxYZaXwYcZyBzZxYZaX
+# Stripe Live Keys (add your keys from Stripe Dashboard)
+STRIPE_SECRET_KEY=
+STRIPE_PUBLISHABLE_KEY=
 STRIPE_WEBHOOK_SECRET=whsec_live_... # Get from Stripe webhook setup
 
 # Security
