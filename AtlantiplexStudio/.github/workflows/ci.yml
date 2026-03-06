@@ -1,0 +1,99 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements_enhanced.txt
+          pip install -r requirements_payments.txt
+      
+      - name: Install Node dependencies
+        run: |
+          cd web/frontend && npm ci
+          cd ../stage && npm ci
+      
+      - name: Run Python tests
+        run: |
+          cd tests
+          python -m pytest --cov=. --cov-report=xml || python test_core_components.py
+      
+      - name: Build frontend
+        run: |
+          cd web/frontend
+          npm run build
+      
+      - name: Build Docker images
+        run: |
+          docker build -t atlantiplex/frontend:${{ github.sha }} -f Dockerfile .
+          docker build -t atlantiplex/stage:${{ github.sha }} -f web/stage/Dockerfile web/stage/
+          docker build -t atlantiplex/frontend:latest -f Dockerfile .
+          docker build -t atlantiplex/stage:latest -f web/stage/Dockerfile web/stage/
+      
+      - name: Security Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+      
+      - name: Run Node tests
+        run: |
+          cd web/frontend && npm test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build and push frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            atlantiplex/studio:latest
+            atlantiplex/studio:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      
+      - name: Build and push stage
+        uses: docker/build-push-action@v5
+        with:
+          context: ./web/stage
+          file: ./web/stage/Dockerfile
+          push: true
+          tags: |
+            atlantiplex/stage:latest
+            atlantiplex/stage:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

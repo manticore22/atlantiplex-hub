@@ -1,28 +1,28 @@
-# Payment Integration Requirements for Enhanced Matrix Studio
+# Payment Integration Requirements for Atlantiplex Studio
 # Add these to your existing requirements_enhanced.txt
 
 # Payment Processing
-stripe==6.6.0
+stripe==17.5.0
 
 # Enhanced JWT and Security
-PyJWT==2.8.0
-cryptography==41.0.7
+PyJWT==2.10.1
+cryptography==44.0.0
 
 # Database and Migration Support
-alembic==1.12.1
+alembic==1.14.0
 
 # Enhanced Email for Billing
-sendgrid==6.10.0
+sendgrid==6.11.0
 
 # Additional Validation and Forms
-marshmallow==3.20.1
-webargs==8.2.0
+marshmallow==3.23.2
+webargs==8.3.0
 
 # Enhanced Monitoring and Analytics
-prometheus-client==0.19.0
+prometheus-client==0.21.0
 
 # Enhanced Logging
-structlog==23.2.0
+structlog==24.4.0
 
 # Webhook Processing
 hmac-compat==0.1.1
@@ -34,5 +34,5 @@ forex-python==1.8
 python-decouple==3.8
 
 # Background Jobs for Subscription Management
-celery==5.3.4
-redis==5.0.1
+celery==5.4.0
+redis==5.2.1

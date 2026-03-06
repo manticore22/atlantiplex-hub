@@ -4,6 +4,8 @@
 ---
 
 ## 🚀 DEPLOYMENT OVERVIEW
+## NEW BASELINE GUIDANCE
+- See docs/DEPLOYMENT_GUIDE_V2.md for updated baseline and Stripe MVP wiring.
 
 ### Application Architecture
 ```
