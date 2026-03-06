@@ -179,9 +179,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Microsoft Azure for cloud infrastructure
 - All contributors who helped build this platform
 
-## 📞 Support
+## 📞 Support & Contact
 
-For support, email support@atlantiplex.com or join our Slack channel.
+**Studio:** Seraphonix Studios  
+**Email:** seraphonixstudios@gmail.com  
+**Website:** https://verilysovereign.org  
+**Twitter/X:** [@r1914514](https://twitter.com/r1914514)
 
 ## 🚀 Roadmap
 
@@ -199,7 +202,6 @@ For support, email support@atlantiplex.com or join our Slack channel.
 </p>
 
 <p align="center">
-  <a href="https://twitter.com/atlantiplex">Twitter</a> •
-  <a href="https://linkedin.com/company/atlantiplex">LinkedIn</a> •
-  <a href="https://atlantiplex.com">Website</a>
+  <a href="https://twitter.com/r1914514">Twitter</a> •
+  <a href="https://verilysovereign.org">Website</a>
 </p>
