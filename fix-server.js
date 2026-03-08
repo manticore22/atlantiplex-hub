@@ -1,0 +1,10 @@
+const fs = require('fs');
+const file = '/root/studio/studio-saas/backend/server.js';
+let content = fs.readFileSync(file, 'utf8');
+content = content.replace(/app\.listen\(PORT, \(\) => \{/, "server.listen(PORT, '0.0.0.0', () => {");
+fs.writeFileSync(file, content);
+console.log('Server.js fixed!');
+console.log('New listen call:');
+const lines = content.split('\n');
+const startIdx = lines.findIndex(l => l.includes('Start server'));
+console.log(lines.slice(startIdx, startIdx + 5).join('\n'));
