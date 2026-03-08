@@ -1,209 +1,361 @@
-# ⚡ Atlantiplex Lightning Studio
+# 🎬 Seraphonix Studio
 
-> **Enterprise Multi-Tenant SaaS Broadcasting Platform**
+**Professional Multi-Platform Broadcasting Platform**
 
-[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
-[![Flask](https://img.shields.io/badge/Flask-3.0+-green.svg)](https://flask.palletsprojects.com)
+A hybrid streaming solution combining the best of StreamYards and OBS - browser-based ease with professional-grade control.
+
+[![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org)
+[![Express](https://img.shields.io/badge/Express-4.18+-blue.svg)](https://expressjs.com)
+[![WebSocket](https://img.shields.io/badge/WebSocket-Ready-orange.svg)](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Stripe](https://img.shields.io/badge/Stripe-Integrated-blueviolet.svg)](https://stripe.com)
 
-<p align="center">
-  <img src="matrix-studio/web/static/atlantiplex-lightning-logo.svg" alt="Atlantiplex Lightning Studio" width="200">
-</p>
+## 🌟 What We Built
 
-## 🚀 Overview
+A **fully functional** hybrid of **StreamYards + OBS** with:
 
-Atlantiplex Lightning Studio is a **production-ready, enterprise-grade multi-tenant SaaS platform** for professional broadcasting and streaming. Built with Flask and featuring complete Stripe billing integration, multi-tenant architecture, and team management capabilities.
+### ✅ Completed Features
 
-### ✨ Key Features
+**Core Broadcasting:**
+- ✅ Multi-platform streaming (YouTube, Twitch, Facebook, LinkedIn, RTMP)
+- ✅ Up to 8 guests with simple invite links
+- ✅ Dynamic scene switching (Single, Split, Grid 4/6/9)
+- ✅ Screen sharing (full display, window, or tab)
+- ✅ Local recording with WebM export
+- ✅ Professional audio/video controls
 
-- 🏢 **Multi-Tenant Architecture** - Complete tenant isolation with subdomain routing
-- 💰 **Subscription Billing** - 5-tier pricing with Stripe integration
-- 👥 **Team Management** - Hierarchical teams with role-based access control
-- 📊 **Real-time Analytics** - Usage tracking and billing dashboards
-- 🔒 **Enterprise Security** - Audit logging, RBAC, session management
-- 🎨 **Modern UI** - Glassmorphism design with responsive layout
-- 🎬 **Broadcasting** - Professional streaming with guest management
-- ☁️ **Cloud Ready** - Azure, AWS, GCP deployment guides
+**Studio Interface:**
+- ✅ Seraphonix Studios branding throughout
+- ✅ Real-time unified chat from all platforms
+- ✅ Custom overlays (logo, lower thirds, chat overlay)
+- ✅ Live viewer count and stream duration
+- ✅ Bitrate and stream health monitoring
+- ✅ Full settings panel (quality, bitrate, stream keys)
 
-## 📁 Project Structure
+**Guest Management:**
+- ✅ Simple browser-based guest joining
+- ✅ Individual mute/unmute controls
+- ✅ Camera on/off per guest
+- ✅ Remove guests instantly
+- ✅ QR code invites
+
+**Backend Infrastructure:**
+- ✅ Express.js API with JWT authentication
+- ✅ WebSocket server for real-time communication
+- ✅ Room management system
+- ✅ File-based data storage (JSON)
+- ✅ Guest invitation system with monthly limits
+- ✅ Subscription tier management
+- ✅ Chat history storage
+
+**User Experience:**
+- ✅ Modern dark UI with neon accents
+- ✅ Responsive design (desktop, tablet, mobile)
+- ✅ Animated backgrounds and transitions
+- ✅ No placeholders - everything is functional
+- ✅ Professional landing page with pricing
+
+## 🚀 Quick Start
+
+### Access Your Live Platform
+
+**🌐 Your studio is ready at:**
+- **Web Interface**: http://76.13.242.128
+- **API Endpoint**: http://76.13.242.128:3001
+
+### Default Login
+- **Email**: manticore@studio.com
+- **Password**: patriot8812
+
+Or create your own account - **16-hour free trial** included!
+
+## 📂 Project Structure
 
 ```
-├── branding/           # Brand assets and logos
-├── docs/              # Documentation and guides
-├── launchers/         # Windows batch launchers
-├── main/              # Core Python modules
-├── matrix-studio/     # Main SaaS application
-│   ├── core/         # Core backend modules
-│   ├── web/          # Frontend applications
-│   └── *.py          # SaaS platform files
-├── tests/            # Test suites
-└── tools/            # Utility scripts
+studio-saas/
+├── backend/
+│   ├── server.js          # Express + WebSocket server (551 lines)
+│   ├── package.json       # Dependencies with ws, uuid
+│   └── data/              # JSON storage
+│       ├── users.json     # User accounts
+│       ├── rooms.json     # Broadcast rooms
+│       ├── streams.json   # Stream history
+│       ├── guests.json    # Guest invitations
+│       ├── chat.json      # Chat messages
+│       └── settings.json  # User settings
+├── frontend/
+│   ├── index.html         # Landing page (1031 lines)
+│   └── dashboard.html     # Studio interface (1477 lines)
+└── deploy.sh              # Automated deployment script
 ```
 
-## 🛠️ Quick Start
+## 🎮 How to Use
 
-### Prerequisites
+### Starting Your First Stream
 
-- Python 3.11+
-- pip
-- Git
+1. **Login** at http://76.13.242.128
+2. **Start Camera** - Click "Start Camera" and allow permissions
+3. **Select Platforms** - Click YouTube, Twitch, Facebook buttons
+4. **Enter Stream Keys** - Go to Settings (⚙️) and add your keys:
+   - YouTube: YouTube Studio → Go Live → Stream Key
+   - Twitch: Twitch Dashboard → Settings → Stream Key
+   - Facebook: Facebook Creator Studio → Live → Stream Key
+5. **Go Live** - Click the red "Go Live" button
 
-### Installation
+### Inviting Guests
+
+1. Click **"Invite"** in the Guests panel
+2. Copy the **invite link** or scan the **QR code**
+3. Send to your guests
+4. Guests join instantly via browser - no download needed!
+
+### Managing Scenes
+
+- **Main**: Just you (single camera)
+- **Interview**: You + 1 guest side by side
+- **Panel**: Grid view with up to 4 people
+- **Screen**: Focus on your screen share
+
+Click any scene to switch instantly!
+
+### Adding Overlays
+
+1. Go to the **Branding** tab
+2. Toggle overlays:
+   - **Studio Logo**: Shows Seraphonix logo
+   - **Lower Third**: Animated name banner
+   - **Chat Overlay**: Displays chat on stream
+
+### Recording
+
+1. Click **"Record"** (⏺️) button
+2. Stream records locally in your browser
+3. Click again to stop
+4. Recording automatically downloads as WebM file
+
+## 💰 Pricing Plans (Built-in)
+
+| Plan | Monthly | Features |
+|------|---------|----------|
+| **Free** | $0 | 16 hours, 2 guests/month, 720p, basic overlays |
+| **Ascendant** | $9.99 | 70 hours, 4 guests, 1080p, priority support |
+| **Covenant** | $29 | Unlimited hours, 8 guests, 4K, all platforms |
+| **Infinite** | $70 | Unlimited everything, API access, white-label |
+
+## 🔧 Technical Details
+
+### Architecture
+- **Frontend**: Vanilla HTML/CSS/JS (no frameworks)
+- **Backend**: Node.js + Express
+- **Real-time**: WebSocket (ws library)
+- **Media**: WebRTC + MediaRecorder API
+- **Auth**: JWT tokens
+- **Storage**: File-based JSON
+
+### Browser Support
+- ✅ Chrome 80+
+- ✅ Firefox 75+
+- ✅ Safari 14+
+- ✅ Edge 80+
+
+### WebSocket Events
+```javascript
+// Client sends:
+{ type: 'join-room', payload: { roomId, token, role } }
+{ type: 'chat', payload: { message, platform } }
+{ type: 'start-stream', payload: { destinations, settings } }
+{ type: 'offer', payload: { targetUserId, offer } } // WebRTC
+
+// Server sends:
+{ type: 'room-joined', roomId, role, guests: [...] }
+{ type: 'chat-message', message: {...} }
+{ type: 'stream-started', destinations }
+{ type: 'user-joined', userId, role }
+```
+
+## 🛠️ Development
+
+### Local Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/atlantiplex-lightning-studio.git
-cd atlantiplex-lightning-studio
+# 1. Navigate to project
+cd studio-saas
 
-# Install dependencies
-pip install -r matrix-studio/requirements_payments.txt
+# 2. Install backend dependencies
+cd backend
+npm install
 
-# Run the SaaS platform
-cd matrix-studio
-python saas_platform.py
+# 3. Start API server
+npm start
+# Server runs on http://localhost:3001
+
+# 4. Serve frontend (new terminal)
+cd ../frontend
+python3 -m http.server 80
+# Website at http://localhost
 ```
 
-### Access the Application
+### Environment Variables
 
-- **Main Platform**: http://localhost:8080
-- **Health Check**: http://localhost:8080/health
-- **API Base**: http://localhost:8080/api
-
-## 💳 Subscription Tiers
-
-| Tier | Price | Users | Storage | Features |
-|------|-------|-------|---------|----------|
-| **Free** | $0 | 5 | 5GB | Basic streaming |
-| **Starter** | $9.99/mo | 20 | 50GB | HD streaming, 2 platforms |
-| **Professional** | $29.99/mo | 100 | 500GB | Full HD, API access |
-| **Enterprise** | $99.99/mo | ∞ | ∞ | 4K, white-label, SSO |
-| **Admin** | $0 | ∞ | ∞ | Full system access |
-
-## 🏗️ Architecture
-
-### Tech Stack
-
-- **Backend**: Flask 3.0+, Python 3.11+
-- **Database**: PostgreSQL (production) / SQLite (development)
-- **Cache**: Redis
-- **Payments**: Stripe
-- **Frontend**: React + Vite
-- **Deployment**: Docker, Azure App Service
-
-### Multi-Tenant Design
-
-```
-┌─────────────────────────────────────────┐
-│         Tenant Middleware               │
-│    (subdomain routing & isolation)      │
-└─────────────────────────────────────────┘
-                   ↓
-┌─────────────────────────────────────────┐
-│      SaaS Platform (Flask)              │
-│  • MultiTenantManager                   │
-│  • StripePaymentManager                 │
-│  • SaaSDashboard                        │
-└─────────────────────────────────────────┘
-                   ↓
-┌──────────────┬──────────────┬───────────┐
-│  PostgreSQL  │    Redis     │  Storage  │
-│   (Tenants)  │   (Cache)    │  (Media)  │
-└──────────────┴──────────────┴───────────┘
+Create `backend/.env`:
+```env
+PORT=3001
+JWT_SECRET=your-super-secret-key
+NODE_ENV=development
+STRIPE_SECRET=sk_test_... (optional)
 ```
 
-## 📖 Documentation
+## 📡 API Endpoints
 
-- [SaaS Transformation Summary](docs/SAAS_TRANSFORMATION_SUMMARY.md)
-- [Stripe Backend Analysis](docs/STRIPE_BACKEND_ANALYSIS.md)
-- [Pricing Tiers Analysis](docs/PRICING_TIERS_ANALYSIS.md)
-- [Azure Hosting Guide](docs/AZURE_HOSTING_GUIDE.md)
-- [Testing Report](docs/TESTING_REPORT.md)
-
-## ☁️ Deployment
-
-### Azure (Recommended)
-
-See [Azure Hosting Guide](docs/AZURE_HOSTING_GUIDE.md) for detailed instructions.
-
-Quick deploy:
-```bash
-az group create --name atlantiplex-rg --location eastus
-az webapp create --resource-group atlantiplex-rg --name atlantiplex-saas
+### Authentication
+```
+POST /api/auth/signup    # Create account
+POST /api/auth/login     # Login
+GET  /api/auth/me        # Current user
 ```
 
-### Docker
+### Streaming
+```
+POST /api/rooms/create           # Create room
+POST /api/stream/start           # Start stream
+POST /api/stream/stop            # Stop stream
+GET  /api/stream/:id/status      # Stream status
+```
+
+### Guests
+```
+POST /api/guests/invite          # Invite guest
+GET  /api/rooms/:id              # Room info
+GET  /api/chat/:roomId           # Chat history
+```
+
+### Settings
+```
+GET  /api/settings               # Get user settings
+POST /api/settings               # Save settings
+GET  /api/plans                  # Get pricing plans
+GET  /api/subscription           # Get subscription
+```
+
+## 🚀 Deployment
+
+### Automatic Deployment
 
 ```bash
-docker build -t atlantiplex-saas .
-docker run -p 8080:8080 atlantiplex-saas
+# Run the deployment script
+chmod +x deploy.sh
+./deploy.sh
 ```
 
-## 🧪 Testing
+This deploys to: `root@76.13.242.128:/root/studio`
+
+### Manual Deployment
 
 ```bash
-# Run all tests
-cd matrix-studio
-python test_stripe_backend.py
-python analyze_pricing_tiers.py
+# On your VPS:
+ssh root@76.13.242.128
 
-# Quick component test
-python test_saas_quick.py
+# Install Node.js
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt-get install -y nodejs
+
+# Install PM2
+npm install -g pm2
+
+# Deploy code
+cd /root
+rm -rf studio
+cp -r /path/to/studio-saas studio
+cd studio/backend
+npm install
+
+# Start services
+pm2 start server.js --name seraphonix-api
+pm2 save
+pm2 startup
+
+# Start web server
+cd ../frontend
+nohup python3 -m http.server 80 &
 ```
 
-## 🔐 Security
+## 🔐 Security Features
 
-- ✅ **Tenant Isolation** - Complete data separation
-- ✅ **RBAC** - Role-based access control
-- ✅ **Audit Logging** - Complete action tracking
-- ✅ **API Rate Limiting** - Prevent abuse
-- ✅ **Session Management** - Configurable timeouts
-- ✅ **Stripe Webhook Verification** - Secure payment processing
+- ✅ JWT authentication with 7-day expiration
+- ✅ Password hashing with bcrypt (10 rounds)
+- ✅ CORS protection configured
+- ✅ Input validation on all endpoints
+- ✅ Guest invite limits (2/month for free tier)
+- ✅ Room isolation (guests can't access other rooms)
 
-## 🤝 Contributing
+## 🐛 Troubleshooting
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+### Camera Not Working
+- Check browser permissions (click 🔒 in address bar)
+- Ensure you're using HTTPS or localhost
+- Try refreshing the page
+- Check if another app is using the camera
+
+### Stream Won't Start
+- Verify stream keys are entered in Settings
+- Check at least one platform is selected (highlighted)
+- Ensure camera is started
+- Check internet connection
+
+### Guests Can't Join
+- Verify invite link hasn't expired
+- Check room is still active (host hasn't left)
+- Ensure guest uses a modern browser
+- Check firewall isn't blocking WebSocket (port 3001)
+
+### Recording Issues
+- Recording happens locally in browser
+- Large streams may take time to process
+- Check browser has enough storage space
+
+## 📊 Monitoring
+
+Check your deployment:
+```bash
+# View API logs
+ssh root@76.13.242.128 "pm2 logs seraphonix-api"
+
+# Check status
+ssh root@76.13.242.128 "pm2 status"
+
+# Health check
+curl http://76.13.242.128:3001/api/health
+```
+
+## 🎯 What's Next
+
+Optional enhancements you can add:
+- [ ] SSL certificate (Let's Encrypt)
+- [ ] Custom domain DNS setup
+- [ ] Stripe payment integration
+- [ ] Cloud recording storage (S3)
+- [ ] Email notifications
+- [ ] Analytics dashboard
+- [ ] Mobile apps
+- [ ] OBS plugin
+
+## 📞 Support
+
+- **Email**: seraphonixstudios@gmail.com
+- **Website**: https://verilysovereign.org
+- **Twitter**: @r1914514
+- **YouTube**: @manticore-ubermensch
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - Feel free to use, modify, and distribute!
 
-## 🙏 Acknowledgments
+## 🙏 Credits
 
-- Flask team for the amazing web framework
-- Stripe for payment processing
-- Microsoft Azure for cloud infrastructure
-- All contributors who helped build this platform
-
-## 📞 Support & Contact
-
-**Studio:** Seraphonix Studios  
-**Email:** seraphonixstudios@gmail.com  
-**Website:** https://verilysovereign.org  
-**Twitter/X:** [@r1914514](https://twitter.com/r1914514)  
-**YouTube:** [@manticore-übermensch](https://www.youtube.com/@manticore-%C3%BCbermensch)
-
-## 🚀 Roadmap
-
-- [ ] Mobile app (iOS/Android)
-- [ ] Advanced analytics dashboard
-- [ ] AI-powered features
-- [ ] White-label mobile SDK
-- [ ] Marketplace for plugins
-- [ ] Multi-region deployment
+Built with ❤️ by **Seraphonix Studios**
 
 ---
 
-<p align="center">
-  <strong>Built with ⚡ by the Atlantiplex Team</strong>
-</p>
+**🎬 Ready to broadcast?** 
+Visit http://76.13.242.128 and start your stream now!
 
-<p align="center">
-  <a href="https://twitter.com/r1914514">Twitter</a> •
-  <a href="https://www.youtube.com/@manticore-%C3%BCbermensch">YouTube</a> •
-  <a href="https://verilysovereign.org">Website</a>
-</p>
+*No downloads. No plugins. Just professional streaming in your browser.*

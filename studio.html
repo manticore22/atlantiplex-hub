@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atlantiplex Studio - Enter the Matrix</title>
+    <meta name="description" content="Professional broadcasting studio with AI-powered streaming capabilities">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-green: #00ff00;
+            --matrix-green: #0f0;
+            --atlantean-blue: #00bfff;
+            --glitch-red: #ff0000;
+            --cyber-purple: #9b00ff;
+            --background-dark: #001a33;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--background-dark);
+            font-family: 'Montserrat', sans-serif;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background Effects */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: linear-gradient(to bottom, #001a33, #000033);
+        }
+
+        .matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.2;
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(to bottom, transparent 0px, transparent 2px, rgba(0, 255, 0, 0.03) 2px, rgba(0, 255, 0, 0.03) 4px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .logo {
+            font-family: 'VT323', monospace;
+            font-size: 4rem;
+            color: var(--neon-green);
+            text-shadow: 0 0 20px var(--matrix-green);
+            margin-bottom: 10px;
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            92% { transform: translate(-2px, 2px); color: var(--glitch-red); }
+            94% { transform: translate(2px, -2px); }
+            96% { transform: translate(-2px, 2px); color: var(--cyber-purple); }
+            98% { transform: translate(2px, -2px); }
+        }
+
+        .tagline {
+            color: var(--atlantean-blue);
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Main Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+
+        /* Info Section */
+        .info-section {
+            padding: 40px;
+            background: rgba(0, 0, 51, 0.6);
+            border-radius: 20px;
+            border: 1px solid var(--atlantean-blue);
+            box-shadow: 0 0 30px rgba(0, 191, 255, 0.2);
+        }
+
+        .info-section h2 {
+            font-family: 'VT323', monospace;
+            color: var(--neon-green);
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px var(--matrix-green);
+        }
+
+        .feature-list {
+            list-style: none;
+            margin: 30px 0;
+        }
+
+        .feature-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #ccc;
+        }
+
+        .feature-list li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: var(--neon-green);
+            font-weight: bold;
+        }
+
+        .trial-badge {
+            background: linear-gradient(45deg, var(--neon-green), var(--atlantean-blue));
+            color: #000;
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 30px;
+            box-shadow: 0 0 20px var(--neon-green);
+        }
+
+        /* Auth Section */
+        .auth-section {
+            background: rgba(0, 0, 51, 0.8);
+            border-radius: 20px;
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 40px rgba(0, 255, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .auth-tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 20px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: 'VT323', monospace;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .auth-tab.active {
+            background: var(--neon-green);
+            color: #000;
+        }
+
+        .auth-tab:hover:not(.active) {
+            background: rgba(0, 255, 0, 0.2);
+        }
+
+        .auth-form {
+            padding: 40px;
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--atlantean-blue);
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--atlantean-blue);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, var(--neon-green), var(--atlantean-blue));
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-family: 'VT323', monospace;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 255, 0, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid var(--glitch-red);
+            color: #ff6b6b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid var(--neon-green);
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        /* Pricing Tiers */
+        .pricing-section {
+            margin-top: 60px;
+            text-align: center;
+        }
+
+        .pricing-section h2 {
+            font-family: 'VT323', monospace;
+            color: var(--neon-green);
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px var(--matrix-green);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .pricing-card {
+            background: rgba(0, 0, 51, 0.6);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid var(--atlantean-blue);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 191, 255, 0.3);
+        }
+
+        .pricing-card.featured {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+        }
+
+        .pricing-card h3 {
+            font-family: 'VT323', monospace;
+            color: var(--atlantean-blue);
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .price {
+            font-size: 2.5rem;
+            color: var(--neon-green);
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .price span {
+            font-size: 1rem;
+            color: #888;
+        }
+
+        .pricing-features {
+            list-style: none;
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .pricing-features li {
+            padding: 8px 0;
+            color: #ccc;
+        }
+
+        .pricing-features li::before {
+            content: "✓";
+            color: var(--neon-green);
+            margin-right: 10px;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 80px;
+            text-align: center;
+            padding: 40px;
+            border-top: 1px solid var(--atlantean-blue);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .footer-links a {
+            color: var(--atlantean-blue);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--neon-green);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #000;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <canvas class="matrix-rain" id="matrix-canvas"></canvas>
+    <div class="matrix-bg"></div>
+    <div class="scanline"></div>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="logo">⚡ ATLANTIPLEX STUDIO</h1>
+            <p class="tagline">Professional Broadcasting Platform • Enter the Matrix</p>
+        </header>
+
+        <div class="content-grid">
+            <!-- Info Section -->
+            <div class="info-section">
+                <h2>🎬 Welcome to the Future</h2>
+                <p style="color: #ccc; line-height: 1.8; margin-bottom: 20px;">
+                    Professional multi-platform broadcasting studio with AI-powered streaming capabilities. 
+                    Guest management, scene control, and real-time streaming to YouTube, Twitch, Facebook, and more.
+                </p>
+                
+                <ul class="feature-list">
+                    <li>Multi-platform streaming (YouTube, Twitch, Facebook, LinkedIn)</li>
+                    <li>Guest management system (up to 8 guests)</li>
+                    <li>Scene switching and overlays</li>
+                    <li>AI-powered broadcasting assistance</li>
+                    <li>Real-time chat integration</li>
+                    <li>Professional audio/video controls</li>
+                    <li>Recording and archiving</li>
+                </ul>
+
+                <div class="trial-badge">
+                    🎁 START WITH 16-HOUR FREE TRIAL<br>
+                    <small>No credit card required</small>
+                </div>
+            </div>
+
+            <!-- Auth Section -->
+            <div class="auth-section">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="switchTab('login')">LOGIN</button>
+                    <button class="auth-tab" onclick="switchTab('signup')">SIGN UP</button>
+                </div>
+
+                <!-- Login Form -->
+                <form class="auth-form active" id="login-form" onsubmit="handleLogin(event)">
+                    <div class="error-message" id="login-error"></div>
+                    <div class="success-message" id="login-success"></div>
+                    
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" required placeholder="your@email.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required placeholder="••••••••">
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" id="login-btn">
+                        <span class="spinner"></span>
+                        ENTER STUDIO
+                    </button>
+                </form>
+
+                <!-- Signup Form -->
+                <form class="auth-form" id="signup-form" onsubmit="handleSignup(event)">
+                    <div class="error-message" id="signup-error"></div>
+                    <div class="success-message" id="signup-success"></div>
+                    
+                    <div class="form-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" required placeholder="your@email.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" required placeholder="Min 8 characters">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-password-confirm">Confirm Password</label>
+                        <input type="password" id="signup-password-confirm" required placeholder="••••••••">
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" id="signup-btn">
+                        <span class="spinner"></span>
+                        CREATE ACCOUNT
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Pricing Section -->
+        <div class="pricing-section">
+            <h2>💎 CHOOSE YOUR TIER</h2>
+            
+            <div class="pricing-grid">
+                <div class="pricing-card featured">
+                    <h3>🆓 FREE TRIAL</h3>
+                    <div class="price">$0 <span>/ 16 hours</span></div>
+                    <ul class="pricing-features">
+                        <li>16 hours of streaming</li>
+                        <li>Up to 4 guests</li>
+                        <li>2 platforms</li>
+                        <li>Basic scenes</li>
+                        <li>720p quality</li>
+                    </ul>
+                </div>
+
+                <div class="pricing-card">
+                    <h3>🌟 ASCENDANT</h3>
+                    <div class="price">$9.99 <span>/ month</span></div>
+                    <ul class="pricing-features">
+                        <li>70 hours/month</li>
+                        <li>Up to 6 guests</li>
+                        <li>3 platforms</li>
+                        <li>Advanced scenes</li>
+                        <li>1080p quality</li>
+                    </ul>
+                </div>
+
+                <div class="pricing-card">
+                    <h3>👑 COVENANT</h3>
+                    <div class="price">$29.99 <span>/ month</span></div>
+                    <ul class="pricing-features">
+                        <li>Unlimited streaming</li>
+                        <li>Up to 8 guests</li>
+                        <li>All platforms</li>
+                        <li>Custom overlays</li>
+                        <li>4K quality</li>
+                        <li>Priority support</li>
+                    </ul>
+                </div>
+
+                <div class="pricing-card">
+                    <h3>♾️ SOVEREIGN</h3>
+                    <div class="price">$99.99 <span>/ month</span></div>
+                    <ul class="pricing-features">
+                        <li>Everything in Covenant</li>
+                        <li>White-label solution</li>
+                        <li>Custom integrations</li>
+                        <li>Dedicated server</li>
+                        <li>24/7 support</li>
+                        <li>API access</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-links">
+                <a href="https://verilysovereign.org">Back to Website</a>
+                <a href="mailto:seraphonixstudios@gmail.com">Support</a>
+                <a href="https://twitter.com/r1914514">Twitter</a>
+                <a href="https://www.youtube.com/@manticore-ubermensch">YouTube</a>
+            </div>
+            <p style="color: #666;">© 2026 Seraphonix Studios. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Matrix Rain Effect
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        const matrixChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:",.<>?/~';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+        
+        for (let i = 0; i < columns; i++) {
+            drops[i] = Math.random() * -100;
+        }
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 26, 51, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        setInterval(drawMatrix, 50);
+
+        // Tab Switching
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.auth-tab');
+            const forms = document.querySelectorAll('.auth-form');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            forms.forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'login') {
+                tabs[0].classList.add('active');
+                document.getElementById('login-form').classList.add('active');
+            } else {
+                tabs[1].classList.add('active');
+                document.getElementById('signup-form').classList.add('active');
+            }
+        }
+
+        // API Configuration
+        const API_URL = 'https://api.verilysovereign.online';
+        
+        // Handle Login
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const btn = document.getElementById('login-btn');
+            const spinner = btn.querySelector('.spinner');
+            const errorDiv = document.getElementById('login-error');
+            
+            // Show loading
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            errorDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Store token
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userEmail', data.user.email);
+                    
+                    // Show success
+                    document.getElementById('login-success').textContent = 'Login successful! Redirecting...';
+                    document.getElementById('login-success').style.display = 'block';
+                    
+                    // Redirect to studio dashboard
+                    setTimeout(() => {
+                        window.location.href = '/studio/dashboard';
+                    }, 1500);
+                } else {
+                    errorDiv.textContent = data.error || 'Login failed. Please check your credentials.';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+            }
+        }
+        
+        // Handle Signup
+        async function handleSignup(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-password-confirm').value;
+            const btn = document.getElementById('signup-btn');
+            const spinner = btn.querySelector('.spinner');
+            const errorDiv = document.getElementById('signup-error');
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                errorDiv.textContent = 'Passwords do not match.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            if (password.length < 8) {
+                errorDiv.textContent = 'Password must be at least 8 characters.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            
+            // Show loading
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            errorDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_URL}/api/auth/signup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Store token
+                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('userEmail', email);
+                    
+                    // Show success
+                    document.getElementById('signup-success').textContent = 'Account created! Your 16-hour free trial has started. Redirecting...';
+                    document.getElementById('signup-success').style.display = 'block';
+                    
+                    // Redirect to studio dashboard
+                    setTimeout(() => {
+                        window.location.href = '/studio/dashboard';
+                    }, 2000);
+                } else {
+                    errorDiv.textContent = data.error || 'Signup failed. Please try again.';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Network error. Please try again.';
+                errorDiv.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+            }
+        }
+        
+        // Check if already logged in
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                // Optional: Verify token is still valid
+                // If valid, redirect to dashboard
+                // window.location.href = '/studio/dashboard';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atlantiplex Studio | Professional Broadcasting Platform</title>
+    <title>Seraphonix Studio | Professional Broadcasting Platform</title>
     <meta name="description" content="Professional multi-platform broadcasting studio with AI-powered streaming capabilities">
     <meta name="theme-color" content="#001a33">
     
@@ -922,8 +922,8 @@
 
         // API Configuration
         const API_URL = window.location.origin.includes('localhost') 
-            ? 'http://localhost:3000' 
-            : 'https://api.verilysovereign.online';
+            ? 'http://localhost:3001' 
+            : 'http://76.13.242.128:3001';
 
         // Show Message
         function showMessage(elementId, type, text) {
@@ -958,7 +958,7 @@
                     localStorage.setItem('authToken', data.token);
                     localStorage.setItem('userEmail', data.user.email);
                     showMessage('login-message', 'success', 'Login successful! Redirecting...');
-                    setTimeout(() => window.location.href = '/dashboard', 1500);
+                    setTimeout(() => window.location.href = '/dashboard.html', 1500);
                 } else {
                     showMessage('login-message', 'error', data.error || 'Login failed. Please check your credentials.');
                 }
@@ -1006,7 +1006,7 @@
                     localStorage.setItem('authToken', data.token);
                     localStorage.setItem('userEmail', email);
                     showMessage('signup-message', 'success', 'Account created! Your 16-hour free trial has started.');
-                    setTimeout(() => window.location.href = '/dashboard', 2000);
+                    setTimeout(() => window.location.href = '/dashboard.html', 2000);
                 } else {
                     showMessage('signup-message', 'error', data.error || 'Signup failed. Please try again.');
                 }

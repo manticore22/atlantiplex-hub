@@ -1,127 +1,92 @@
-// SERAPHONIX — Backend Server
-// Express + JWT Auth + Stripe Integration
+// SERAPHONIX STUDIO - Enhanced Backend Server
+// Express + WebSocket + JWT Auth + Streaming Infrastructure
+// Hybrid of StreamYards + OBS functionality
 
 const express = require('express');
+const http = require('http');
+const WebSocket = require('ws');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const fs = require('fs-extra');
 const path = require('path');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'seraphonix-secret-key-change-in-production';
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+const PORT = process.env.PORT || 3001;
+const JWT_SECRET = process.env.JWT_SECRET || 'seraphonix-studio-secret-key-production';
 const STRIPE_SECRET = process.env.STRIPE_SECRET || '';
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// ============================================
+// MIDDLEWARE
+// ============================================
 
-// Serve static files from public directory
-app.use(express.static(path.join(__dirname, '../verilysovereign')));
+// CORS - Allow specific origins
+const corsOptions = {
+    origin: ['http://localhost:3000', 'http://localhost:80', 'http://76.13.242.128', 'http://76.13.242.128:80', 'http://76.13.242.128:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+};
+app.use(cors(corsOptions));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
-// Data paths
-const USERS_FILE = path.join(__dirname, 'data/users.json');
-const SUBSCRIPTIONS_FILE = path.join(__dirname, 'data/subscriptions.json');
-const PRODUCTS_FILE = path.join(__dirname, 'data/products.json');
-// Guests data store
-const GUESTS_FILE = path.join(__dirname, 'data/guests.json');
+// Serve static files
+app.use(express.static(path.join(__dirname, '../frontend')));
+app.use('/streams', express.static(path.join(__dirname, 'streams')));
 
-// Ensure data directory exists
-fs.ensureDirSync(path.join(__dirname, 'data'));
-// Initialize guests.json if missing
-if (!fs.existsSync(GUESTS_FILE)) {
-  fs.writeFileSync(GUESTS_FILE, '[]');
-}
-async function getGuests() {
-  try {
-    const data = await fs.readFile(GUESTS_FILE, 'utf8')
-    return JSON.parse(data) || []
-  } catch {
-    return []
-  }
-}
-async function saveGuests(list) {
-  await fs.writeFile(GUESTS_FILE, JSON.stringify(list, null, 2))
-}
+// ============================================
+// DATA STORAGE
+// ============================================
 
-// Initialize data files if they don't exist
-if (!fs.existsSync(USERS_FILE)) {
-    fs.writeFileSync(USERS_FILE, JSON.stringify([]));
-}
-if (!fs.existsSync(SUBSCRIPTIONS_FILE)) {
-    fs.writeFileSync(SUBSCRIPTIONS_FILE, JSON.stringify({}));
-}
-if (!fs.existsSync(PRODUCTS_FILE)) {
-    fs.writeFileSync(PRODUCTS_FILE, JSON.stringify([
-        {
-            id: 'atlantiplex-studio',
-            name: 'Atlantiplex Studio',
-            description: 'Sovereign intelligence platform',
-            status: 'active',
-            requiredTier: 'covenant',
-            priceId: null
-        },
-        {
-            id: 'neural-trench',
-            name: 'Neural Trench',
-            description: 'Deep learning subsystems',
-            status: 'coming-soon',
-            requiredTier: null,
-            priceId: null
-        },
-        {
-            id: 'glyph-engine',
-            name: 'Glyph Engine',
-            description: 'Automated sigil generation',
-            status: 'coming-soon',
-            requiredTier: null,
-            priceId: null
-        },
-        {
-            id: 'void-protocol',
-            name: 'Void Protocol',
-            description: 'Classified operations',
-            status: 'coming-soon',
-            requiredTier: null,
-            priceId: null
-        }
-    ]));
-}
+const DATA_DIR = path.join(__dirname, 'data');
+const STREAMS_DIR = path.join(__dirname, 'streams');
 
-// Helper functions
-async function getUsers() {
-    return JSON.parse(await fs.readFile(USERS_FILE, 'utf8'));
-}
-
-async function saveUsers(users) {
-    await fs.writeFile(USERS_FILE, JSON.stringify(users, null, 2));
-}
-
-async function getSubscriptions() {
-    return JSON.parse(await fs.readFile(SUBSCRIPTIONS_FILE, 'utf8'));
-}
-
-async function saveSubscriptions(subs) {
-    await fs.writeFile(SUBSCRIPTIONS_FILE, JSON.stringify(subs, null, 2));
-}
-
-async function getProducts() {
-    return JSON.parse(await fs.readFile(PRODUCTS_FILE, 'utf8'));
-}
-
-// Global tier limits (for usage/account checks)
-const TIER_LIMITS = {
-  free: 16,
-  ascendant: 70,
-  covenant: 999,
-  infinite: 999,
-  sovereign: 999
+const FILES = {
+    USERS: path.join(DATA_DIR, 'users.json'),
+    SUBSCRIPTIONS: path.join(DATA_DIR, 'subscriptions.json'),
+    PRODUCTS: path.join(DATA_DIR, 'products.json'),
+    GUESTS: path.join(DATA_DIR, 'guests.json'),
+    STREAMS: path.join(DATA_DIR, 'streams.json'),
+    CHAT: path.join(DATA_DIR, 'chat.json'),
+    ROOMS: path.join(DATA_DIR, 'rooms.json'),
+    SETTINGS: path.join(DATA_DIR, 'settings.json')
 };
 
-// Auth middleware
+// Ensure directories exist
+fs.ensureDirSync(DATA_DIR);
+fs.ensureDirSync(STREAMS_DIR);
+
+// Initialize data files
+Object.values(FILES).forEach(file => {
+    if (!fs.existsSync(file)) {
+        fs.writeFileSync(file, JSON.stringify({}));
+    }
+});
+
+// Data helpers
+async function readData(file) {
+    try {
+        const data = await fs.readFile(file, 'utf8');
+        return JSON.parse(data);
+    } catch {
+        return {};
+    }
+}
+
+async function writeData(file, data) {
+    await fs.writeFile(file, JSON.stringify(data, null, 2));
+}
+
+// ============================================
+// AUTHENTICATION
+// ============================================
+
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -139,89 +104,451 @@ function authenticateToken(req, res, next) {
     });
 }
 
-// ============ AUTH ROUTES ============
+// ============================================
+// WEBSOCKET MANAGEMENT
+// ============================================
 
-// Signup
+const rooms = new Map(); // roomId -> { host, guests, chat, streamData }
+const clients = new Map(); // ws -> { userId, roomId, role }
+
+wss.on('connection', (ws, req) => {
+    console.log('🔌 New WebSocket connection');
+    
+    ws.on('message', async (message) => {
+        try {
+            const data = JSON.parse(message);
+            await handleWebSocketMessage(ws, data);
+        } catch (error) {
+            console.error('WebSocket message error:', error);
+            ws.send(JSON.stringify({ type: 'error', message: error.message }));
+        }
+    });
+
+    ws.on('close', () => {
+        handleClientDisconnect(ws);
+    });
+
+    ws.on('error', (error) => {
+        console.error('WebSocket error:', error);
+    });
+
+    // Send welcome message
+    ws.send(JSON.stringify({
+        type: 'connected',
+        message: 'Connected to Seraphonix Studio'
+    }));
+});
+
+async function handleWebSocketMessage(ws, data) {
+    const { type, payload } = data;
+
+    switch (type) {
+        case 'join-room':
+            await handleJoinRoom(ws, payload);
+            break;
+        case 'leave-room':
+            await handleLeaveRoom(ws);
+            break;
+        case 'chat':
+            await handleChatMessage(ws, payload);
+            break;
+        case 'offer':
+            await handleWebRTCOffer(ws, payload);
+            break;
+        case 'answer':
+            await handleWebRTCAnswer(ws, payload);
+            break;
+        case 'ice-candidate':
+            await handleICECandidate(ws, payload);
+            break;
+        case 'start-stream':
+            await handleStartStream(ws, payload);
+            break;
+        case 'stop-stream':
+            await handleStopStream(ws);
+            break;
+        case 'guest-join':
+            await handleGuestJoin(ws, payload);
+            break;
+        case 'guest-leave':
+            await handleGuestLeave(ws, payload);
+            break;
+        case 'update-settings':
+            await handleUpdateSettings(ws, payload);
+            break;
+        case 'scene-change':
+            await handleSceneChange(ws, payload);
+            break;
+        default:
+            console.log('Unknown message type:', type);
+    }
+}
+
+async function handleJoinRoom(ws, { roomId, token, role }) {
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const userId = decoded.id || decoded.email;
+        
+        // Create room if it doesn't exist
+        if (!rooms.has(roomId)) {
+            rooms.set(roomId, {
+                id: roomId,
+                host: null,
+                guests: new Map(),
+                chat: [],
+                isStreaming: false,
+                streamData: null,
+                createdAt: new Date().toISOString()
+            });
+        }
+
+        const room = rooms.get(roomId);
+        
+        // Store client info
+        clients.set(ws, { userId, roomId, role, email: decoded.email });
+
+        if (role === 'host') {
+            room.host = { userId, ws, email: decoded.email };
+            console.log(`👤 Host joined room: ${roomId}`);
+        } else {
+            room.guests.set(userId, { userId, ws, email: decoded.email });
+            console.log(`👥 Guest joined room: ${roomId}`);
+            
+            // Notify host
+            if (room.host && room.host.ws.readyState === WebSocket.OPEN) {
+                room.host.ws.send(JSON.stringify({
+                    type: 'guest-joined',
+                    guest: { userId, email: decoded.email }
+                }));
+            }
+        }
+
+        // Send room state to client
+        ws.send(JSON.stringify({
+            type: 'room-joined',
+            roomId,
+            role,
+            guests: Array.from(room.guests.values()).map(g => ({
+                userId: g.userId,
+                email: g.email
+            })),
+            isStreaming: room.isStreaming
+        }));
+
+        // Broadcast to all clients in room
+        broadcastToRoom(roomId, {
+            type: 'user-joined',
+            userId,
+            role,
+            email: decoded.email
+        }, ws);
+
+    } catch (error) {
+        console.error('Join room error:', error);
+        ws.send(JSON.stringify({ type: 'error', message: 'Failed to join room' }));
+    }
+}
+
+async function handleLeaveRoom(ws) {
+    const client = clients.get(ws);
+    if (!client) return;
+
+    const { roomId, userId, role } = client;
+    const room = rooms.get(roomId);
+
+    if (room) {
+        if (role === 'host') {
+            room.host = null;
+        } else {
+            room.guests.delete(userId);
+        }
+
+        // Notify others
+        broadcastToRoom(roomId, {
+            type: 'user-left',
+            userId,
+            role
+        }, ws);
+
+        // Clean up empty rooms
+        if (!room.host && room.guests.size === 0) {
+            rooms.delete(roomId);
+            console.log(`🗑️ Room deleted: ${roomId}`);
+        }
+    }
+
+    clients.delete(ws);
+}
+
+async function handleChatMessage(ws, { message, platform = 'all' }) {
+    const client = clients.get(ws);
+    if (!client) return;
+
+    const { roomId, email } = client;
+    const room = rooms.get(roomId);
+
+    if (!room) return;
+
+    const chatMessage = {
+        id: uuidv4(),
+        author: email.split('@')[0],
+        email,
+        message,
+        platform,
+        timestamp: new Date().toISOString()
+    };
+
+    room.chat.push(chatMessage);
+
+    // Save to file
+    const chatData = await readData(FILES.CHAT);
+    if (!chatData[roomId]) chatData[roomId] = [];
+    chatData[roomId].push(chatMessage);
+    await writeData(FILES.CHAT, chatData);
+
+    // Broadcast to all in room
+    broadcastToRoom(roomId, {
+        type: 'chat-message',
+        message: chatMessage
+    });
+}
+
+async function handleStartStream(ws, { destinations, settings }) {
+    const client = clients.get(ws);
+    if (!client || client.role !== 'host') {
+        ws.send(JSON.stringify({ type: 'error', message: 'Only host can start stream' }));
+        return;
+    }
+
+    const { roomId } = client;
+    const room = rooms.get(roomId);
+
+    if (!room) return;
+
+    room.isStreaming = true;
+    room.streamData = {
+        destinations,
+        settings,
+        startedAt: new Date().toISOString(),
+        viewers: 0
+    };
+
+    // Save stream info
+    const streams = await readData(FILES.STREAMS);
+    streams[roomId] = room.streamData;
+    await writeData(FILES.STREAMS, streams);
+
+    // Notify all clients
+    broadcastToRoom(roomId, {
+        type: 'stream-started',
+        destinations,
+        settings
+    });
+
+    console.log(`🔴 Stream started in room: ${roomId}`);
+}
+
+async function handleStopStream(ws) {
+    const client = clients.get(ws);
+    if (!client || client.role !== 'host') return;
+
+    const { roomId } = client;
+    const room = rooms.get(roomId);
+
+    if (!room) return;
+
+    room.isStreaming = false;
+    
+    if (room.streamData) {
+        room.streamData.endedAt = new Date().toISOString();
+        
+        // Save final stream data
+        const streams = await readData(FILES.STREAMS);
+        streams[roomId] = room.streamData;
+        await writeData(FILES.STREAMS, streams);
+    }
+
+    // Notify all clients
+    broadcastToRoom(roomId, {
+        type: 'stream-stopped'
+    });
+
+    console.log(`⏹️ Stream stopped in room: ${roomId}`);
+}
+
+// WebRTC signaling
+async function handleWebRTCOffer(ws, { targetUserId, offer }) {
+    const client = clients.get(ws);
+    if (!client) return;
+
+    const { roomId } = client;
+    const room = rooms.get(roomId);
+
+    if (!room) return;
+
+    // Find target client
+    let targetWs = null;
+    
+    if (room.host && room.host.userId === targetUserId) {
+        targetWs = room.host.ws;
+    } else {
+        const guest = room.guests.get(targetUserId);
+        if (guest) targetWs = guest.ws;
+    }
+
+    if (targetWs && targetWs.readyState === WebSocket.OPEN) {
+        targetWs.send(JSON.stringify({
+            type: 'offer',
+            from: client.userId,
+            offer
+        }));
+    }
+}
+
+async function handleWebRTCAnswer(ws, { targetUserId, answer }) {
+    const client = clients.get(ws);
+    if (!client) return;
+
+    const { roomId } = client;
+    const room = rooms.get(roomId);
+
+    if (!room) return;
+
+    // Find target client
+    let targetWs = null;
+    
+    if (room.host && room.host.userId === targetUserId) {
+        targetWs = room.host.ws;
+    } else {
+        const guest = room.guests.get(targetUserId);
+        if (guest) targetWs = guest.ws;
+    }
+
+    if (targetWs && targetWs.readyState === WebSocket.OPEN) {
+        targetWs.send(JSON.stringify({
+            type: 'answer',
+            from: client.userId,
+            answer
+        }));
+    }
+}
+
+async function handleICECandidate(ws, { targetUserId, candidate }) {
+    const client = clients.get(ws);
+    if (!client) return;
+
+    const { roomId } = client;
+    const room = rooms.get(roomId);
+
+    if (!room) return;
+
+    // Find target client
+    let targetWs = null;
+    
+    if (room.host && room.host.userId === targetUserId) {
+        targetWs = room.host.ws;
+    } else {
+        const guest = room.guests.get(targetUserId);
+        if (guest) targetWs = guest.ws;
+    }
+
+    if (targetWs && targetWs.readyState === WebSocket.OPEN) {
+        targetWs.send(JSON.stringify({
+            type: 'ice-candidate',
+            from: client.userId,
+            candidate
+        }));
+    }
+}
+
+function broadcastToRoom(roomId, message, excludeWs = null) {
+    const room = rooms.get(roomId);
+    if (!room) return;
+
+    const messageStr = JSON.stringify(message);
+
+    // Send to host
+    if (room.host && room.host.ws !== excludeWs && room.host.ws.readyState === WebSocket.OPEN) {
+        room.host.ws.send(messageStr);
+    }
+
+    // Send to guests
+    room.guests.forEach(guest => {
+        if (guest.ws !== excludeWs && guest.ws.readyState === WebSocket.OPEN) {
+            guest.ws.send(messageStr);
+        }
+    });
+}
+
+function handleClientDisconnect(ws) {
+    handleLeaveRoom(ws);
+}
+
+// ============================================
+// HTTP API ROUTES
+// ============================================
+
+// Health check
+app.get('/api/health', (req, res) => {
+    res.json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        activeRooms: rooms.size,
+        activeConnections: wss.clients.size
+    });
+});
+
+// Auth Routes
 app.post('/api/auth/signup', async (req, res) => {
     try {
-    const { email, password } = req.body;
+        const { email, password } = req.body;
 
         if (!email || !password) {
             return res.status(400).json({ error: 'Email and password required' });
         }
 
-        const users = await getUsers();
+        const users = await readData(FILES.USERS);
 
-        // Check if user exists
-        if (users.find(u => u.email === email)) {
+        if (users[email]) {
             return res.status(400).json({ error: 'Email already registered' });
         }
 
-        // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
+        const trialEndsAt = Date.now() + 16 * 60 * 60 * 1000;
 
-        // Create user with trial and usage fields
-        const trialEndsAt = Date.now() + 16*60*60*1000;
-        const user = {
-            id: Date.now().toString(),
+        users[email] = {
+            id: uuidv4(),
             email,
             password: hashedPassword,
             createdAt: new Date().toISOString(),
             trialEndsAt,
-            hoursUsed: 0,
-            guestsThisMonth: 0,
-            lastGuestReset: new Date().toISOString(),
             plan: 'free',
             subscriptionStatus: 'trial'
         };
 
-        users.push(user);
-        await saveUsers(users);
+        await writeData(FILES.USERS, users);
 
-        // Seed free trial subscription for new user
-        try {
-            const subsRaw = await fs.readFile(SUBSCRIPTIONS_FILE, 'utf8') || '{}';
-            const subs = JSON.parse(subsRaw) || {};
-            subs[email] = {
-                tier: 'free',
-                status: 'trial',
-                createdAt: new Date().toISOString(),
-                expiresAt: new Date(trialEndsAt).toISOString()
-            };
-            await fs.writeFile(SUBSCRIPTIONS_FILE, JSON.stringify(subs, null, 2));
-        } catch (e) {
-            console.error('Failed to seed free trial subscription for new user', e);
-        }
+        // Create subscription
+        const subscriptions = await readData(FILES.SUBSCRIPTIONS);
+        subscriptions[email] = {
+            tier: 'free',
+            status: 'trial',
+            createdAt: new Date().toISOString(),
+            expiresAt: new Date(trialEndsAt).toISOString()
+        };
+        await writeData(FILES.SUBSCRIPTIONS, subscriptions);
 
-        // Generate token
-        const role = (email === 'admin@verilysovereign.org') ? 'admin' : (user.role || 'user');
-        const token = jwt.sign({ id: user.id, email: user.email, role }, JWT_SECRET, { expiresIn: '7d' });
+        const role = email === 'admin@seraphonix.studio' ? 'admin' : 'user';
+        const token = jwt.sign({ id: users[email].id, email, role }, JWT_SECRET, { expiresIn: '7d' });
 
-        // Also create a free access subscription for the new user
-        try {
-            const subs = JSON.parse(await fs.readFile(SUBSCRIPTIONS_FILE, 'utf8')) || {};
-            const newSub = {
-                tier: 'free',
-                status: 'active',
-                createdAt: new Date().toISOString()
-            };
-            subs[user.email] = newSub;
-            await fs.writeFile(SUBSCRIPTIONS_FILE, JSON.stringify(subs, null, 2));
-        } catch (e) {
-            console.error('Failed to seed free subscription for new user', e);
-        }
-
-        res.json({
-            token,
-            user: { id: user.id, email: user.email, role }
-        });
+        res.json({ token, user: { id: users[email].id, email, role } });
     } catch (error) {
         console.error('Signup error:', error);
         res.status(500).json({ error: 'Signup failed' });
     }
 });
 
-// Login
 app.post('/api/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -230,8 +557,8 @@ app.post('/api/auth/login', async (req, res) => {
             return res.status(400).json({ error: 'Email and password required' });
         }
 
-        const users = await getUsers();
-        const user = users.find(u => u.email === email);
+        const users = await readData(FILES.USERS);
+        const user = users[email];
 
         if (!user) {
             return res.status(401).json({ error: 'Invalid credentials' });
@@ -242,310 +569,370 @@ app.post('/api/auth/login', async (req, res) => {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
-        const role = (email === 'admin@verilysovereign.org') ? 'admin' : (user.role || 'user');
-        const token = jwt.sign({ id: user.id, email: user.email, role }, JWT_SECRET, { expiresIn: '7d' });
+        const role = email === 'admin@seraphonix.studio' ? 'admin' : 'user';
+        const token = jwt.sign({ id: user.id, email, role }, JWT_SECRET, { expiresIn: '7d' });
 
-        // Ensure a free subscription exists for the user on login
-        try {
-            const subs = JSON.parse(await fs.readFile(SUBSCRIPTIONS_FILE, 'utf8')) || {};
-            if (!subs[email]) {
-                subs[email] = { tier: 'free', status: 'active', createdAt: new Date().toISOString() };
-                await fs.writeFile(SUBSCRIPTIONS_FILE, JSON.stringify(subs, null, 2));
-            }
-        } catch (e) {
-            console.error('Failed to seed free subscription on login', e);
-        }
-
-        res.json({
-            token,
-            user: { id: user.id, email: user.email, role }
-        });
+        res.json({ token, user: { id: user.id, email, role } });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ error: 'Login failed' });
     }
 });
 
-// Get current user
-app.get('/api/auth/me', authenticateToken, async (req, res) => {
+app.get('/api/auth/me', authenticateToken, (req, res) => {
     res.json({ user: req.user });
 });
 
-// ============ PRODUCTS ROUTES ============
+// Room Management
+app.post('/api/rooms/create', authenticateToken, async (req, res) => {
+    try {
+        const roomId = uuidv4().slice(0, 8);
+        const rooms = await readData(FILES.ROOMS);
+        
+        rooms[roomId] = {
+            id: roomId,
+            host: req.user.email,
+            createdAt: new Date().toISOString(),
+            status: 'active'
+        };
 
-// Get all products
-app.get('/api/products', async (req, res) => {
-    const products = await getProducts();
-    res.json(products);
+        await writeData(FILES.ROOMS, rooms);
+
+        const API_BASE = `http://76.13.242.128:${PORT}`;
+        res.json({
+            roomId,
+            inviteLink: `${API_BASE}/guest.html?room=${roomId}`,
+            wsUrl: `ws://76.13.242.128:${PORT}`
+        });
+    } catch (error) {
+        console.error('Create room error:', error);
+        res.status(500).json({ error: 'Failed to create room' });
+    }
 });
 
-// Guests invite endpoint (monthly limit 2 invites per inviter)
+app.get('/api/rooms/:roomId', authenticateToken, async (req, res) => {
+    try {
+        const { roomId } = req.params;
+        const roomsData = await readData(FILES.ROOMS);
+        const room = roomsData[roomId];
+
+        if (!room) {
+            return res.status(404).json({ error: 'Room not found' });
+        }
+
+        // Get live room data from in-memory Map
+        const liveRoom = rooms.has(roomId) ? rooms.get(roomId) : null;
+        
+        res.json({
+            ...room,
+            isLive: !!liveRoom,
+            guestCount: liveRoom ? liveRoom.guests.size : 0,
+            isStreaming: liveRoom ? liveRoom.isStreaming : false
+        });
+    } catch (error) {
+        console.error('Get room error:', error);
+        res.status(500).json({ error: 'Failed to get room' });
+    }
+});
+
+// Guest Management
 app.post('/api/guests/invite', authenticateToken, async (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ error: 'guest email required' });
-  try {
-    const guests = await getGuests();
-    const now = new Date();
-    const monthKey = now.toISOString().slice(0, 7);
-    const count = guests.filter(g => g.inviter_email === req.user.email && g.month === monthKey).length;
-    if (count >= 2) {
-      return res.status(429).json({ error: 'Guest invite limit reached for this month' });
+    try {
+        const { roomId, email } = req.body;
+        
+        if (!roomId || !email) {
+            return res.status(400).json({ error: 'Room ID and guest email required' });
+        }
+
+        const guests = await readData(FILES.GUESTS);
+        
+        if (!guests[roomId]) {
+            guests[roomId] = [];
+        }
+
+        // Check guest limit (2 per month for free tier)
+        const now = new Date();
+        const monthKey = now.toISOString().slice(0, 7);
+        const monthlyInvites = guests[roomId].filter(g => 
+            g.inviter === req.user.email && 
+            g.invitedAt.startsWith(monthKey)
+        ).length;
+
+        if (monthlyInvites >= 2) {
+            return res.status(429).json({ error: 'Guest invite limit reached for this month' });
+        }
+
+        const invite = {
+            id: uuidv4(),
+            roomId,
+            inviter: req.user.email,
+            guestEmail: email,
+            invitedAt: new Date().toISOString(),
+            status: 'pending'
+        };
+
+        guests[roomId].push(invite);
+        await writeData(FILES.GUESTS, guests);
+
+        res.json({ success: true, invite });
+    } catch (error) {
+        console.error('Guest invite error:', error);
+        res.status(500).json({ error: 'Failed to invite guest' });
     }
-    const invite = { id: Date.now().toString(), inviter_email: req.user.email, guest_email: email, invitedAt: now.toISOString(), month: monthKey, status: 'pending' };
-    guests.push(invite);
-    await saveGuests(guests);
-    res.json({ invited: true, invite });
-  } catch (e) {
-    console.error('Guest invite error', e);
-    res.status(500).json({ error: 'Failed to invite guest' });
-  }
 });
 
-// ============ SUBSCRIPTION ROUTES ============
+// Streaming Endpoints
+app.post('/api/stream/start', authenticateToken, async (req, res) => {
+    try {
+        const { roomId, destinations, settings } = req.body;
+        
+        const streams = await readData(FILES.STREAMS);
+        streams[roomId] = {
+            roomId,
+            host: req.user.email,
+            destinations,
+            settings,
+            startedAt: new Date().toISOString(),
+            status: 'live'
+        };
 
-// Get user subscription
-app.get('/api/user/subscription', authenticateToken, async (req, res) => {
-    const subscriptions = await getSubscriptions();
-    const sub = subscriptions[req.user.email];
-    
-    if (!sub) {
-        return res.json({ tier: null, status: 'none' });
+        await writeData(FILES.STREAMS, streams);
+
+        res.json({ success: true, stream: streams[roomId] });
+    } catch (error) {
+        console.error('Start stream error:', error);
+        res.status(500).json({ error: 'Failed to start stream' });
+    }
+});
+
+app.post('/api/stream/stop', authenticateToken, async (req, res) => {
+    try {
+        const { roomId } = req.body;
+        
+        const streams = await readData(FILES.STREAMS);
+        if (streams[roomId]) {
+            streams[roomId].status = 'ended';
+            streams[roomId].endedAt = new Date().toISOString();
+            await writeData(FILES.STREAMS, streams);
+        }
+
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Stop stream error:', error);
+        res.status(500).json({ error: 'Failed to stop stream' });
+    }
+});
+
+app.get('/api/stream/:roomId/status', authenticateToken, async (req, res) => {
+    try {
+        const { roomId } = req.params;
+        const streams = await readData(FILES.STREAMS);
+        const stream = streams[roomId];
+
+        if (!stream) {
+            return res.status(404).json({ error: 'Stream not found' });
+        }
+
+        res.json(stream);
+    } catch (error) {
+        console.error('Get stream status error:', error);
+        res.status(500).json({ error: 'Failed to get stream status' });
+    }
+});
+
+// Chat History
+app.get('/api/chat/:roomId', authenticateToken, async (req, res) => {
+    try {
+        const { roomId } = req.params;
+        const chatData = await readData(FILES.CHAT);
+        const messages = chatData[roomId] || [];
+
+        res.json({ messages: messages.slice(-100) }); // Last 100 messages
+    } catch (error) {
+        console.error('Get chat error:', error);
+        res.status(500).json({ error: 'Failed to get chat history' });
+    }
+});
+
+// Settings Management
+app.get('/api/settings', authenticateToken, async (req, res) => {
+    try {
+        const settings = await readData(FILES.SETTINGS);
+        const userSettings = settings[req.user.email] || {};
+        
+        res.json(userSettings);
+    } catch (error) {
+        console.error('Get settings error:', error);
+        res.status(500).json({ error: 'Failed to get settings' });
+    }
+});
+
+app.post('/api/settings', authenticateToken, async (req, res) => {
+    try {
+        const settings = await readData(FILES.SETTINGS);
+        settings[req.user.email] = {
+            ...settings[req.user.email],
+            ...req.body,
+            updatedAt: new Date().toISOString()
+        };
+        
+        await writeData(FILES.SETTINGS, settings);
+        res.json({ success: true, settings: settings[req.user.email] });
+    } catch (error) {
+        console.error('Save settings error:', error);
+        res.status(500).json({ error: 'Failed to save settings' });
+    }
+});
+
+// Subscription Management
+app.get('/api/subscription', authenticateToken, async (req, res) => {
+    try {
+        const subscriptions = await readData(FILES.SUBSCRIPTIONS);
+        const subscription = subscriptions[req.user.email];
+
+        if (!subscription) {
+            return res.json({ tier: 'free', status: 'trial' });
+        }
+
+        res.json(subscription);
+    } catch (error) {
+        console.error('Get subscription error:', error);
+        res.status(500).json({ error: 'Failed to get subscription' });
+    }
+});
+
+app.get('/api/plans', (req, res) => {
+    const plans = [
+        {
+            id: 'free',
+            name: 'Free Trial',
+            price: 0,
+            features: ['16 hours streaming', '2 guests/month', '720p quality', 'Basic overlays'],
+            limits: { hours: 16, guests: 2, quality: '720p' }
+        },
+        {
+            id: 'ascendant',
+            name: 'Ascendant',
+            price: 9.99,
+            features: ['70 hours streaming', '4 guests', '1080p quality', 'Custom overlays', 'Priority support'],
+            limits: { hours: 70, guests: 4, quality: '1080p' }
+        },
+        {
+            id: 'covenant',
+            name: 'Covenant',
+            price: 29,
+            features: ['Unlimited streaming', '8 guests', '1080p60 quality', 'Multi-platform', 'Analytics', 'Priority support'],
+            limits: { hours: Infinity, guests: 8, quality: '1080p60' }
+        },
+        {
+            id: 'infinite',
+            name: 'Infinite',
+            price: 70,
+            features: ['Unlimited everything', 'Unlimited guests', '4K quality', 'API access', 'White-label', 'Dedicated support'],
+            limits: { hours: Infinity, guests: Infinity, quality: '4K' }
+        }
+    ];
+
+    res.json(plans);
+});
+
+// Recording Management
+app.get('/api/recordings', authenticateToken, async (req, res) => {
+    try {
+        const recordingsDir = path.join(STREAMS_DIR, req.user.email);
+        
+        if (!fs.existsSync(recordingsDir)) {
+            return res.json({ recordings: [] });
+        }
+
+        const files = await fs.readdir(recordingsDir);
+        const recordings = files
+            .filter(f => f.endsWith('.webm'))
+            .map(f => ({
+                filename: f,
+                createdAt: fs.statSync(path.join(recordingsDir, f)).mtime,
+                url: `/streams/${req.user.email}/${f}`
+            }))
+            .sort((a, b) => b.createdAt - a.createdAt);
+
+        res.json({ recordings });
+    } catch (error) {
+        console.error('Get recordings error:', error);
+        res.status(500).json({ error: 'Failed to get recordings' });
+    }
+});
+
+// Admin Routes
+app.get('/api/admin/stats', authenticateToken, async (req, res) => {
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Admin access required' });
     }
 
-    res.json({
-        tier: sub.tier,
-        status: sub.status,
-        expiresAt: sub.expiresAt
+    try {
+        const users = await readData(FILES.USERS);
+        const subscriptions = await readData(FILES.SUBSCRIPTIONS);
+        const rooms = await readData(FILES.ROOMS);
+        const streams = await readData(FILES.STREAMS);
+
+        res.json({
+            users: Object.keys(users).length,
+            activeSubscriptions: Object.values(subscriptions).filter(s => s.status === 'active').length,
+            totalRooms: Object.keys(roomsData).length,
+            activeStreams: Object.values(streams).filter(s => s.status === 'live').length,
+            liveConnections: wss.clients.size,
+            activeLiveRooms: rooms.size,
+            uptime: process.uptime()
+        });
+    } catch (error) {
+        console.error('Admin stats error:', error);
+        res.status(500).json({ error: 'Failed to get stats' });
+    }
+});
+
+// Explicit routes for HTML files
+app.get('/dashboard.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/dashboard.html'));
+});
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
+
+// Serve frontend for all other routes
+app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api') && !req.path.startsWith('/streams')) {
+        res.sendFile(path.join(__dirname, '../frontend/index.html'));
+    }
+});
+
+// ============================================
+// START SERVER
+// ============================================
+
+server.listen(PORT, '0.0.0.0', () => {
+    console.log('╔════════════════════════════════════════════════════════╗');
+    console.log('║          🎬 SERAPHONIX STUDIO SERVER                   ║');
+    console.log('║     Hybrid Streaming Platform - StreamYards + OBS      ║');
+    console.log('╠════════════════════════════════════════════════════════╣');
+    console.log(`║  HTTP API:     http://76.13.242.128:${PORT}             ║`);
+    console.log(`║  WebSocket:    ws://76.13.242.128:${PORT}               ║`);
+    console.log(`║  Environment:  ${process.env.NODE_ENV || 'development'}                    ║`);
+    console.log('╚════════════════════════════════════════════════════════╝');
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
     });
 });
 
-// Get user usage (streaming hours)
-app.get('/api/user/usage', authenticateToken, async (req, res) => {
-    const subscriptions = await getSubscriptions();
-    const sub = subscriptions[req.user.email];
-    
-    const tier = sub?.tier || 'free';
-    const limit = TIER_LIMITS[tier] || 16;
-    
-    // In production, this would track actual usage from the streaming service
-    // For now, return placeholder data
-    res.json({ hoursUsed: 0, hoursLimit: limit, tier: tier });
-});
-
-// ============ STRIPE ROUTES ============
-
-// Create checkout session
-app.post('/api/stripe/create-checkout-session', authenticateToken, async (req, res) => {
-    const { tier } = req.body;
-    const email = req.user.email;
-
-    // Price IDs - read from environment (Stripe) with safe fallbacks
-    const PRICES = {
-        'ascendant': process.env.STRIPE_PRICE_ASCENDANT || 'price_ascendant_monthly',    // $9.99/month
-        'covenant': process.env.STRIPE_PRICE_COVENANT || 'price_covenant_monthly',     // $29/month
-        'infinite': process.env.STRIPE_PRICE_INFINITE || 'price_infinite_monthly',    // $70/month
-        'sovereign': process.env.STRIPE_PRICE_SOVEREIGN || 'price_sovereign_monthly'   // $99/month (legacy)
-    };
-
-    // Hours limits per tier
-    const TIER_LIMITS = {
-        'free': 16,
-        'ascendant': 70,
-        'covenant': 999,
-        'infinite': 999,
-        'sovereign': 999
-    };
-
-    const priceId = PRICES[tier];
-
-    if (!priceId) {
-        return res.status(400).json({ error: 'Invalid tier' });
-    }
-
-    // If Stripe is not configured, simulate success for testing
-    if (!STRIPE_SECRET) {
-        // Save subscription
-        const subscriptions = await getSubscriptions();
-        subscriptions[email] = {
-            tier,
-            status: 'active',
-            createdAt: new Date().toISOString(),
-            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-        };
-        await saveSubscriptions(subscriptions);
-
-        return res.json({ 
-            url: '/?subscription=success' 
-        });
-    }
-
-    try {
-        const stripe = require('stripe')(STRIPE_SECRET);
-
-        const session = await stripe.checkout.sessions.create({
-            mode: 'subscription',
-            payment_method_types: ['card'],
-            line_items: [{
-                price: priceId,
-                quantity: 1
-            }],
-            customer_email: email,
-            success_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/?subscription=success`,
-            cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/membership.html?canceled=true`
-        });
-
-        res.json({ url: session.url });
-    } catch (error) {
-        console.error('Stripe error:', error);
-        res.status(500).json({ error: 'Failed to create checkout session' });
-    }
-});
-
-// Stripe webhook
-app.post('/api/stripe/webhook', async (req, res) => {
-    if (!STRIPE_SECRET) {
-        return res.json({ received: true });
-    }
-
-    const stripe = require('stripe')(STRIPE_SECRET);
-    const sig = req.headers['stripe-signature'];
-    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-    let event;
-
-    try {
-        if (endpointSecret && sig) {
-            event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-        } else {
-            event = req.body;
-        }
-    } catch (err) {
-        console.error('Webhook signature verification failed:', err.message);
-        return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
-
-    // Handle the event
-    if (event.type === 'checkout.session.completed') {
-        const session = event.data.object;
-        const email = session.customer_email;
-
-        if (email) {
-            const subscriptions = await getSubscriptions();
-            subscriptions[email] = {
-                tier: 'covenant', // Determine based on session data
-                status: 'active',
-                stripeCustomerId: session.customer,
-                stripeSubscriptionId: session.subscription,
-                createdAt: new Date().toISOString()
-            };
-            await saveSubscriptions(subscriptions);
-        }
-    }
-
-    res.json({ received: true });
-});
-
-// Stripe public key (for frontend)
-app.get('/api/stripe/public-key', (req, res) => {
-  res.json({ publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || '' });
-});
-
-// Plans endpoint (front-end can fetch plan catalog)
-app.get('/api/plans', (req, res) => {
-  const plans = [
-    { id: 'free', name: 'Free Trial', price: 0, cadence: 'monthly', features: ['16 hours', '2 guests/month', 'Basic access'] },
-    { id: 'ascendant', name: 'Ascendant', price: 9.99, cadence: 'month', features: ['70 hours', 'Priority support'] },
-    { id: 'covenant', name: 'Covenant', price: 29, cadence: 'month', features: ['Unlimited hours', 'Premium support'] },
-    { id: 'infinite', name: 'Infinite', price: 70, cadence: 'month', features: ['Unlimited hours', 'Enterprise support'] }
-  ];
-  res.json(plans);
-});
-
-// ============ ADMIN ROUTES ============
-// Admin metrics endpoint (Stage 2)
-app.get('/api/admin/metrics', authenticateToken, async (req, res) => {
-  // Only allow 'admin' role
-  const user = req.user || {};
-  if (user.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin access required' });
-  }
-  try {
-    const users = JSON.parse(await fs.readFile(USERS_FILE, 'utf8')).length;
-    const subs = JSON.parse(await fs.readFile(SUBSCRIPTIONS_FILE, 'utf8'));
-    const subCount = Object.keys(subs).length;
-    const health = 'ok';
-    res.json({ userCount: users, subscriptionCount: subCount, status: health, server: { uptime: process.uptime() } });
-  } catch (e) {
-    res.status(500).json({ error: 'Failed to fetch metrics' });
-  }
-});
-
-// Admin login path mounted from admin_login_google.js
-try {
-  const adminLoginGoogle = require('./admin_login_google')
-  app.use('/api/admin/login', adminLoginGoogle())
-} catch (e) {
-  // optional: ignore if not available in this environment
-  console.warn('Admin Google login module could not be loaded:', e)
-}
-// Admin login via Gmail (Id Token) for Stage 2
-app.post('/api/admin/login/google', async (req, res) => {
-  const { credential } = req.body;
-  if (!credential) return res.status(400).json({ error: 'credential required' });
-  try {
-    const fetch = require('node-fetch');
-    const resp = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + credential);
-    const data = await resp.json();
-    const allowed = ['Snark2470@gmail.com'];
-    if (data.email && allowed.includes(data.email) && data.email_verified === 'true') {
-      const token = jwt.sign({ id: 'admin', email: data.email, role: 'admin' }, JWT_SECRET, { expiresIn: '7d' });
-      return res.json({ token, user: { email: data.email, role: 'admin' } });
-    }
-    return res.status(403).json({ error: 'Not authorized' });
-  } catch (e) {
-    console.error('Admin Google login error', e);
-    res.status(500).json({ error: 'Admin login failed' });
-  }
-});
-
-// ============ LORE ROUTES ============
-
-// Get lore content
-app.get('/api/lore', async (req, res) => {
-    const lore = [
-        {
-            id: 'genesis',
-            title: 'Genesis Protocol',
-            classification: 'ABYSSAL',
-            content: 'In the trenches beneath the veil, the first sigils awakened...'
-        },
-        {
-            id: 'sovereign',
-            title: 'The Sovereign Mind',
-            classification: 'SOVEREIGN',
-            content: 'Seraphonix is not born—it is forged...'
-        }
-    ];
-    res.json(lore);
-});
-
-// ============ HEALTH CHECK ============
-
-app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-// ============ PAGE ROUTES ============
-
-// Serve the main app for all non-API routes
-app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api')) {
-        res.sendFile(path.join(__dirname, '../verilysovereign/index.html'));
-    }
-});
-
-// Start server
-app.listen(PORT, () => {
-    console.log(`SERAPHONIX Server running on port ${PORT}`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+process.on('SIGINT', () => {
+    console.log('SIGINT received, shutting down gracefully');
+    server.close(() => {
+        console.log('Server closed');
+        process.exit(0);
+    });
 });
